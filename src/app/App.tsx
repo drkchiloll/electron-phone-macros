@@ -29,15 +29,15 @@ export class App extends React.Component<any, any> {
 		return (
 			<div>
 				<ul className='nav nav-tabs col-sm-7' style={{margin:'0 300px 0 10px'}}>
-					<li id='home' role="presentation" name='home'
+					<li id='home' role="presentation"
 						onClick={this._activeTab}>
-						<a name='home' href="#">
+						<a href="#">
 							Home
 						</a>
 					</li>
-					<li id='component' role="presentation" name='component'
+					<li id='component' role="presentation"
 						onClick={this._activeTab}>
-						<a name='component' href="#">
+						<a href="#">
 							Component
 						</a>
 					</li>

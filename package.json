@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-ts-starter",
-  "version": "0.0.1",
-  "description": "A Starter Project for Electron/React/Typescript 2.x",
+  "name": "electron-cucm-itldelete",
+  "version": "1.0.0",
+  "description": "A Standalone Application for the removal of ITL Certs on Cisco IP Phones",
   "main": "./dist/main.bundle.js",
   "scripts": {
     "build:dev": "node_modules/.bin/webpack --watch --progress --profile",

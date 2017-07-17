@@ -72,5 +72,7 @@ let prod = {
 	]
 };
 
-if(NODE_ENV === 'production') module.exports = merge(dev, prod);
-else module.exports = dev;
+if(NODE_ENV === 'production') {
+	delete dev.devtool;
+	module.exports = merge(dev, prod);
+} else module.exports = dev;

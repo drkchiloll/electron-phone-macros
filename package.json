@@ -7,13 +7,15 @@
     "build:dev": "node_modules/.bin/webpack --watch --progress --profile",
     "build:dist": "NODE_ENV=production node_modules/.bin/webpack --progress --colors",
     "start": "electron .",
+    "clean": "rm dist/app.bundle.js && rm dist/app.bundle.js.map",
     "package": "node_modules/.bin/electron-packager ./ AppName --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/electron* --app-version=0.0.1 --icon ./resources/iconForApp.icns"
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/bluebird": "^3.5.8",
     "@types/jquery": "^2.0.41",
     "@types/material-ui": "^0.17.4",
-    "@types/nedb": "^1.8.2",
+    "@types/nedb": "^1.8.3",
     "@types/node": "^7.0.13",
     "@types/react": "^15.0.14",
     "@types/react-dom": "^0.14.23",

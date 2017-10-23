@@ -1,0 +1,814 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soapenv:Body>
+      <ns1:SelectCmDeviceResponse soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://schemas.cisco.com/ast/soap/">
+         <SelectCmDeviceResult xsi:type="ns1:SelectCmDeviceResult">
+            <TotalDevicesFound xsi:type="xsd:unsignedInt">25</TotalDevicesFound>
+            <CmNodes soapenc:arrayType="ns1:CmNode[4]" xsi:type="soapenc:Array" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+               <item xsi:type="ns1:CmNode">
+                  <ReturnCode xsi:type="ns1:RisReturnCode">Ok</ReturnCode>
+                  <Name xsi:type="xsd:string">10.220.16.20</Name>
+                  <NoChange xsi:type="xsd:boolean">false</NoChange>
+                  <CmDevices soapenc:arrayType="ns1:CmDevice[1]" xsi:type="soapenc:Array">
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP081735D45B81</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.59</IpAddress>
+                        <DirNumber xsi:type="xsd:string">5555553580-Registered,9077708381-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Jim Steele - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441830928</TimeStamp>
+                     </item>
+                  </CmDevices>
+               </item>
+               <item xsi:type="ns1:CmNode">
+                  <ReturnCode xsi:type="ns1:RisReturnCode">NotFound</ReturnCode>
+                  <Name xsi:type="xsd:string">10.27.0.20</Name>
+                  <NoChange xsi:type="xsd:boolean">false</NoChange>
+                  <CmDevices soapenc:arrayType="ns1:CmDevice[0]" xsi:type="soapenc:Array"/>
+               </item>
+               <item xsi:type="ns1:CmNode">
+                  <ReturnCode xsi:type="ns1:RisReturnCode">Ok</ReturnCode>
+                  <Name xsi:type="xsd:string">10.27.0.21</Name>
+                  <NoChange xsi:type="xsd:boolean">false</NoChange>
+                  <CmDevices soapenc:arrayType="ns1:CmDevice[4]" xsi:type="soapenc:Array">
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEPDCEB94BD0CD2</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.130</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708311-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">36217</Model>
+                        <Product xsi:type="xsd:unsignedInt">36670</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">heimj</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Jeff Heim - MRA</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442429144</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEPDCEB94BD0F54</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.214</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708315-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">36217</Model>
+                        <Product xsi:type="xsd:unsignedInt">36670</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">hamlettj</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Jason Hamlett - MRA</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442429144</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0015621AC69C</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.230</IpAddress>
+                        <DirNumber xsi:type="xsd:string">5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">phillipsc</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Craig Phillips - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767949</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEPE4C72266E560</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.254</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708361-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">584</Model>
+                        <Product xsi:type="xsd:unsignedInt">471</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">USA-AK-ANC-EX90</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1440262490</TimeStamp>
+                     </item>
+                  </CmDevices>
+               </item>
+               <item xsi:type="ns1:CmNode">
+                  <ReturnCode xsi:type="ns1:RisReturnCode">Ok</ReturnCode>
+                  <Name xsi:type="xsd:string">10.27.0.22</Name>
+                  <NoChange xsi:type="xsd:boolean">false</NoChange>
+                  <CmDevices soapenc:arrayType="ns1:CmDevice[20]" xsi:type="soapenc:Array">
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0004F2F595CB</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.128</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708326-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">431</Model>
+                        <Product xsi:type="xsd:unsignedInt">330</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Anchorage Conf Room 1 - Change when named</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442358800</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP001D45958C7B</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.147</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708338-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">115</Model>
+                        <Product xsi:type="xsd:unsignedInt">115</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">spangleg</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Gina Spangler - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767594</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP54781AE0989E</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.159</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708331-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">gentnere</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Elain Gentner - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442258822</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0022905C5720</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.213</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708339-Registered,9077708300-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">404</Model>
+                        <Product xsi:type="xsd:unsignedInt">303</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">busseyd</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Darin Bussey - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767669</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP00169DD213C7</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.22</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708323-Registered,5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">schroedl</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Lloyd Schroeder - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441763505</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEPA8B1D41F0BA8</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.228</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708345-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Matthew Kutchins - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442023992</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0022905C6481</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.229</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708380-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">404</Model>
+                        <Product xsi:type="xsd:unsignedInt">303</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">kronb</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Blake Kron - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442024080</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0015621AC766</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.23</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708310-Registered,5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">KempC</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Corey Kemp - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767267</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP00E16D1491B4</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.235</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708336-Registered,9077708300-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">MaysD</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Donnie Mays - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442258829</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP00131A1E4C46</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.247</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708314-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Ron DeWitt - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442091852</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP54781A1D8654</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.250</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077707309-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Anchorage Door Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442023992</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP001D457DEECB</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.251</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708300-Registered,9077708307-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">115</Model>
+                        <Product xsi:type="xsd:unsignedInt">115</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">sindelg</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Kurtis Devon - Desk Phone (B)</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767063</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP00131A4D4827</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.26</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708343-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string" xsi:nil="true"/>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Rory Devon</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767625</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP000D299D30C0</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.30</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708388-Registered,5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">LindH</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Holly Lind - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767220</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP001469E265D6</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.43</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708333-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">RademakW</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Willie Rademaker - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441767288</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP000E3892E5FF</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.45</IpAddress>
+                        <DirNumber xsi:type="xsd:string">5555553580-Registered,9077708319-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">8</Model>
+                        <Product xsi:type="xsd:unsignedInt">36</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">RosynekD</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Derek Rosynek - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441768029</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP0022905C63E9</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.50</IpAddress>
+                        <DirNumber xsi:type="xsd:string">5555553580-Registered,9077708386-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">404</Model>
+                        <Product xsi:type="xsd:unsignedInt">303</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">meltond</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Derrick Melton - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441759358</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEPA8B1D41F356E</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.51</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708387-Registered,5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">AustermJ</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Joe Austerman - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442272867</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP000830311950</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.53</IpAddress>
+                        <DirNumber xsi:type="xsd:string">5555553580-Registered,9077708337-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">canom</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Michael Cano - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1442024070</TimeStamp>
+                     </item>
+                     <item xsi:type="ns1:CmDevice">
+                        <Name xsi:type="xsd:string">SEP00083031282C</Name>
+                        <IpAddress xsi:type="xsd:string">10.160.35.61</IpAddress>
+                        <DirNumber xsi:type="xsd:string">9077708382-Registered,5555553580-Registered</DirNumber>
+                        <Class xsi:type="ns1:DeviceClass">Phone</Class>
+                        <Model xsi:type="xsd:unsignedInt">434</Model>
+                        <Product xsi:type="xsd:unsignedInt">333</Product>
+                        <BoxProduct xsi:type="xsd:unsignedInt">0</BoxProduct>
+                        <Httpd xsi:type="ns1:CmDevHttpd">Yes</Httpd>
+                        <RegistrationAttempts xsi:type="xsd:unsignedInt">0</RegistrationAttempts>
+                        <IsCtiControllable xsi:type="xsd:boolean">true</IsCtiControllable>
+                        <LoginUserId xsi:type="xsd:string">kincadej</LoginUserId>
+                        <Status xsi:type="ns1:CmDevRegStat">Registered</Status>
+                        <StatusReason xsi:type="xsd:unsignedInt">0</StatusReason>
+                        <PerfMonObject xsi:type="xsd:unsignedInt">2</PerfMonObject>
+                        <DChannel xsi:type="xsd:unsignedInt">0</DChannel>
+                        <Description xsi:type="xsd:string">Jesse Kincade - Desk Phone</Description>
+                        <H323Trunk xsi:type="ns1:H323Trunk">
+                           <ConfigName xsi:type="xsd:string" xsi:nil="true"/>
+                           <TechPrefix xsi:type="xsd:string" xsi:nil="true"/>
+                           <Zone xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer1 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer2 xsi:type="xsd:string" xsi:nil="true"/>
+                           <RemoteCmServer3 xsi:type="xsd:string" xsi:nil="true"/>
+                           <AltGkList xsi:type="xsd:string" xsi:nil="true"/>
+                           <ActiveGk xsi:type="xsd:string" xsi:nil="true"/>
+                           <CallSignalAddr xsi:type="xsd:string" xsi:nil="true"/>
+                           <RasAddr xsi:type="xsd:string" xsi:nil="true"/>
+                        </H323Trunk>
+                        <TimeStamp xsi:type="xsd:unsignedInt">1441816074</TimeStamp>
+                     </item>
+                  </CmDevices>
+               </item>
+            </CmNodes>
+         </SelectCmDeviceResult>
+         <StateInfo xsi:type="xsd:string"><![CDATA[<StateInfo><Node Name="10.220.16.20" SubsystemStartTime="1440259396" StateId="15166" TotalItemsFound="1" TotalItemsReturned="1"/><Node Name="10.27.0.20" SubsystemStartTime="1440257077" StateId="41" TotalItemsFound="0" TotalItemsReturned="0"/><Node Name="10.27.0.21" SubsystemStartTime="1440258018" StateId="176632" TotalItemsFound="4" TotalItemsReturned="4"/><Node Name="10.27.0.22" SubsystemStartTime="1440258029" StateId="11665" TotalItemsFound="20" TotalItemsReturned="20"/></StateInfo>]]></StateInfo>
+      </ns1:SelectCmDeviceResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

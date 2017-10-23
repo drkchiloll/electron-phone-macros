@@ -1,6 +1,6 @@
 import {
   React, $, Tabs, Tab, FontIcon, Dialog, FlatButton,
-  Accounts, WorkingComponent
+  Accounts, WorkingComponent, Api, Cucm, phModelQuery
 } from './index';
 
 export class App extends React.Component<any, any> {
@@ -10,10 +10,43 @@ export class App extends React.Component<any, any> {
       tabValue: 'mainView',
       openAcct: false,
       tabIndx: 1,
-      db: null
+      db: null,
+      api: null,
+      modelNum: null
     };
     this._handleClose = this._handleClose.bind(this);
     this._tabSelect = this._tabSelect.bind(this);
+  }
+  componentWillMount() {
+    let api = new Api({ db: 'acctDb', dbName: 'accounts' }),
+        modelDb = new Api({ db: 'modelDb', dbName: 'models' }),
+        account:any;
+    this.setState({ api });
+    return modelDb.get().then((recs:any) => {
+      if(recs.length === 0) {
+        return api.get().then((recs: any) => {
+          if(recs.length > 0) {
+            account = recs.filter((r: any) => r.selected)[0];
+          }
+          return account;
+        });
+      } else {
+        this.setState({ modelNum: recs });
+        return;
+      }
+    }).then((acct) => {
+      if(acct && acct.host) {
+        let cucm = new Cucm(acct);
+        return cucm.query(phModelQuery, true);
+      }
+    }).then((results:any) => {
+      // console.log(results);
+      if(results && results.length > 0) {
+        modelDb.add(results).then((resp: any) => {
+          console.log(resp);
+        });
+      }
+    });
   }
   _handleClose() {
     this.setState({
@@ -33,8 +66,8 @@ export class App extends React.Component<any, any> {
   }
   render() {
     return (
-      <div>
-        <div>
+      <div style={{marginLeft: 15}}>
+        <div style={{width: 180}}>
           <Tabs className='tabs-container'
             inkBarStyle={{ background: '#d7dddd' }}
             tabItemContainerStyle={{ width: 180 }}
@@ -48,13 +81,16 @@ export class App extends React.Component<any, any> {
               }
               label='Accounts'
               value='accts'>
-              <Accounts openDia={this.state.openAcct} acctClose={this._handleClose} />
+              <Accounts api={this.state.api}
+                openDia={this.state.openAcct}
+                acctClose={this._handleClose} />
             </Tab>
           </Tabs>
-          <hr color='black'/>
+          <hr color='black' style={{ width: 180 }} />
         </div>
-        <div style={{ width: 300 }}>
-          <WorkingComponent />
+        <div>
+          <WorkingComponent api={this.state.api} 
+            modelNum={this.state.modelNum} />
         </div>
       </div>
     );

@@ -10,6 +10,7 @@ export class Api {
   acctDb: Datastore;
   queryDb: Datastore;
   editorDb: Datastore;
+  modelDb: Datastore;
   recordId: string;
 
   constructor({db, dbName}:any) {
@@ -27,6 +28,8 @@ export class Api {
       case 'acctDb':
         this.acctDb = new Datastore({ filename, autoload: true });
         break;
+      case 'modelDb':
+        this.modelDb = new Datastore({ filename, autoload: true });
       default:
         return null;
     }
@@ -37,6 +40,7 @@ export class Api {
     if(this.acctDb) return this.acctDb;
     if(this.queryDb) return this.queryDb;
     if(this.editorDb) return this.editorDb;
+    if(this.modelDb) return this.modelDb;
   }
 
   get(query={}) {

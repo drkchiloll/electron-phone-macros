@@ -5,7 +5,7 @@ import {
   FontIcon, Paper, Divider, TextField,
   Subheader, List, ListItem, makeSelectable,
   SelectField, Snackbar, SelectableList,
-  Api, CucmSql, moment
+  Api, Cucm, moment
 } from './index'
 
 export class Accounts extends React.Component<any,any> {
@@ -27,13 +27,10 @@ export class Accounts extends React.Component<any,any> {
   }
   componentWillMount() {
     let accounts;
-    let api = new Api({
-      db: 'acctDb',
-      dbName: 'accounts'
-    });
+    let api = this.props.api;
     api.get().then((records: any) => {
       // console.log(records);
-      if (records.length === 0) {
+      if(records.length === 0) {
         accounts = [{
           name: 'New Account', host: '', version: '8.5',
           username: '', password: '', selected: true
@@ -41,7 +38,7 @@ export class Accounts extends React.Component<any,any> {
         return accounts;
       } else {
         return Promise.map(records, (record: any) => {
-          if (new Date().getTime() - new Date(record.lastTested).getTime() > 86400000) {
+          if(new Date().getTime() - new Date(record.lastTested).getTime() > 86400000) {
             record['status'] = 'red';
             return api.update(record).then(() => {
               return record;
@@ -52,7 +49,7 @@ export class Accounts extends React.Component<any,any> {
       }
     }).then((records) => {
       accounts = records;
-      console.log(accounts);
+      // console.log(accounts);
       let selectedAcct = accounts.findIndex(acct => acct.selected),
         account = accounts[selectedAcct];
       this.setState({ api, accounts, selectedAcct, account });
@@ -81,7 +78,7 @@ export class Accounts extends React.Component<any,any> {
     let accounts = this.state.accounts,
       account = this.state.accounts[this.state.selectedAcct],
       acctMsg: string;
-    if (account._id) {
+    if(account._id) {
       // Update
       this.state.api.update(account).then(() => {
         acctMsg = `${account.name} updated successfully`;
@@ -101,7 +98,7 @@ export class Accounts extends React.Component<any,any> {
     let { accounts, selectedAcct } = this.state,
       account = accounts[selectedAcct],
       { host, version, username, password } = account;
-    let cucm = new CucmSql({ host, version, username, password }),
+    let cucm = new Cucm({ host, version, username, password }),
       statement = cucm.testAxlQuery;
     cucm.query(statement, true).then((resp) => {
       console.log(resp);

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<soapenv:Body>
+		<ns1:SelectCmDevice xmlns:ns1="http://schemas.cisco.com/ast/soap/" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+			<StateInfo xsi:type="xsd:string"/>
+			<CmSelectionCriteria href="#id0"/>
+		</ns1:SelectCmDevice>
+		<multiRef xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns2="http://schemas.cisco.com/ast/soap/" id="id0" soapenc:root="0" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="ns2:CmSelectionCriteria">
+			<MaxReturnedDevices xsi:type="xsd:unsignedInt">1000</MaxReturnedDevices>
+			<Class xsi:type="xsd:string">Phone</Class>
+			<Status xsi:type="xsd:string">Registered</Status>
+			<NodeName xsi:type="xsd:string" xsi:nil="true"/>
+			<SelectBy xsi:type="xsd:string">IpAddress</SelectBy>
+			<SelectItems soapenc:arrayType="ns2:SelectItem[1]" xsi:type="soapenc:Array">
+				<item><Item>*</Item></item>
+			</SelectItems>
+		</multiRef>
+	</soapenv:Body>
+</soapenv:Envelope>

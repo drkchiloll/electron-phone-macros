@@ -1,0 +1,13 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.cisco.com/AXL/API/11.0">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:getPhone sequence="?">
+         <!--You have a CHOICE of the next 2 items at this level-->
+         <name></name>
+         <!--Optional:-->
+         <returnedTags>
+            <loadInformation></loadInformation>
+         </returnedTags>
+      </ns:getPhone>
+   </soapenv:Body>
+</soapenv:Envelope>

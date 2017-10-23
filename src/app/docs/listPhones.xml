@@ -1,0 +1,17 @@
+<soapenv:Envelope
+   xmlns:ns="http://www.cisco.com/AXL/API/9.1"
+   xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Body>
+    <ns:listPhone>
+      <skip>0</skip>
+      <first>2000</first>
+      <searchCriteria>
+        <devicePoolName></devicePoolName>
+      </searchCriteria>
+      <returnedTags>
+        <name/>
+        <model/>
+      </returnedTags>
+    </ns:listPhone>
+  </soapenv:Body>
+</soapenv:Envelope>

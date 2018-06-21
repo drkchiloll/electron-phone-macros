@@ -5,40 +5,36 @@ import {
   FontIcon, Paper, Divider, TextField,
   Subheader, List, ListItem, makeSelectable,
   SelectField, Snackbar, SelectableList,
-  Api, Cucm, moment
+  Api, Cucm, moment, Component
 } from './index'
 
-export class Accounts extends React.Component<any,any> {
+export class Accounts extends Component<any,any> {
   constructor() {
     super();
     this.state = {
       api: null,
-      accounts: null,
+      accounts: [{
+        name: 'New Account', host: '', version: '8.5',
+        username: '', password: '', selected: true
+      }],
       openAccounts: false,
       selectedAcct: 0,
       account: null,
       openSnack: false,
       acctMsg: ''
     };
-    this.handleAccountsToggle = this.handleAccountsToggle.bind(this);
-    this.changeAcctValues = this.changeAcctValues.bind(this);
-    this.save = this.save.bind(this);
-    this.testAccount = this.testAccount.bind(this);
   }
   componentWillMount() {
     let accounts;
     let api = this.props.api;
     api.get().then((records: any) => {
-      // console.log(records);
-      if(records.length === 0) {
-        accounts = [{
-          name: 'New Account', host: '', version: '8.5',
-          username: '', password: '', selected: true
-        }];
-        return accounts;
-      } else {
+      this.setState({ accounts: records });
+      if(records.length !== 0) {
         return Promise.map(records, (record: any) => {
-          if(new Date().getTime() - new Date(record.lastTested).getTime() > 86400000) {
+          const { lastTested } = record;
+          const testDiff =
+            new Date().getTime() - new Date(lastTested).getTime();
+          if(testDiff > 86400000) {
             record['status'] = 'red';
             return api.update(record).then(() => {
               return record;
@@ -59,22 +55,24 @@ export class Accounts extends React.Component<any,any> {
   componentWillUnmount() {
     console.log('this component dismounted');
   }
-  handleAccountsToggle() {
+  handleAccountsToggle = () => {
     this.setState({ openAccounts: !this.state.openAccounts });
   }
-  changeAcctValues(e:any, val:any) {
+  changeAcctValues = (e:any, val:any) => {
     let { name } = e.target,
       accounts = this.state.accounts,
       selectedAcct = this.state.selectedAcct;
     accounts[selectedAcct][name] = val;
     this.setState({ accounts });
   }
-  setAccounts() {
-    return [
-      { name: 'New', host: '', version: '8.5', username: '', password: '' }
-    ];
-  }
-  save() {
+  setAccounts = () => [{
+    name: 'New',
+    host: '',
+    version: '8.5',
+    username: '',
+    password: ''
+  }]
+  save = () => {
     let accounts = this.state.accounts,
       account = this.state.accounts[this.state.selectedAcct],
       acctMsg: string;
@@ -94,7 +92,7 @@ export class Accounts extends React.Component<any,any> {
       });
     }
   }
-  testAccount() {
+  testAccount = () => {
     let { accounts, selectedAcct } = this.state,
       account = accounts[selectedAcct],
       { host, version, username, password } = account;
@@ -131,26 +129,26 @@ export class Accounts extends React.Component<any,any> {
         icon={<FontIcon className='fa fa-hdd-o' />}
         primary={true}
         keyboardFocused={true}
-        onTouchTap={this.save}
+        onClick={this.save}
       />,
       <FlatButton
         label='Test'
         icon={<FontIcon color={testColor} className='fa fa-plug' />}
         primary={true}
-        onTouchTap={this.testAccount}
+        onClick={this.testAccount}
       />,
       <FlatButton
         label='Close'
         icon={<FontIcon className='fa fa-window-close-o' />}
         primary={true}
-        onTouchTap={() => {
+        onClick={() => {
           this.props.acctClose();
         }}
       />
     ];
     let accounts = this.state.accounts;
     if (!accounts || accounts.length === 0) {
-      this.state.accounts = this.setAccounts();
+      accounts = this.setAccounts();
     }
     return (
       <div>
@@ -201,7 +199,7 @@ export class Accounts extends React.Component<any,any> {
                     <BottomNavigationItem
                       label="Account"
                       icon={<FontIcon className='fa fa-user-plus' />}
-                      onTouchTap={() => {
+                      onClick={() => {
                         console.log('add account');
                         let accounts = this.state.accounts;
                         accounts.push({
@@ -218,7 +216,7 @@ export class Accounts extends React.Component<any,any> {
                     <BottomNavigationItem
                       label="Remove"
                       icon={<FontIcon color='red' className='fa fa-trash' />}
-                      onTouchTap={() => {
+                      onClick={() => {
                         console.log('remove touched');
                         let accounts = this.state.accounts,
                           acctIdx = this.state.selectedAcct,

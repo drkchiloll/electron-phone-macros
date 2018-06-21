@@ -1,9 +1,10 @@
 import {
   React, $, Tabs, Tab, FontIcon, Dialog, FlatButton,
-  Accounts, WorkingComponent, Api, Cucm, phModelQuery
+  Accounts, MainView, Api, Cucm, phModelQuery,
+  Component
 } from './index';
 
-export class App extends React.Component<any, any> {
+export class App extends Component<any, any> {
   constructor() {
     super();
     this.state = {
@@ -14,8 +15,6 @@ export class App extends React.Component<any, any> {
       api: null,
       modelNum: null
     };
-    this._handleClose = this._handleClose.bind(this);
-    this._tabSelect = this._tabSelect.bind(this);
   }
   componentWillMount() {
     let api = new Api({ db: 'acctDb', dbName: 'accounts' }),
@@ -48,14 +47,14 @@ export class App extends React.Component<any, any> {
       }
     });
   }
-  _handleClose() {
+  _handleClose = () => {
     this.setState({
       openAcct: false,
       tabIdx: 1,
       tabValue: 'mainView'
     });
   }
-  _tabSelect(tabValue: string) {
+  _tabSelect = tabValue => {
     let saveQuery = false;
     if(tabValue === 'save') saveQuery = true;
     this.setState({
@@ -66,7 +65,7 @@ export class App extends React.Component<any, any> {
   }
   render() {
     return (
-      <div style={{marginLeft: 15}}>
+      <div>
         <div style={{width: 180}}>
           <Tabs className='tabs-container'
             inkBarStyle={{ background: '#d7dddd' }}
@@ -89,7 +88,7 @@ export class App extends React.Component<any, any> {
           <hr color='black' style={{ width: 180 }} />
         </div>
         <div>
-          <WorkingComponent api={this.state.api} 
+          <MainView api={this.state.api} 
             modelNum={this.state.modelNum} />
         </div>
       </div>

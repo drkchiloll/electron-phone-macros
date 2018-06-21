@@ -1,5 +1,6 @@
 // LIB Imports
 import * as React from 'react';
+import { Component } from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Promise from 'bluebird';
 import * as $ from 'jquery';
@@ -12,18 +13,20 @@ import * as xpath from 'xpath';
 
 import { App } from './App';
 import { Accounts } from './Accounts';
-import { WorkingComponent } from './WorkingComponent';
+import { MainView } from './MainView';
 import { Api } from '../lib/api';
 import { Cucm } from '../lib/cucm';
 import {
-  sqlDoc, risDoc, axlHeaders, headers, phModelQuery, devAssQuery, updDevAssoc
+  sqlDoc, risDoc, axlHeaders, headers,
+  phModelQuery, devAssQuery, updDevAssoc
 } from '../lib/configs';
 
 import {
-  indigo900, blue300, red300
+  indigo900, blue300, red300,
+  darkBlack, darkWhite, fullWhite
 } from 'material-ui/styles/colors';
 
-// import SvgIconErrorOutline from 'material-ui/svg-icons/alert/error-outline';
+import { getMuiTheme, MuiThemeProvider } from 'material-ui/styles';
 
 import {
   Paper, TextField, Divider, Drawer,
@@ -36,10 +39,10 @@ import {
   TableHeaderColumn, TableRow, TableRowColumn
 } from 'material-ui';
 const SelectableList = makeSelectable(List),
-      fs = require('fs');
+  fs = require('fs');
 
 export {
-  React, ReactDOM, Promise, $,
+  React, Component, ReactDOM, Promise, $,
   Paper, TextField, Divider, Drawer,
   Subheader, List, ListItem, makeSelectable,
   BottomNavigation, BottomNavigationItem,
@@ -48,10 +51,11 @@ export {
   IconButton, FontIcon, Snackbar, LinearProgress,
   SelectableList, fs, App, Accounts, Cucm,
   MenuItem, SelectField, path, Datastore, moment,
-  Api, WorkingComponent, FloatingActionButton,
+  Api, MainView, FloatingActionButton,
   Tab, Tabs, sqlDoc, risDoc, axlHeaders,
   request, dom, headers, RaisedButton, phModelQuery,
   xpath, Card, CardHeader, CardText, Table, TableBody,
   TableHeader, TableHeaderColumn, TableRow, TableRowColumn,
-  devAssQuery, updDevAssoc
+  devAssQuery, updDevAssoc, darkBlack, darkWhite, getMuiTheme,
+  MuiThemeProvider, fullWhite
 };

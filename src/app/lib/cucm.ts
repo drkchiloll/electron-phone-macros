@@ -259,8 +259,18 @@ export class Cucm {
         { version } = this.profile,
         uri = (version.startsWith('8')) ? this.risPort8Url :
           this.risPortUrl;
+    // console.log(body);
     return this._req(this._options({ uri, headers, body }))
-      .then((data:string) => this.parseRisDoc(data, params.modelNum));
+      .then((data:string) => this.parseRisDoc(data, params.modelNum))
+      .catch((err:any) => {
+        console.log(err);
+        return;
+        // return new Promise((resolve, reject) => {
+        //   setTimeout(() => {
+        //     resolve(this._req(params));
+        //   }, 5000);
+        // });
+      })
   }
 
   devConcattor(old:any, news:any) {

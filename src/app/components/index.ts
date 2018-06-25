@@ -16,6 +16,7 @@ import { Accounts } from './Accounts';
 import { MainView } from './MainView';
 import { Api } from '../lib/api';
 import { Cucm } from '../lib/cucm';
+import { phone } from '../lib/phone-macros';
 import {
   sqlDoc, risDoc, axlHeaders, headers,
   phModelQuery, devAssQuery, updDevAssoc
@@ -23,7 +24,8 @@ import {
 
 import {
   indigo900, blue300, red300,
-  darkBlack, darkWhite, fullWhite
+  darkBlack, darkWhite, fullWhite,
+  blueGrey200
 } from 'material-ui/styles/colors';
 
 import { getMuiTheme, MuiThemeProvider } from 'material-ui/styles';
@@ -36,7 +38,7 @@ import {
   IconButton, FontIcon, Snackbar, LinearProgress, MenuItem,
   SelectField, FloatingActionButton, Tab, Tabs, RaisedButton,
   Card, CardHeader, CardText, Table, TableBody, TableHeader,
-  TableHeaderColumn, TableRow, TableRowColumn
+  TableHeaderColumn, TableRow, TableRowColumn, Checkbox
 } from 'material-ui';
 const SelectableList = makeSelectable(List),
   fs = require('fs');
@@ -47,7 +49,7 @@ export {
   Subheader, List, ListItem, makeSelectable,
   BottomNavigation, BottomNavigationItem,
   Toggle, Dialog, FlatButton, Chip, Avatar,
-  indigo900, blue300, red300,
+  indigo900, blue300, red300, blueGrey200,
   IconButton, FontIcon, Snackbar, LinearProgress,
   SelectableList, fs, App, Accounts, Cucm,
   MenuItem, SelectField, path, Datastore, moment,
@@ -57,5 +59,5 @@ export {
   xpath, Card, CardHeader, CardText, Table, TableBody,
   TableHeader, TableHeaderColumn, TableRow, TableRowColumn,
   devAssQuery, updDevAssoc, darkBlack, darkWhite, getMuiTheme,
-  MuiThemeProvider, fullWhite
+  MuiThemeProvider, fullWhite, phone, Checkbox
 };

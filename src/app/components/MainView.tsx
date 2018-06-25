@@ -240,7 +240,7 @@ export class MainView extends Component<any, any> {
       <div>
         <div style={this.style().main}>
           <Paper zDepth={4} style={this.style().mainpaper}>
-            { this._searchPanel(this.state.ipAddresses) }
+            { this._searchPanel(ipAddresses) }
           </Paper>
           <RaisedButton style={this.style().rbtn} label={searchLabel}
             icon={
@@ -253,9 +253,9 @@ export class MainView extends Component<any, any> {
         </div>
         <div style={this.style().cdiv}>
           {
-            this.state.devices ? 
-              Object.keys(this.state.devices).map((type, i) => {
-                if(this.state.devices[type].length === 0) return;
+            devices ?
+              Object.keys(devices).map((type, i) => {
+                if(devices[type].length === 0) return;
                 return (
                   <Card key={i} style={this.style().card}
                     initiallyExpanded={true}
@@ -266,6 +266,10 @@ export class MainView extends Component<any, any> {
                       actAsExpander={true}
                       showExpandableButton={true} />
                     <CardText expandable={true}>
+                      <RaisedButton style={{ margin: 0, padding: 0 }}
+                        icon={<i className='fa fa-upload fa-lg' />}
+                        label='Upload Background'
+                      />
                       {this._renderTable(devices[type])}
                     </CardText>
                   </Card>

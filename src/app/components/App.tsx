@@ -3,6 +3,7 @@ import {
   Accounts, MainView, Api, Cucm, phModelQuery,
   Component
 } from './index';
+import { PhoneMacros } from './PhoneMacros';
 
 export class App extends Component<any, any> {
   constructor() {
@@ -13,7 +14,8 @@ export class App extends Component<any, any> {
       tabIndx: 1,
       db: null,
       api: null,
-      modelNum: null
+      modelNum: null,
+      account: []
     };
   }
   componentWillMount() {
@@ -22,17 +24,14 @@ export class App extends Component<any, any> {
         account:any;
     this.setState({ api });
     return modelDb.get().then((recs:any) => {
-      if(recs.length === 0) {
-        return api.get().then((recs: any) => {
-          if(recs.length > 0) {
-            account = recs.filter((r: any) => r.selected)[0];
-          }
-          return account;
-        });
-      } else {
-        this.setState({ modelNum: recs });
-        return;
-      }
+      return api.get().then((accounts: any) => {
+        if(accounts.length > 0) {
+          account = accounts.find((r: any) => r.selected);
+        }
+        this.setState({ modelNum: recs, account });
+        if(recs.length === 0) return account; 
+        else return;
+      });
     }).then((acct) => {
       if(acct && acct.host) {
         let cucm = new Cucm(acct);
@@ -55,41 +54,54 @@ export class App extends Component<any, any> {
     });
   }
   _tabSelect = tabValue => {
-    let saveQuery = false;
-    if(tabValue === 'save') saveQuery = true;
+    console.log(tabValue);
     this.setState({
-      openAcct: (tabValue === 'accts') ? true: false,
-      tabValue,
-      saveQuery
+      openAcct: (tabValue === 'accounts') ? true: false,
+      tabValue
     });
   }
   render() {
     return (
       <div>
-        <div style={{width: 180}}>
+        <div style={{width: 405, marginBottom: 5}}>
           <Tabs className='tabs-container'
-            inkBarStyle={{ background: '#d7dddd' }}
-            tabItemContainerStyle={{ width: 180 }}
+            inkBarStyle={{ background: 'black' }}
+            tabItemContainerStyle={{ width: 405 }}
             initialSelectedIndex={this.state.tabIdx}
             value={this.state.tabValue}
             onChange={this._tabSelect}>
             <Tab icon={
                 <span className='fa-stack fa-lg'>
-                  <i className='fa fa-server fa-stack-2x'/>
+                  <i className='fa fa-server fa-lg'/>
                 </span>
               }
               label='Accounts'
-              value='accts'>
+              value='accounts'>
               <Accounts api={this.state.api}
                 openDia={this.state.openAcct}
                 acctClose={this._handleClose} />
             </Tab>
+            <Tab icon={
+              <span className='fa-stack fa-lg'>
+                <i className='fa fa-phone fa-lg' />
+              </span>
+            }
+              label='Device Search'
+              value='device-search' >
+              <MainView api={this.state.api}
+                modelNum={this.state.modelNum} />
+            </Tab>
+            <Tab icon={
+                <span className='fa-stack fa-lg'>
+                  <i className='fa fa-superpowers fa-lg' />
+                </span>
+              }
+              label='Phone Macros'
+              value='templates' >
+              <PhoneMacros account={this.state.account} />
+            </Tab>
           </Tabs>
-          <hr color='black' style={{ width: 180 }} />
-        </div>
-        <div>
-          <MainView api={this.state.api} 
-            modelNum={this.state.modelNum} />
+          {/* <hr color='black' style={{ width: 180 }} /> */}
         </div>
       </div>
     );

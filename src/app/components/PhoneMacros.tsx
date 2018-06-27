@@ -3,9 +3,8 @@ import {
   CardHeader, CardText, Paper,
   phone, Avatar, List, ListItem, blueGrey200,
   Dialog, Promise, Checkbox, SelectableList,
-  RaisedButton
+  RaisedButton, MacroForm
 } from './index';
-import { MacroForm } from './MacroForm';
 import { remote } from 'electron';
 let bwin;
 

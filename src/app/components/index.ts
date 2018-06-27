@@ -14,6 +14,10 @@ import * as xpath from 'xpath';
 import { App } from './App';
 import { Accounts } from './Accounts';
 import { MainView } from './MainView';
+import { MacroForm } from './MacroForm';
+import { MacroSequences } from './MacroSequences'
+import { PhoneMacros } from './PhoneMacros';
+
 import { Api } from '../lib/api';
 import { Cucm } from '../lib/cucm';
 import { phone } from '../lib/phone-macros';
@@ -25,7 +29,7 @@ import {
 import {
   indigo900, blue300, red300,
   darkBlack, darkWhite, fullWhite,
-  blueGrey200
+  blueGrey200, blueGrey500
 } from 'material-ui/styles/colors';
 
 import { getMuiTheme, MuiThemeProvider } from 'material-ui/styles';
@@ -59,5 +63,6 @@ export {
   xpath, Card, CardHeader, CardText, Table, TableBody,
   TableHeader, TableHeaderColumn, TableRow, TableRowColumn,
   devAssQuery, updDevAssoc, darkBlack, darkWhite, getMuiTheme,
-  MuiThemeProvider, fullWhite, phone, Checkbox
+  MuiThemeProvider, fullWhite, phone, Checkbox, blueGrey500,
+  PhoneMacros, MacroForm, MacroSequences
 };

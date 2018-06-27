@@ -5,6 +5,7 @@ import {
   Dialog, Promise, Checkbox, SelectableList,
   RaisedButton
 } from './index';
+import { MacroForm } from './MacroForm';
 import { remote } from 'electron';
 let bwin;
 
@@ -13,7 +14,7 @@ export class PhoneMacros extends Component<any, any> {
     super(props);
     this.state = {
       devices: [],
-      open: false
+      newMacro: false
     };
   }
   queryBackground = () => {
@@ -31,7 +32,7 @@ export class PhoneMacros extends Component<any, any> {
       })
     }, [])
   }
-  getImgAvatar(type: string) {
+  getImgAvatar = type => {
     if(type.includes('79')) return '7900.jpg';
     else if(type.includes('89')) return '9900.jpg';
     else if(type.includes('88')) return '8800.jpg';
@@ -98,27 +99,38 @@ export class PhoneMacros extends Component<any, any> {
     })
   }
   render() {
-    const { devices, open } = this.state;
+    const { devices, newMacro } = this.state;
     const { account } = this.props;
     return (
       <div>
-        <RaisedButton label='Add New Macro' style={this.styles.addbtn} />
-        <Card style={this.styles.card}
-          initiallyExpanded={false}
-          onExpandChange={this.queryBackground}
-        >
-          <CardHeader title='Bulk Background Change'
-            avatar={<i className='fa fa-picture-o fa-lg' />}
-            actAsExpander={true}
-            showExpandableButton={true} />
-          <CardText expandable={true} >
-            {
-              devices && devices.length > 0 ? this._renderDevices(devices) : null
-            }
-            <RaisedButton label='Save'
-              onClick={() => {}} />
-          </CardText>
-        </Card>
+        {
+          newMacro
+            ?
+              <MacroForm close={() => this.setState({ newMacro: false })} />
+            :
+              <div>
+                <RaisedButton label='Add New Macro' style={this.styles.addbtn}
+                  onClick={() => this.setState({ newMacro: true })} />
+                <Card style={this.styles.card}
+                  initiallyExpanded={false}
+                  onExpandChange={this.queryBackground}
+                >
+                  <CardHeader title='Bulk Background Change'
+                    avatar={<i className='fa fa-picture-o fa-lg' />}
+                    actAsExpander={true}
+                    showExpandableButton={true} />
+                  <CardText expandable={true} >
+                    {
+                      devices && devices.length > 0 ?
+                        this._renderDevices(devices) :
+                        null
+                    }
+                    <RaisedButton label='Save'
+                      onClick={() => { }} />
+                  </CardText>
+                </Card>
+              </div>
+        }
       </div>
     );
   }

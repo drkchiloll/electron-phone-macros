@@ -9,7 +9,7 @@ let nodeModules = {};
 
 fs.readdirSync('node_modules')
   .filter(function(x) {
-    return ['.bin'].indexOf(x) === -1 && x === 'java';
+    return ['.bin'].indexOf(x) === -1;
   })
   .forEach(function(mod) {
     nodeModules[mod] = 'commonjs ' + mod;
@@ -37,6 +37,7 @@ module.exports = (env, options) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js']
     },
+    externals: nodeModules,
     module: {
       rules: [{
         test: /\.tsx?$/,

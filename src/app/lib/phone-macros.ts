@@ -1,7 +1,8 @@
 import { req } from './requests';
-import { DOMParser } from 'xmldom';
+import { DOMParser, DOMImplementation } from 'xmldom';
 import * as xpath from 'xpath';
 import { Promise } from 'bluebird';
+import { macroDb } from './macro-db';
 
 export const phone = (() => {
   return {
@@ -223,93 +224,112 @@ export const phone = (() => {
       switch(deviceType) {
         case '6900':
           keys = this.cmds.keys
-            .reduce((a: any, c: any) => {
-              switch(c.name) {
-                case 'Applications':
-                case 'Hold':
-                case 'Directories':
-                  return a;
-                default:
-                  c['type'] = 'key';
-                  a.push(c);
-                  return a;
-              }
-            }, [])
+            .filter((c: any) =>
+              c.name !== 'Applications' &&
+              c.name !== 'Hold' &&
+              c.name !== 'Directories')
+            .map(c => {
+              c['type'] = 'key'
+              return c;
+            });
           return keys.concat([{ type: 'init', ...this.cmds.init }]);
         case '7900':
           keys = this.cmds.keys
-            .reduce((a: any, c: any) => {
-              switch(c.name) {
-                case 'Applications':
-                case 'Onhook':
-                case 'Offhook':
-                  return a;
-                default:
-                  c['type'] = 'key';
-                  a.push(c);
-                  return a;
-              }
-            }, []);
+            .filter((c: any) =>
+              c.name !== 'Applications' &&
+              c.name !== 'Onhook' &&
+              c.name !== 'Offhook')
+            .map(c => {
+              c['type'] = 'key'
+              return c;
+            });
           return keys.concat([{ type: 'init', ...this.cmds.init }]);
         case '7800':
-          keys = this.cmds.keys
-            .reduce((a: any, c: any) => {
-              switch(c.name) {
-                case 'Onhook':
-                case 'Offhook':
-                case 'Soft5':
-                  return a;
-                default:
-                  c['type'] = 'key';
-                  a.push(c);
-                  return c;
-              }
-            }, [])
-          return keys.concat([{ type: 'init', ...this.cmds.init }]);
+          return this.cmds.keys
+            .filter((c: any) =>
+              c.name !== 'Onhook' &&
+              c.name !== 'Offhook' &&
+              c.name !== 'Soft5')
+            .map(c => {
+              c['type'] = 'key'
+              return c;
+            });
         case '8800':
           return this.cmds.keys
-            .reduce((a: any, c: any) => {
-              switch(c.name) {
-                case 'Onhook':
-                case 'Offhook':
-                  return a;
-                default:
-                  c['type'] = 'key';
-                  a.push(c);
-                  return c;
-              }
-            }, [])
+            .filter((c: any) => 
+              c.name !== 'Onhook' &&
+              c.name !== 'Offhook')
+            .map(c => {
+              c['type'] = 'key'
+              return c;
+            });
         case '8900':
-          return this.cmds
-          .reduce((a: any, c: any) => {
-            switch(c.name) {
-              case 'Directories':
-              case 'Hold':
-              case 'Onhook':
-              case 'Offhook':
-                return a;
-              default:
-                c['type'] = 'key';
-                a.push(c);
-                return c;
-            }
-          }, [])
         case '9900':
-          return this.cmds
-          .reduce((a: any, c: any) => {
-            switch(c.name) {
-              case 'Directories':
-              case 'Hold':
-              case 'Onhook':
-              case 'Offhook':
-                return a;
-              default:
-                c['type'] = 'key';
-                a.push(c);
-                return c;
-            }
-          }, [])
+          return this.cmds.keys
+            .filter((c: any) =>
+              name !== 'Directories' &&
+              name !== 'Hold' &&
+              name !== 'Onhook' &&
+              name !== 'Offhook')
+            .map(c => {
+              c['type'] = 'key'
+              return c;
+            });
       }
     },
+    bgXmlBuilder() {
+      let d: any = (new DOMImplementation()).createDocument('', '', null);
+      let setEl = d.createElement('setBackground'),
+        bgEl = d.createElement('background'),
+        imgEl = d.createElement('image'),
+        icnEl = d.createElement('icon');
+      bgEl.appendChild(imgEl);
+      bgEl.appendChild(icnEl);
+      setEl.appendChild(bgEl);
+      return d.toString();
+    },
+    saveBgMacro(devices) {
+      let macro: any = {
+        name: 'Backgrounds',
+        jobs: []
+      };
+      macro.jobs = devices.reduce((a: any[], dev: any) => {
+        if(dev.selectedImg) {
+          a.push({
+            types: dev.types,
+            background: {
+              tn: dev.backgrounds[dev.selectedIndx].tn,
+              img: dev.backgrounds[dev.selectedIndx].image,
+              imagePreview: dev.backgrounds[dev.selectedIndx].imgPreview,
+              xml: this.bgXmlBuilder()
+            }
+          });
+        }
+        return a;
+      }, []);
+      console.log(macro.jobs);
+    },
+    saveMacro(macro) {
+      // Generate XML
+      let { cmds } = macro;
+      return Promise.map(cmds, (c: any) => {
+        let d: any = (new DOMImplementation()).createDocument('', '', null);
+        let el1: Element = d.createElement('CiscoIPPhoneExecute'),
+          el2: Element = d.createElement('ExecuteItem');
+        el2.setAttribute('URL', c.name);
+        el1.appendChild(el2);
+        d.appendChild(el1);
+        console.log(d.toString());
+        c['xml'] = d.toString();
+        return c;
+      }).then(commands => {
+        macro['cmds'] = commands;
+        if(macro._id) {
+          return macroDb.update(macro);
+        } else {
+          return macroDb.add(macro);
+        }
+      })
+    }
   };
 })();

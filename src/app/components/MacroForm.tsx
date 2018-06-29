@@ -3,7 +3,7 @@ import {
   Paper, MenuItem, TextField,
   phone, blueGrey500, SelectField,
   RaisedButton, FloatingActionButton,
-  blue300, MacroSequences
+  blue300, MacroSequences, Api
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 // import { MacroSequences } from './MacroSequences';
@@ -28,32 +28,17 @@ export class MacroForm extends Component<any, any> {
       }
     };
   }
-  getItemStyle = (isDragging, draggableStyle) => ({
-    userSelect: 'none',
-    background: isDragging ? 'lightblue': 'lightgrey',
-    ...draggableStyle
-  })
-  getListStyle = isDraggingOver => ({
-    background: isDraggingOver ? 'lightblue': 'lightgrey',
-    padding: this.grid,
-    width: 985
-  })
-  reorder = (list, startIndex, endIndex) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  }
-  onDragEnd = result => {
-    let { macro } = this.state;
-    if(!result.destination) return;
-    const items = this.reorder(
-      macro.cmds,
-      result.source.index,
-      result.destination.index
-    );
-    macro['cmds'] = items;
-    this.setState({ macro });
+  componentDidMount() {
+    const { macro } = this.props;
+    if(macro) {
+      this.setState({
+        macroName: macro.name,
+        macro,
+        deviceList: macro.types
+      });
+      this.handleSelect(null, null, macro.types);
+      this._renderItem(macro.types);
+    }
   }
   _renderItem = deviceList => {
     const devices = phone.devices;
@@ -107,8 +92,8 @@ export class MacroForm extends Component<any, any> {
   }
   addSequence = () => {
     let {
-      macroName, selectedCmd, cmdList,
-      deviceList, macro, sequenceDesc
+      selectedCmd, cmdList,
+      macro, sequenceDesc
     } = this.state;
     let command: any;
     if(macro.cmds.find(c => c.editing)) {
@@ -122,28 +107,25 @@ export class MacroForm extends Component<any, any> {
         command.name = `Init:${command.name}`;
       }
       let curIndx = macro.cmds.findIndex(c => c.editing);
-      command['id'] = curIndx + 1;
+      command['sequenceId'] = curIndx + 1;
       macro.cmds[curIndx] = command;
     } else {
       command = JSON.parse(JSON.stringify(cmdList.find((c: any) =>
         c.displayName === selectedCmd)));
       command['description'] = sequenceDesc;
-      if(!macro.name) macro.name = macroName;
-      command['id'] = macro.cmds.length + 1;
+      command['sequenceId'] = macro.cmds.length + 1;
       if(command.type === 'key') {
         command.name = `Key:${command.name}`;
       } else {
         command.name = `Init:${command.name}`;
       }
       macro.cmds.push(command);
-      macro.types = deviceList;
     }
     this.setState({
       selectedCmd: '',
       sequenceDesc: '',
       macro
     });
-    console.log(macro);
   }
   editSequenceItem = cmd => {
     this.setState({
@@ -152,7 +134,7 @@ export class MacroForm extends Component<any, any> {
     });
     let { macro } = this.state;
     macro.cmds.forEach(c => {
-      if(c.id === cmd.id) {
+      if(c.sequenceId === cmd.sequenceId) {
         c['editing'] = true;
       }
     })
@@ -171,10 +153,18 @@ export class MacroForm extends Component<any, any> {
     }
     this.setState({ macro });
   }
+  saveMacro = () => {
+    let {
+      macro, deviceList, macroName
+    } = this.state;
+    macro.types = deviceList;
+    macro.name = macroName;
+    phone.saveMacro(macro);
+  }
   render() {
     const {
-      deviceList, selectedCmd, cmdList, macroName, sequenceDesc,
-      macro: { cmds }
+      deviceList, selectedCmd, cmdList,
+      macroName, sequenceDesc, macro
     } = this.state;
     return <Paper zDepth={1} style={this.styles.mpaper}>
       <div style={this.styles.pridiv}>
@@ -220,47 +210,24 @@ export class MacroForm extends Component<any, any> {
         </FloatingActionButton>
         <br/>
         {
-          cmds.length > 0 ?
-          <DragDropContext onDragEnd={this.onDragEnd}>
-            <Droppable droppableId='droppable'>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  style={this.getListStyle(snapshot.isDraggingOver)}
-                >
-                  {
-                    cmds.map((c: any, indx: number) => (
-                      <Draggable
-                        key={c.id}
-                        draggableId={c.id}
-                        index={indx}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={this.getItemStyle(
-                              snapshot.isDragging,
-                              provided.draggableProps.style
-                            )}
-                          >
-                            <MacroSequences cmd={c}
-                              edit={this.editSequenceItem}
-                              remove={this.removeSequence} />
-                          </div>
-                        )}
-                      </Draggable>
-                  ))}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext> :
-          null
+          macro.cmds.length > 0 ?
+            <MacroSequences
+              macro={macro}
+              remove={this.removeSequence}
+              edit={this.editSequenceItem}
+              updateMacro={(macro) => this.setState({ macro })} /> :
+            null
         }
         <br/>
         <RaisedButton
+          label='Save'
+          onClick={this.saveMacro}
+          style={{marginRight: '10px' }}
+        />
+        <RaisedButton
           label='Close'
-          onClick={() => this.props.close()} />
+          onClick={() => this.props.close()}
+        />
       </div>
     </Paper>;
   }
@@ -290,14 +257,14 @@ export class MacroForm extends Component<any, any> {
       marginBottom: '10px'
     },
     cmddesc: {
-      width: 375,
+      width: 500,
       position: 'absolute',
       left: 380,
       top: 82
     },
     fltbtn1: {
       position: 'absolute',
-      left: 785,
+      left: 900,
       top: 101
     }
   }

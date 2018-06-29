@@ -50,8 +50,10 @@ let sqlDoc = (
       FROM typemodel
       WHERE name NOT LIKE "%Expansion Module%"
       AND name!="SPA8800" AND name NOT MATCHES "*79[0123]*"
+      AND name NOT MATCHES "*6911*"
       AND (name MATCHES "*7[89]*"
-      OR name MATCHES "*[89][89]*")`
+      OR name MATCHES "*[89][89]*"
+      OR name MATCHES "*69*")`
   ),
   devAssQuery = (
     `SELECT d.name as devicename from device as d

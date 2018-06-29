@@ -8,8 +8,7 @@ const appOut = path.resolve(__dirname, '../../'),
 
 export class Api {
   acctDb: Datastore;
-  queryDb: Datastore;
-  editorDb: Datastore;
+  macroDb: Datastore;
   modelDb: Datastore;
   recordId: string;
 
@@ -20,6 +19,7 @@ export class Api {
     } else {
       filename = `${appIn}/.data/.${dbName}`;
     }
+    console.log(filename);
     this.setDB(db, filename);
   }
 
@@ -30,6 +30,8 @@ export class Api {
         break;
       case 'modelDb':
         this.modelDb = new Datastore({ filename, autoload: true });
+      case 'macroDb':
+        this.macroDb = new Datastore({ filename, autoload: true });
       default:
         return null;
     }
@@ -38,8 +40,7 @@ export class Api {
 
   whichDB() {
     if(this.acctDb) return this.acctDb;
-    if(this.queryDb) return this.queryDb;
-    if(this.editorDb) return this.editorDb;
+    if(this.macroDb) return this.macroDb;
     if(this.modelDb) return this.modelDb;
   }
 
@@ -76,17 +77,26 @@ export class Api {
   }
 }
 
-export interface IAccount {
-  name:string;
-  host:string;
-  version:string;
-  username:string;
-  password:string;
-  selected:boolean;
-  connected:boolean;
-}
-
-export interface IEditorSettings {
-  vimMode:boolean;
-  fontSize:number;
-}
+export const dbService = (() => {
+  const service: any = {
+    accounts() {
+      return new Api({
+        db: 'acctDb',
+        dbName: 'accounts'
+      });
+    },
+    models() {
+      return new Api({
+        db: 'modelDb',
+        dbName: 'models'
+      });
+    },
+    macros() {
+      return new Api({
+        db: 'macroDb',
+        dbName: 'macros'
+      });
+    }
+  };
+  return service;
+})()

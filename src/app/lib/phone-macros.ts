@@ -126,7 +126,10 @@ export const phone = (() => {
         url,
         method: 'get',
         responseType: 'arraybuffer'
-      }).then(resp => resp.data);
+      }).then(resp => {
+        if(resp.status === 404) return null;
+        else return resp.data;
+      });
     },
     cmds: {
       keys: [{

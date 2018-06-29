@@ -59,9 +59,9 @@ export class Backgrounds extends Component<any, any> {
               primaryTogglesNestedList={true}
               nestedItems={(() => {
                 if(d.backgrounds && d.backgrounds.length > 0) {
-                  return d.backgrounds.map((b: any, i: number) => {
-                    if(b.imgPreview === 'not found') return;
-                    return (
+                  return d.backgrounds.reduce((a: any[], b: any, i: number) => {
+                    if(b.imgPreview === 'not found') return a;
+                    a.push((
                       <ListItem key={d.types[0] + '_' + i}
                         onClick={() => {
                           d.selectedImg = b.name
@@ -101,8 +101,9 @@ export class Backgrounds extends Component<any, any> {
                               })
                             }} />
                         } />
-                    )
-                  })
+                    ));
+                    return a;
+                  }, [])
                 } else return [];
               })()} />
           </SelectableList>

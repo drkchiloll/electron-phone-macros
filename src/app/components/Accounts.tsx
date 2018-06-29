@@ -6,7 +6,10 @@ import {
   Subheader, List, ListItem, makeSelectable,
   SelectField, Snackbar, SelectableList,
   Api, Cucm, moment, Component
-} from './index'
+} from './index';
+import { accountDb } from '../lib/account-db';
+
+import { dbService } from '../lib/api';
 
 export class Accounts extends Component<any,any> {
   constructor() {
@@ -26,8 +29,7 @@ export class Accounts extends Component<any,any> {
   }
   componentWillMount() {
     let accounts;
-    let api = this.props.api;
-    api.get().then((records: any) => {
+    accountDb.get().then((records: any) => {
       this.setState({ accounts: records });
       if(records.length !== 0) {
         return Promise.map(records, (record: any) => {
@@ -36,7 +38,7 @@ export class Accounts extends Component<any,any> {
             new Date().getTime() - new Date(lastTested).getTime();
           if(testDiff > 86400000) {
             record['status'] = 'red';
-            return api.update(record).then(() => {
+            return accountDb.update(record).then(() => {
               return record;
             });
           }
@@ -48,7 +50,7 @@ export class Accounts extends Component<any,any> {
       // console.log(accounts);
       let selectedAcct = accounts.findIndex(acct => acct.selected),
         account = accounts[selectedAcct];
-      this.setState({ api, accounts, selectedAcct, account });
+      this.setState({ accounts, selectedAcct, account });
     });
 
   }
@@ -78,14 +80,14 @@ export class Accounts extends Component<any,any> {
       acctMsg: string;
     if(account._id) {
       // Update
-      this.state.api.update(account).then(() => {
+      accountDb.update(account).then(() => {
         acctMsg = `${account.name} updated successfully`;
         this.setState({ accounts, openSnack: true, acctMsg });
       });
     } else {
       account['status'] = 'red';
       account['lastTested'] = null;
-      this.state.api.add(account).then((doc) => {
+      accountDb.add(account).then((doc) => {
         account._id = doc._id;
         acctMsg = `${account.name} added successfully`;
         this.setState({ accounts, openSnack: true, acctMsg });
@@ -103,13 +105,13 @@ export class Accounts extends Component<any,any> {
       account['lastTested'] = moment().toDate();
       if (resp && resp instanceof Array) {
         account['status'] = 'green';
-        return this.state.api.update(account);
+        return accountDb.update(account);
       } else if (resp.error) {
         account['status'] = 'red';
-        return this.state.api.update(account);
+        return accountDb.update(account);
       }
     }).then(() => {
-      this.state.api.get({ _id: account._id }).then((record) => {
+      accountDb.get({ _id: account._id }).then((record) => {
         account = record[0];
         this.setState({ account });
       });
@@ -221,7 +223,7 @@ export class Accounts extends Component<any,any> {
                         let accounts = this.state.accounts,
                           acctIdx = this.state.selectedAcct,
                           { _id, name } = accounts[acctIdx];
-                        this.state.api.remove(_id).then(() => {
+                        accountDb.remove(_id).then(() => {
                           accounts.splice(acctIdx, 1);
                           if (accounts.length === 0) {
                             accounts.push({

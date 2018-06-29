@@ -6,6 +6,7 @@ import {
   TableHeaderColumn, TableRow, TableRowColumn, devAssQuery,
   updDevAssoc, Component
 } from './index';
+import { modelDb } from '../lib/model-db';
 
 export class MainView extends Component<any, any> {
   constructor() {
@@ -14,14 +15,18 @@ export class MainView extends Component<any, any> {
       ipAddresses: [''],
       account: null,
       searchLabel: 'Search',
-      devices: null
+      devices: null,
+      modelNum: null
     };
   }
-  componentWillMount() {
-    this.props.api.get().then((recs:any) => {
+  componentDidMount() {
+    if(this.props.account) {
       this.setState({
-        account: recs.filter((r:any) => r.selected)[0]
+        account: this.props.account
       });
+    }
+    modelDb.get().then(modelNum => {
+      this.setState({ modelNum })
     });
   }
   handleSearchChange = (e: any, value: string) => {
@@ -136,10 +141,8 @@ export class MainView extends Component<any, any> {
   }
   _search = () => {
     this.setState({ searchLabel: '' });
-    let {
-      ipAddresses, account: {username, password, host, version}
-    } = this.state,
-      { modelNum } = this.props;
+    let { ipAddresses, modelNum } = this.state;
+    const { account: { username, password, host, version } } = this.props;
     let cucm = new Cucm({ host, version, username, password });
     cucm.models = null;
     let devices: any;
@@ -234,8 +237,9 @@ export class MainView extends Component<any, any> {
     );
   }
   render() {
-    let { ipAddresses, account, devices, searchLabel } = this.state,
-        disabled = (account && ipAddresses[0]) ? false : true;
+    let { ipAddresses, devices, searchLabel } = this.state;
+    const { account } = this.props;
+    const disabled = (account && ipAddresses[0]) ? false : true;
     return (
       <div>
         <div style={this.style().main}>

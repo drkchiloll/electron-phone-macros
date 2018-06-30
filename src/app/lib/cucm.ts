@@ -290,15 +290,13 @@ export class Cucm {
       strictSSL: false,
       method: 'POST',
       auth: { user: this.profile.username, pass: this.profile.password },
-      body,
-      timeout: 7500
+      body
     };
   }
 
   private _req(options: any) {
     return new Promise((resolve, reject) => {
       request(options, (err:any, res:any, body:any) => {
-        // console.log(body);
         if (err) return reject({ error: err });
         if (res.statusCode >= 500 && res.statusCode <= 599) return reject(res);
         if (res.statusCode === 200) return resolve(body);

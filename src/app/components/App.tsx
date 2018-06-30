@@ -5,7 +5,6 @@ import {
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
 import { Backgrounds } from './Backgrounds';
-import { modelDb } from '../lib/model-db';
 import { accountDb } from '../lib/account-db';
 
 export class App extends Component<any, any> {

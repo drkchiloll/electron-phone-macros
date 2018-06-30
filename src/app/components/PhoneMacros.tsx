@@ -7,8 +7,6 @@ import {
 } from './index';
 import RemoveMacro from 'material-ui/svg-icons/content/clear';
 import { macroDb } from '../lib/macro-db';
-// import { remote } from 'electron';
-// let bwin;
 
 export class PhoneMacros extends Component<any, any> {
   constructor(props) {

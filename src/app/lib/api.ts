@@ -19,7 +19,6 @@ export class Api {
     } else {
       filename = `${appIn}/.data/.${dbName}`;
     }
-    console.log(filename);
     this.setDB(db, filename);
   }
 

@@ -1,2 +1,2 @@
-import { dbService } from './api';
-export const macroDb = dbService.macros();
+import { dbService, Api } from './api';
+export const macroDb: Api = dbService.macros();

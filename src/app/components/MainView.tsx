@@ -76,13 +76,6 @@ export class MainView extends Component<any, any> {
       card: { marginBottom: 10 }
     }
   }
-  _searchPanel = searches =>
-    <SearchPanel
-      searches={searches}
-      changed={this.handleSearchChange}
-      query={this.queryClick}
-    />
-
   _addrsquery = (cucm:any, o:any, modelNum) => {
     let devices:any;
     return cucm.createRisDoc(o).then((doc:any) => {
@@ -170,7 +163,11 @@ export class MainView extends Component<any, any> {
             <MoreVertIcon />
           </IconButton> <strong>{job}</strong>
           <Paper zDepth={4} style={this.style().mainpaper}>
-            { this._searchPanel(ipAddresses) }
+            <SearchPanel
+              searches={ipAddresses}
+              changed={this.handleSearchChange}
+              query={this.queryClick}
+            />
           </Paper>
           <RaisedButton style={this.style().rbtn} label={searchLabel}
             icon={

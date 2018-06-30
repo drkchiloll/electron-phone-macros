@@ -5,3 +5,4 @@ dist/*.js
 *.db
 *.DS_Store
 *.data/*
+CiscoJtapi*

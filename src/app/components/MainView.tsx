@@ -4,9 +4,15 @@ import {
   Divider, RaisedButton, risDoc, Card,
   CardHeader, CardText, Table, TableBody, TableHeader,
   TableHeaderColumn, TableRow, TableRowColumn, devAssQuery,
-  updDevAssoc, Component
+  updDevAssoc, Component, Subheader
 } from './index';
-import { modelDb } from '../lib/model-db';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import { DeviceTable } from './DeviceTable';
+import { SearchPanel } from './SearchPanel';
+import { join } from 'path';
+import * as java from 'java';
+import { ModelEnum } from '../lib/model-db';
+import { macroDb } from '../lib/macro-db';
 
 export class MainView extends Component<any, any> {
   constructor() {
@@ -16,7 +22,9 @@ export class MainView extends Component<any, any> {
       account: null,
       searchLabel: 'Search',
       devices: null,
-      modelNum: null
+      modelNum: null,
+      job: 'Select Job(s) to Run:',
+      macros: null
     };
   }
   componentDidMount() {
@@ -25,9 +33,10 @@ export class MainView extends Component<any, any> {
         account: this.props.account
       });
     }
-    modelDb.get().then(modelNum => {
-      this.setState({ modelNum })
-    });
+    Promise.all([
+      ModelEnum.get().then(modelNum => this.setState({ modelNum })),
+      macroDb.get().then(macros => this.setState({ macros }))
+    ])
   }
   handleSearchChange = (e: any, value: string) => {
     let { ipAddresses } = this.state;
@@ -67,46 +76,13 @@ export class MainView extends Component<any, any> {
       card: { marginBottom: 10 }
     }
   }
-  _searchPanel = searches => {
-    return searches.map((search:any, i:number) => {
-      return (
-        <div key={i}>
-          <div style={{ marginLeft: '10px' }}>
-            <TextField hintText='10.255.2.*'
-              name={`ip_${i}`}
-              underlineShow={true}
-              floatingLabelFixed={true}
-              floatingLabelText='IP Address'
-              floatingLabelStyle={{ font: '18px helvetica' }}
-              style={{ left: 0, width: 230 }}
-              value={search}
-              onChange={this.handleSearchChange} />
-            <IconButton
-              style={{
-                position: 'relative',
-                bottom: 20,
-                left: 15
-              }}
-              className='fa-plus'
-              onClick={e => this.queryClick(e, i)}>
-              <FontIcon className='fa fa-plus fa-lg' color='green' />
-            </IconButton>
-            <IconButton
-              className='fa-minus'
-              style={{
-                position: 'relative',
-                bottom: 20,
-                left: 10
-              }}
-              onClick={e => this.queryClick(e, i)}>
-              <FontIcon className='fa fa-minus fa-lg' color='red' />
-            </IconButton>
-          </div>
-          <Divider style={{ borderBottom: 'solid 1px black' }} />
-        </div>
-      );
-    });
-  }
+  _searchPanel = searches =>
+    <SearchPanel
+      searches={searches}
+      changed={this.handleSearchChange}
+      query={this.queryClick}
+    />
+
   _addrsquery = (cucm:any, o:any, modelNum) => {
     let devices:any;
     return cucm.createRisDoc(o).then((doc:any) => {
@@ -154,11 +130,6 @@ export class MainView extends Component<any, any> {
       this.setState({ devices: cucm.models, searchLabel: 'Search' });
     })
   }
-  computeTableHeight = devices => {
-    if(devices.length <= 2) return '100px';
-    else if(devices.length >= 3 && devices.length <= 7) return '250px';
-    else if(devices.length > 7) return '350px';
-  }
   selectRow = rows => {
     let { devices } = this.state;
     if(rows === 'all') {
@@ -188,61 +159,16 @@ export class MainView extends Component<any, any> {
       });
     }
   }
-  _renderTable = devices => {
-    return (
-      <Table height={this.computeTableHeight(devices)}
-        fixedHeader={true}
-        selectable={true}
-        multiSelectable={true}
-        onRowSelection={this.selectRow} >
-        <TableHeader displaySelectAll={true}
-          adjustForCheckbox={true}
-          enableSelectAll={true} >
-          <TableRow>
-            <TableHeaderColumn>IP Address</TableHeaderColumn>
-            <TableHeaderColumn>Name</TableHeaderColumn>
-            <TableHeaderColumn>Type</TableHeaderColumn>
-            <TableHeaderColumn>ITL Cleared</TableHeaderColumn>
-            <TableHeaderColumn>Device Association</TableHeaderColumn>
-          </TableRow>
-        </TableHeader>
-        <TableBody displayRowCheckbox={true}
-          deselectOnClickaway={true}
-          stripedRows={true} >
-          {devices.map((device:any, i:number) => (
-            <TableRow key={i} selected={device.checked}>
-              <TableRowColumn>{device.ip}</TableRowColumn>
-              <TableRowColumn>{device.name}</TableRowColumn>
-              <TableRowColumn>{device.model}</TableRowColumn>
-              <TableRowColumn>
-                {
-                  device.cleared ?
-                    <FontIcon className='fa fa-check-circle-o' color='green' /> :
-                    <FontIcon className='fa fa-times-circle fa-2x' color='red' />
-                }
-              
-              </TableRowColumn>
-              <TableRowColumn>
-                {
-                  device.associated ?
-                    <FontIcon className='fa fa-check' color='green' /> :
-                    <FontIcon className='fa fa-times fa-2x' color='red' />
-                }
-              </TableRowColumn>
-              
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
-  }
   render() {
-    let { ipAddresses, devices, searchLabel } = this.state;
+    let { ipAddresses, devices, searchLabel, job } = this.state;
     const { account } = this.props;
     const disabled = (account && ipAddresses[0]) ? false : true;
     return (
       <div>
         <div style={this.style().main}>
+          <IconButton>
+            <MoreVertIcon />
+          </IconButton> <strong>{job}</strong>
           <Paper zDepth={4} style={this.style().mainpaper}>
             { this._searchPanel(ipAddresses) }
           </Paper>
@@ -254,6 +180,22 @@ export class MainView extends Component<any, any> {
               </div>} 
             disabled={disabled}
             onClick={this._search} />
+          <RaisedButton
+            label='Execute Job'
+            fullWidth={true}
+            onClick={() => {
+              const classPath = join(__dirname, '../src/app/dataterminal_11_0');
+              java.classpath.push(classPath);
+              const JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
+              JtapiPeerFactory.getJtapiPeer(null, (err, peer) => {
+                const provider = `${account.host};login=${account.username}` +
+                  `;passwd=${account.password}`;
+                peer.getProvider(provider, (err, jtapiProvider) => {
+                  console.log(err);
+                  console.log(jtapiProvider);
+                })
+              })
+            }} />
         </div>
         <div style={this.style().cdiv}>
           {
@@ -270,11 +212,7 @@ export class MainView extends Component<any, any> {
                       actAsExpander={true}
                       showExpandableButton={true} />
                     <CardText expandable={true}>
-                      <RaisedButton style={{ margin: 0, padding: 0 }}
-                        icon={<i className='fa fa-upload fa-lg' />}
-                        label='Upload Background'
-                      />
-                      {this._renderTable(devices[type])}
+                      <DeviceTable devices={devices[type]} />
                     </CardText>
                   </Card>
                 );

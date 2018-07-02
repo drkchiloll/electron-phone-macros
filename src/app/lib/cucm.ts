@@ -79,20 +79,6 @@ export class Cucm {
     });
   }
 
-  gridify(data: any) {
-    let keys = Object.keys(data[0]);
-    return Promise.all([
-      keys.map(value => ({ value })),
-      data.reduce((a:any, obj:any, i:number) => {
-        a.push(keys.map(value => ({ value: obj[value] })));
-        return a;
-      }, [])
-    ]).then(results => {
-      results[1].unshift(results[0]);
-      return results[1];
-    })
-  }
-
   dataGridColumnize(data: any) {
     let keys = Object.keys(data[0]);
     return Promise.map(keys, (key) => ({
@@ -102,23 +88,6 @@ export class Cucm {
 
   fixDataGridColumnize(data: any) {
     return Object.keys(data[0]);
-  }
-
-  dataGridRowify(data: any) {
-    let keys = Object.keys(data[0]);
-    return Promise.reduce(data, (a:any, o:any, i:any) => {
-      return Promise.reduce(keys, (ob:any, key:any, i:any) => {
-        if (i === 0) {
-          ob['id'] = o[key];
-          ob[key] = o[key];
-        }
-        else ob[key] = o[key];
-        return ob;
-      }, {}).then((object) => {
-        a.push(object);
-        return a;
-      });
-    }, []);
   }
 
   fixedDataRowify(data: any) {
@@ -271,16 +240,6 @@ export class Cucm {
         //   }, 5000);
         // });
       })
-  }
-
-  devConcattor(old:any, news:any) {
-    console.log(old);
-    console.log(news);
-    // return Object.keys(old).reduce((o:any, k:string) => {
-    //   o[k] = old[k];
-    //   o[k].concat(news[k]);
-    //   return o;
-    // }, {})
   }
 
   private _options({ uri, headers, body }) {

@@ -2,6 +2,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as Datastore from 'nedb-core';
+import { EventEmitter } from 'events';
 
 const appOut = path.resolve(__dirname, '../../'),
       appIn = path.resolve(__dirname, '../');
@@ -11,6 +12,7 @@ export class Api {
   macroDb: Datastore;
   modelDb: Datastore;
   recordId: string;
+  macroEvent = new EventEmitter();
 
   constructor({db, dbName}:any) {
     let filename: string;
@@ -53,7 +55,14 @@ export class Api {
   add(record:any) {
     return new Promise((resolve, reject) => {
       let db = this.whichDB();
-      db.insert(record, (err, doc) => resolve(doc));
+      db.insert(record, (err, doc) => {
+        if(this.macroDb) {
+          this.get().then(macros => {
+            this.macroEvent.emit('m-add', macros);
+          });
+        }
+        resolve(doc)
+      });
     });
   }
 
@@ -62,7 +71,15 @@ export class Api {
     return new Promise((resolve, reject) => {
       let db = this.whichDB();
       db.update({ _id }, record, { upsert: false },
-        (err:any, num:number) => resolve(num));
+        (err:any, num:number) => {
+          db.persistence.compactDatafile();
+          if(this.macroDb) {
+            this.get().then(macros => {
+              this.macroEvent.emit('m-update', macros);
+            });
+          }
+          return resolve(num);
+      });
     });
   }
 
@@ -70,6 +87,12 @@ export class Api {
     return new Promise((resolve, reject) => {
       let db = this.whichDB();
       db.remove({ _id }, {}, (err: any, num: any) => {
+        db.persistence.compactDatafile();
+        if(this.macroDb) {
+          this.get().then(macros => {
+            this.macroEvent.emit('m-remove', macros);
+          });
+        }
         return resolve(num);
       });
     });

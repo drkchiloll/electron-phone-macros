@@ -1,8 +1,8 @@
 import {
   React, Component, Paper,
-  IconButton
+  IconButton, darkWhite, darkBlack
 } from './index';
-import { Row, Col } from 'react-flexbox-grid';
+import { Row, Col } from 'react-styled-flexboxgrid';
 import ClearSequence from 'material-ui/svg-icons/content/clear';
 import EditSequence from 'material-ui/svg-icons/image/edit';
 import {
@@ -13,11 +13,10 @@ export class MacroSequences extends Component<any, any> {
   public grid = 7;
   getItemStyle = (isDragging, draggableStyle) => ({
     userSelect: 'none',
-    background: isDragging ? 'lightblue' : 'lightgrey',
     ...draggableStyle
   })
   getListStyle = isDraggingOver => ({
-    background: isDraggingOver ? 'lightblue' : 'lightgrey',
+    background: isDraggingOver ? '#1A237E' : 'lightgrey',
     padding: this.grid,
     width: 985
   })
@@ -35,7 +34,11 @@ export class MacroSequences extends Component<any, any> {
       result.source.index,
       result.destination.index
     );
-    macro['cmds'] = items;
+    let updItems = items.map((item: any, i) => {
+      item['sequenceId'] = i + 1;
+      return item;
+    })
+    macro['cmds'] = updItems;
     this.props.updateMacro(macro);
   }
   render() {
@@ -66,7 +69,7 @@ export class MacroSequences extends Component<any, any> {
                           provided.draggableProps.style
                         )}
                       >
-                        { this._renderCard(c) }
+                        {this._renderCard(c, snapshot.isDragging) }
                       </div>
                     )}
                   </Draggable>
@@ -78,7 +81,7 @@ export class MacroSequences extends Component<any, any> {
       </DragDropContext>
     );
   }
-  _renderCard = c => {
+  _renderCard = (c, isDragging) => {
     return (
       <Paper zDepth={2}
         className='seq-paper'
@@ -87,14 +90,14 @@ export class MacroSequences extends Component<any, any> {
           width: 970,
           height: 60,
           margin: '7px 0px 7px 7px',
-          backgroundColor: '#29B6F6'
+          backgroundColor: isDragging ? '#0288D1' : 'lightblue',
         }}
       >
         <IconButton
           tooltip='Remove This Sequence'
           tooltipPosition='bottom-left'
           style={{ position: 'absolute', top: 0, right: 0 }}
-          onClick={() => this.props.remove(c.id)} >
+          onClick={() => this.props.remove(c.sequenceId)} >
           <ClearSequence style={{ height: 20, width: 20 }} />
         </IconButton>
         <div style={{
@@ -116,12 +119,23 @@ export class MacroSequences extends Component<any, any> {
         <div style={{ marginLeft: '10px' }}>
           <Row>
             <Col sm={4}>
-              <div style={{ marginTop: '22px', borderRight: 'solid 1px black' }}>
+              <div
+                style={{
+                  marginTop: '22px',
+                  borderRight: 'solid 1px black',
+                  color: isDragging ? darkWhite : darkBlack
+                }}
+              >
                 {c.displayName}
               </div>
             </Col>
             <Col sm={6}>
-              <div style={{ marginTop: '22px' }}>
+              <div
+                style={{
+                  marginTop: '22px',
+                  color: isDragging ? darkWhite : darkBlack
+                }}
+              >
                 {c.description}
               </div>
             </Col>

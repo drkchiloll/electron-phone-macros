@@ -37,41 +37,6 @@ export const phone = (() => {
       8900: ['8941', '8945', '8961'],
       9900: ['9951', '9971']
     },
-    itl() {
-      return [{
-        type: '8800',
-        sequence: [
-          'Key:Applications',
-          'Key:KeyPad6',
-          'Key:KeyPad4',
-          'Key:KeyPad5',
-          'Key:Soft3',
-          'Key:Soft1',
-          'Key:Soft1'
-        ]
-      }, {
-        type: '8811',
-        sequence: [
-          'Key:Applications',
-          'Key:KeyPad5',
-          'Key:KeyPad4',
-          'Key:KeyPad5',
-          'Key:Soft3',
-          'Key:Soft1',
-          'Key:Soft1'
-        ]
-      }, {
-        type: '8831',
-        sequence: [
-          'Init:Services',
-          'Key:Soft3',
-          'Key:KeyPad4',
-          'Key:KeyPad4',
-          'Key:Soft4',
-          'Key:Soft2'
-        ]
-      }]
-    },
     backgrounds() {
       return [{
         types: ['7941', '7942', '7961', '7962'],
@@ -216,6 +181,17 @@ export const phone = (() => {
       }, {
         name: 'Settings',
         displayName: 'Press Settings Key'
+      }, {
+        name: 'Pause3',
+        displayName: 'Pause for 3 Seconds'
+      }, { name: 'NavUp',
+        displayName: 'Navigate Up',
+      }, {
+        name: 'NavDwn',
+        displayName: 'Navigate Down',
+      }, {
+        name: 'NavSelect',
+        displayName: 'Navigate Select Button'
       }],
       init: {
         name: 'Services',
@@ -258,7 +234,7 @@ export const phone = (() => {
               return c;
             });
         case '8800':
-          return this.cmds.keys
+          keys = this.cmds.keys
             .filter((c: any) => 
               c.name !== 'Onhook' &&
               c.name !== 'Offhook')
@@ -266,6 +242,15 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
+          return keys.concat([{
+            name: 'NavLeft',
+            displayName: 'Navigate Left',
+            type: 'key'
+          }, {
+            name: 'NavRight',
+            displayName: 'Navigate Right',
+            type: 'key'
+          }])
         case '8900':
         case '9900':
           return this.cmds.keys
@@ -289,15 +274,18 @@ export const phone = (() => {
       bgEl.appendChild(imgEl);
       bgEl.appendChild(icnEl);
       setEl.appendChild(bgEl);
+      d.appendChild(setEl);
       return d.toString();
     },
     saveBgMacro(devices) {
       let macro: any = {
-        name: 'Backgrounds',
-        jobs: []
+        name: 'Bulk Background Change',
+        jobs: [],
+        types: []
       };
       macro.jobs = devices.reduce((a: any[], dev: any) => {
         if(dev.selectedImg) {
+          macro.types = macro.types.concat(dev.types);
           a.push({
             types: dev.types,
             background: {
@@ -310,7 +298,7 @@ export const phone = (() => {
         }
         return a;
       }, []);
-      console.log(macro.jobs);
+      return macroDb.add(macro);
     },
     saveMacro(macro) {
       // Generate XML
@@ -322,7 +310,6 @@ export const phone = (() => {
         el2.setAttribute('URL', c.name);
         el1.appendChild(el2);
         d.appendChild(el1);
-        console.log(d.toString());
         c['xml'] = d.toString();
         return c;
       }).then(commands => {

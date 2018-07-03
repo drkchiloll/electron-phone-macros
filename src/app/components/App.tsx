@@ -11,7 +11,7 @@ export class App extends Component<any, any> {
   constructor() {
     super();
     this.state = {
-      tabValue: 'mainView',
+      tabValue: 'device-search',
       openAcct: false,
       tabIndx: 1,
       account: null
@@ -69,7 +69,10 @@ export class App extends Component<any, any> {
           label='Device Search'
           value='device-search'
         >
-          <MainView account={account} />
+          {
+            tabValue !== 'device-search' ? null :
+              <MainView account={account} />
+          }
         </Tab>
         <Tab icon={
             <span className='fa-stack fa-lg'>

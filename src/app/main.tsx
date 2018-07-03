@@ -12,14 +12,23 @@ const lightMuiTheme = getMuiTheme({
     backgroundColor: '#d7dddd',
   },
   textField: {
-    floatingLabelColor: darkBlack,
-    focusColor: 'rgb(120,20,17)'
+    floatingLabelColor: darkBlack
   },
   flatButton: {
     primaryTextColor: darkBlack
   },
   snackbar: {
     textColor: fullWhite
+  },
+  palette: {
+    primary1Color: '#01579B'
+  },
+  menuItem: {
+    selectedTextColor: '#1A237E'
+  },
+  tableRow: {
+    stripeColor: '#CFD8DC',
+    selectedColor: '#90CAF9',
   }
 });
 

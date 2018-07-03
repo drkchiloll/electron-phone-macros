@@ -20,8 +20,20 @@ export class PhoneMacros extends Component<any, any> {
   componentDidMount() {
     this.getMacros();
   }
-  getMacros = () =>
-    macroDb.get().then(macros => this.setState({ macros }));
+
+  getMacros = () => {
+    macroDb.get()
+      .then(macros => this.setState({ macros }))
+      .then(() => {
+        macroDb.macroEvent.on('m-add', this.updateMacros);
+        macroDb.macroEvent.on('m-update', this.updateMacros);
+        macroDb.macroEvent.on('m-remove', this.updateMacros);
+      })
+  }
+
+  updateMacros = macros => {
+    this.setState({ macros });
+  }
   
   closeMacro = () => {
     this.setState({
@@ -31,6 +43,7 @@ export class PhoneMacros extends Component<any, any> {
     this.getMacros();
 
   }
+
   render() {
     const { macros, newMacro, clickedMacro } = this.state;
     return (
@@ -47,11 +60,7 @@ export class PhoneMacros extends Component<any, any> {
               macros.map((m: any, i: number) =>
                 <Card
                   key={m._id}
-                  style={{
-                    position: 'relative',
-                    margin: '10px 0 10px 0',
-                    width: 650
-                  }}
+                  style={this.styles.card}
                   initiallyExpanded={false}
                   onExpandChange={() => {
                     this.setState({
@@ -71,6 +80,12 @@ export class PhoneMacros extends Component<any, any> {
                     tooltipPosition='bottom-left'
                     iconStyle={{ height: 15, width: 15 }}
                     style={{ position: 'absolute', top: 0, right: 0 }}
+                    onClick={e => {
+                      macroDb.remove(m._id).then(() => {
+                        macros.splice(i, 1);
+                        this.setState({ macros });
+                      });
+                    }}
                   >
                     <RemoveMacro />
                   </IconButton>
@@ -82,11 +97,13 @@ export class PhoneMacros extends Component<any, any> {
       </div>
     );
   }
+
   styles: any = {
     addbtn: { marginTop: 15 },
     card: {
+      position: 'relative',
       margin: '10px 0 10px 0',
-      width: 1024
+      width: 650
     }
   }
 }

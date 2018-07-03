@@ -11,7 +11,7 @@ import { GridList, GridTile } from 'material-ui';
 
 import { DeviceTable } from './DeviceTable';
 import { SearchPanel } from './SearchPanel';
-import { JobSelector } from './JobSelector';
+import { MacroSelector } from './MacroSelector';
 import { ModelEnum } from '../lib/model-db';
 import { macroDb } from '../lib/macro-db';
 import { jtapi } from '../lib/jtapi';
@@ -256,7 +256,7 @@ export class MainView extends Component<any, any> {
     const disabled = (account && ipAddresses[0]) ? false : true;
     return (
       <div>
-        <JobSelector
+        <MacroSelector
           values={selectedMacros}
           macros={macros}
           change={this.handleJobChange}

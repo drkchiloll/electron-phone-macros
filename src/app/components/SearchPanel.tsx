@@ -22,7 +22,7 @@ export class SearchPanel extends Component<any, any> {
                 onChange={this.props.changed}
               />
               <IconButton className='fa-plus'
-                style={{positon: 'absolute', bottom: 15, right: -20}}
+                style={{position: 'absolute', bottom: 15, right: 30}}
                 onClick={e => this.props.query(e, i)}
               >
                 <FontIcon className='fa fa-plus fa-lg' color='green' />

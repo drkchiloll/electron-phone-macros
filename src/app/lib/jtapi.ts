@@ -3,13 +3,7 @@ import { Promise } from 'bluebird';
 import { join } from 'path';
 import { EventEmitter } from 'events';
 import { DOMParser } from 'xmldom';
-
-// java.asyncOptions = {
-//   asyncSuffix: undefined,
-//   syncSuffix: '',
-//   promiseSuffix: 'Promise',
-//   promisify: Promise.promisify
-// };
+import { req } from './requests';
 
 export class JTAPI {
   public account: any;
@@ -92,28 +86,26 @@ const bgdocHandler = ({account, background}) => {
   return doc.toString();
 }
 
-const exec = (terminal, dev, cmd) => {
-  const timer = cmd.sequenceId === 1 ? 0 :
-    cmd.name.includes('Pause') ? 3000 :
-    cmd.sequenceId * 150;
-  return new Promise((resolve, reject) => {
-    setTimeout((term, d, xml) => {
-      term.execAction([d, xml], (err, msg) => {
-        setTimeout(() => {
-          term.getResp((err, resp) => {
-            resolve(resp);
-          });
-        }, 1500);
-      });
-    }, timer, terminal, dev, cmd.xml);
-  });
-};
-
 export const jtapi = (() => {
   const service: any = {
     cti: null,
+    account: null,
     runner: new EventEmitter(),
-    devices: null,
+    execMacro(terminal, dev, cmd) {
+      const timer = cmd.name.includes('Pause') ? 2000 :
+        dev.type === '7800' ? 300 : 0;
+      return new Promise((resolve, reject) => {
+        setTimeout((term, d, c) => {
+          term.execAction([d.deviceName, c.xml], (err, msg) => {
+            setTimeout(() => {
+              term.getResp((err, resp) => {
+                resolve(resp);
+              });
+            }, 1000);
+          });
+        }, timer, terminal, dev, cmd);
+      });
+    },
     computeDevicesToPush({types, devices}) {
       return Promise.reduce(types, (a: any, type) => Promise.filter(
         devices, (d: any) => d.model === type).then(matches => {
@@ -125,16 +117,45 @@ export const jtapi = (() => {
       return this.cti.createList(provider)
         .then(list => new this.cti.CiscoTerminal(list));
     },
+    getBackground(options) {
+      return req.get(options)
+        .then(({ data }) => data)
+        .catch(() => null);
+    },
+    updateEmitter(event, d, cmd, resp) {
+      let { username, password } = this.account;
+      const url = `http://${d.ip}/CGI/Screenshot`;
+      let update: any = {
+        device: d,
+        cmd: cmd ? cmd.name : undefined,
+        responseMessage: resp || undefined
+      };
+      return this.getBackground({
+        url,
+        method: 'get',
+        responseType: 'arraybuffer',
+        auth: { username, password }
+      }).then(img => {
+        if(img) update['img'] = img;
+        this.runner.emit(event, update);
+        return;
+      });
+    },
     macroRunner(cmds, d, provider) {
-      return Promise.mapSeries(cmds, (cmd, indx) => {
+      return Promise.mapSeries(cmds, (cmd: any, indx) => {
         return this.terminal(provider).then(t => {
-          return exec(t, d.deviceName, cmd).then(resp => {
-            console.log(resp);
-            if(indx === cmds.length-1) t.close();
-            return resp;
-          })
-        })
-      })
+          return this.execMacro(t, d, cmd).then(resp => {
+            this.updateEmitter('update', d, cmd, resp)
+            if(indx === cmds.length - 1) {
+              setTimeout(() => {
+                this.updateEmitter('update-end', d, cmd, resp);
+              }, 3000);
+              t.close();
+            }
+            return;
+          });
+        });
+      });
     },
     deviceRunner({cmds, provider, devices}) {
       return Promise.map(devices, (d: any) => {
@@ -147,12 +168,13 @@ export const jtapi = (() => {
     },
     run({ account, macros, devices }) {
       this.cti = new JTAPI(account);
+      this.account = account;
       return Promise.map(macros, (macro: any) => {
         // Map Through Types
         let compute = { types: macro.types, devices };
         return this.computeDevicesToPush(compute)
           .then(d => this.getProvider(macro.cmds, d)
-          .then((results) => this.deviceRunner(results)))
+          .then(results => this.deviceRunner(results)))
       })
     }
   };

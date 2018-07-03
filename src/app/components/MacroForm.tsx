@@ -3,10 +3,10 @@ import {
   Paper, MenuItem, TextField,
   phone, blueGrey500, SelectField,
   RaisedButton, FloatingActionButton,
-  blue300, MacroSequences, Api
+  blue300, MacroSequences, Api, IconButton
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-// import { MacroSequences } from './MacroSequences';
+import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
 import {
   DragDropContext, Droppable, Draggable
 } from 'react-beautiful-dnd';
@@ -73,7 +73,7 @@ export class MacroForm extends Component<any, any> {
           primaryText={c.displayName}
         />
       )
-    })
+    });
   }
   handleSelect = (e, indx, deviceList) => {
     let cmdList = [];
@@ -84,7 +84,10 @@ export class MacroForm extends Component<any, any> {
     }
     this.setState({ deviceList, cmdList });
   }
-  addCommand = (e, indx, value) => this.setState({ selectedCmd: value });
+  addCommand = (e, indx, value) => {
+    if(!value) return;
+    this.setState({ selectedCmd: value });
+  }
   handleInputs = (e, value) => {
     if(e.target.name === 'macroName')
       this.setState({ macroName: value });
@@ -141,12 +144,11 @@ export class MacroForm extends Component<any, any> {
   }
   removeSequence = id => {
     let { macro } = this.state;
-    console.log(macro.cmds);
     let cmds = JSON.parse(JSON.stringify(macro.cmds));
-    let remove = cmds.findIndex(c => c.id === id);
+    let remove = cmds.findIndex(c => c.sequenceId === id);
     cmds.splice(remove, 1);
     if(cmds.length > 0) {
-      cmds.forEach((c, i) => c['id'] = i+1);
+      cmds.forEach((c, i) => c['sequenceId'] = i+1);
       macro['cmds'] = cmds;
     } else {
       macro['cmds'] = [];
@@ -160,6 +162,7 @@ export class MacroForm extends Component<any, any> {
     macro.types = deviceList;
     macro.name = macroName;
     phone.saveMacro(macro);
+    this.props.close();
   }
   render() {
     const {
@@ -167,6 +170,12 @@ export class MacroForm extends Component<any, any> {
       macroName, sequenceDesc, macro
     } = this.state;
     return <Paper zDepth={1} style={this.styles.mpaper}>
+      <IconButton
+        tooltip='BACK'
+        tooltipPosition='bottom-right'
+        iconClassName='fa fa-hand-o-left'
+        onClick={() => this.props.close()}
+      />
       <div style={this.styles.pridiv}>
         <TextField
           name='macroName'
@@ -224,10 +233,6 @@ export class MacroForm extends Component<any, any> {
           onClick={this.saveMacro}
           style={{marginRight: '10px' }}
         />
-        <RaisedButton
-          label='Close'
-          onClick={() => this.props.close()}
-        />
       </div>
     </Paper>;
   }
@@ -236,7 +241,7 @@ export class MacroForm extends Component<any, any> {
       position: 'relative',
       marginTop: '10px',
       width: 1024,
-      height: 650,
+      height: '100%',
       overflow: 'auto'
     },
     pridiv: {
@@ -247,7 +252,7 @@ export class MacroForm extends Component<any, any> {
     name: { width: 350, marginRight: 45 },
     selectDev: {
       position: 'absolute',
-      top: 0,
+      top: 48,
       left: 385,
       width: 500
     },
@@ -260,12 +265,12 @@ export class MacroForm extends Component<any, any> {
       width: 500,
       position: 'absolute',
       left: 380,
-      top: 82
+      top: 130
     },
     fltbtn1: {
       position: 'absolute',
       left: 900,
-      top: 101
+      top: 150
     }
   }
 }

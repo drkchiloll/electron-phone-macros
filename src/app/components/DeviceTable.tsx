@@ -3,18 +3,14 @@ import {
   TableHeaderColumn, TableRow, TableRowColumn,
   FontIcon
 } from './index';
+import { IconButton, CircularProgress } from 'material-ui';
 
 export class DeviceTable extends Component<any, any> {
   constructor() {
     super();
   }
-  computeTableHeight = devices => {
-    if(devices.length <= 2) return '100px';
-    else if(devices.length >= 3 && devices.length <= 7) return '250px';
-    else if(devices.length > 7) return '350px';
-  }
   _tableHeader = () => [
-      'IP Address', 'Name', 'Type', 'Device Association', 'ITL Cleared'
+      'IP Address', 'Name', 'Type', 'Device Association', 'Job Status'
     ].map(item =>
       <TableHeaderColumn
         style={{ width: item==='Name' ? 155 : 100 }}
@@ -24,14 +20,33 @@ export class DeviceTable extends Component<any, any> {
       </TableHeaderColumn>
     );
 
+  handleRowSelect = selections => {
+    // all none Number[]
+    let { devices } = this.props;
+    devices = devices.map((d, indx) => {
+      if(selections === 'all') d.checked = true;
+      else if(selections === 'none') d.checked = false;
+      else {
+        const match: number = selections.indexOf(indx);
+        if(d.checked) {
+          if(match === -1) d.checked = false;
+        } else {
+          if(match !== -1) d.checked = true;
+        }
+      }
+      return d;
+    })
+    this.props.updateSelection(devices);
+  }
+
   render() {
     const { devices } = this.props;
     return (
-      <Table height={this.computeTableHeight(devices)}
+      <Table height={'auto'}
         fixedHeader={true}
         selectable={true}
         multiSelectable={true}
-        onRowSelection={() => {}}
+        onRowSelection={this.handleRowSelect}
       >
         <TableHeader
           displaySelectAll={true}
@@ -40,24 +55,31 @@ export class DeviceTable extends Component<any, any> {
         >
           <TableRow>{this._tableHeader()}</TableRow>
         </TableHeader>
-        <TableBody displayRowCheckbox={true}
-          deselectOnClickaway={true}
+        <TableBody
+          displayRowCheckbox={true}
+          deselectOnClickaway={false}
           stripedRows={true} >
           {devices.map((device: any, i: number) => (
-            <TableRow key={i} selected={device.checked} displayBorder={true}>
+            <TableRow
+              key={i}
+              selectable={device.associated ? true : false}
+              selected={device.checked}
+            >
               <TableRowColumn>{device.ip}</TableRowColumn>
               <TableRowColumn style={{width: 155}}>{device.name}</TableRowColumn>
               <TableRowColumn >{device.model}</TableRowColumn>
               <TableRowColumn>
                 {device.associated ?
-                  <FontIcon className='fa fa-check' color='green' /> :
-                  <FontIcon className='fa fa-times fa-2x' color='red' />
+                  <FontIcon className='fa fa-check fa-lg' /> :
+                  <FontIcon className='fa fa-times fa-2x' />
                 }
               </TableRowColumn>
               <TableRowColumn>
-                {device.cleared ?
-                  <FontIcon className='fa fa-check-circle-o' color='green' /> :
-                  <FontIcon className='fa fa-times-circle fa-2x' color='red' />
+                {device.cleared === 'in progress' ?
+                  <FontIcon className='fa fa-spinner fa-spin fa-lg fa-fw' /> :
+                 device.cleared ?
+                  <FontIcon className='fa fa-check' /> :
+                  <FontIcon className='fa fa-times-circle fa-2x' />
                 }
               </TableRowColumn>
             </TableRow>

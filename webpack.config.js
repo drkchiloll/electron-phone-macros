@@ -8,10 +8,10 @@ const { NODE_ENV } = process.env;
 let nodeModules = {};
 
 fs.readdirSync('node_modules')
-  .filter((x) =>
-    ['.bin'].indexOf(x) === -1 || x === 'java'
-  )
-  .forEach(function(mod) {
+  .filter(function (x) {
+    return ['.bin'].indexOf(x) === -1 && x === 'java';
+  })
+  .forEach(function (mod) {
     nodeModules[mod] = 'commonjs ' + mod;
   });
 
@@ -37,7 +37,6 @@ module.exports = (env, options) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js']
     },
-    externals: nodeModules,
     module: {
       rules: [{
         test: /\.tsx?$/,
@@ -52,7 +51,8 @@ module.exports = (env, options) => {
         test: /.woff$|.woff2$|.ttf$|.eot$|.svg$|.jpg$/,
         loader: 'url-loader'
       }]
-    }
+    },
+    externals: nodeModules
   };
 
   let prod = {

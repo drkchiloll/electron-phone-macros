@@ -4,7 +4,6 @@ import {
   Component
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
-import { Backgrounds } from './Backgrounds';
 import { accountDb } from '../lib/account-db';
 
 export class App extends Component<any, any> {
@@ -30,7 +29,7 @@ export class App extends Component<any, any> {
     this.setState({
       openAcct: false,
       tabIdx: 1,
-      tabValue: 'mainView'
+      tabValue: 'device-search'
     });
   }
   _tabSelect = tabValue => {
@@ -83,17 +82,6 @@ export class App extends Component<any, any> {
           value='templates'
         >
           <PhoneMacros />
-        </Tab>
-        <Tab
-          label='BACKGROUNDS'
-          value='backgrounds'
-          icon={
-            <span className='fa-stack fa-lg'>
-              <i className='fa fa-picture-o fa-lg' />
-            </span>
-          }
-        >
-          <Backgrounds account={account} />
         </Tab>
       </Tabs>
     );

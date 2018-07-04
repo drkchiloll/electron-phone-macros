@@ -2,14 +2,15 @@ const path = require('path'),
   fs = require('fs'),
   webpack = require('webpack'),
   merge = require('webpack-merge')
-  UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+  UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
+  nodeLoader = require('node-loader');
 
 const { NODE_ENV } = process.env;
 let nodeModules = {};
 
 fs.readdirSync('node_modules')
   .filter(function (x) {
-    return ['.bin'].indexOf(x) === -1 && x === 'java';
+    return ['.bin'].indexOf(x) === -1 && x === 'java'
   })
   .forEach(function (mod) {
     nodeModules[mod] = 'commonjs ' + mod;
@@ -50,7 +51,10 @@ module.exports = (env, options) => {
       }, {
         test: /.woff$|.woff2$|.ttf$|.eot$|.svg$|.jpg$/,
         loader: 'url-loader'
-      }]
+        }, {
+          test: /\.node$/,
+          use: 'node-loader'
+        }]
     },
     externals: nodeModules
   };

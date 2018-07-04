@@ -174,18 +174,22 @@ export class Cucm {
 
   parseRisDoc(xml:string, modelNum) {
     let doc = new dom().parseFromString(xml),
-        // models = this.getDeviceModel(),
         ipNodes,modelNodes,nameNodes,fwNodes;
     if(!this.models) this.models = this.getDeviceModel();
     if(this.profile.version.startsWith('8')) {}
     else {
+      const cmDevicesTag = doc.getElementsByTagNameNS(
+        'http://schemas.cisco.com/ast/soap',
+        'CmDevices'
+      );
+      const devDoc = new dom().parseFromString(cmDevicesTag.toString());
       let ns1Select = xpath.useNamespaces({
         ns1: 'http://schemas.cisco.com/ast/soap'
       });
-      ipNodes = ns1Select('//ns1:IP', doc);
-      modelNodes = ns1Select('//ns1:Model', doc);
-      nameNodes = ns1Select('//ns1:CmDevices/ns1:item/ns1:Name', doc);
-      fwNodes = ns1Select('//ns1:ActiveLoadID', doc);
+      ipNodes = ns1Select('//ns1:IP', devDoc);
+      modelNodes = ns1Select('//ns1:Model', devDoc);
+      nameNodes = ns1Select('//ns1:Name', devDoc);
+      fwNodes = ns1Select('//ns1:ActiveLoadID', devDoc);
     }
     return Promise.map(ipNodes, (node:any, i) => {
       return {
@@ -194,7 +198,6 @@ export class Cucm {
         name: nameNodes[i].firstChild.data,
         firmware: (() => {
           if(fwNodes[i] && fwNodes[i].firstChild) {
-            // console.log(fwNodes[i].firstChild.data);
             return fwNodes[i].firstChild.data;
           } else {
             'UNKNOWN'

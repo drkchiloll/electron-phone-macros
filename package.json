@@ -6,17 +6,20 @@
   "scripts": {
     "rebuild": "node_modules/.bin/electron-rebuild -p -t \"dev,prod,optional\"",
     "postinst_java": "node node_modules/java/postInstall.js",
-    "build_java": "npm run rebuild && npm run postinst_java",
+    "build_java": "npm install java@latest && npm run rebuild && npm run postinst_java",
     "build:dev": "webpack --mode development --watch --profile",
     "build:dev:win": "SET \"NODE_ENV=development\" && webpack --watch --progress --profile",
-    "build:dist": "node_modules/.bin/webpack --config webpack.config.js --mode production --progress --colors && rm dist/*.js.map",
+    "build:dist": "node_modules/.bin/webpack --config webpack.config.js --mode production --progress --colors",
     "build:win:dist": "SET \"NODE_ENV=production\" && webpack --define process.env.NODE_ENV=\"production\" --progress --colors",
     "start": "electron .",
-    "package:macos": "node_modules/.bin/electron-packager ./ VideoCodec-Emulator --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=1.0.4 --icon ./resources/touch10_panel.icns",
-    "package:win64": "node_modules/.bin/electron-packager ./ VideoCodec_Emulator --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/electron* --app-version=1.0.3 --icon ./resources/touch10_panel.ico",
-    "clean": "cd dist && rm *.js *.map && cd .."
+    "package:macos": "node_modules/.bin/electron-packager ./ coHuslin Phone Macro Builder --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
+    "package:win64": "node_modules/.bin/electron-packager ./ coHuslin Phone Macro Builder --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/touch10_panel.ico",
+    "clean": "cd dist && rm *.js* && cd ..",
+    "clean_jtapi": "rm CiscoJtapi*"
   },
-  "dependencies": {},
+  "dependencies": {
+    "java": "^0.10.0"
+  },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
     "@types/jquery": "^2.0.41",
@@ -39,7 +42,6 @@
     "electron-rebuild": "^1.7.3",
     "file-loader": "^0.10.1",
     "font-awesome": "^4.7.0",
-    "java": "^0.10.0",
     "jquery": "^3.1.1",
     "material-ui": "^0.20.1",
     "moment": "^2.18.1",

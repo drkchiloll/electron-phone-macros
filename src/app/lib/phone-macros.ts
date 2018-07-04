@@ -37,65 +37,6 @@ export const phone = (() => {
       8900: ['8941', '8945', '8961'],
       9900: ['9951', '9971']
     },
-    backgrounds() {
-      return [{
-        types: ['7941', '7942', '7961', '7962'],
-        folder: '320x196x4'
-      }, {
-        types: ['7945', '7965'],
-        folder: '320x212x16'
-      }, {
-        types: ['7970', '7971'],
-        folder: '320x212x12'
-      }, {
-        types: ['7975'],
-        folder: '320x216x16'
-      }, {
-        types: ['8941', '8945', '9951', '9971'],
-        folder: '640x480x24'
-      }, {
-        types: ['8800'],
-        folder: '800x480x24'
-      }];
-    },
-    backgroundSearch({ host, path }) {
-      const baseURL = `http://${host}:6970`;
-      return req.get({
-        url: baseURL + `/Desktops/${path}/List.xml`,
-        method: 'get'
-      }).then(({data}: any) => {
-        if(!data) return null;
-        const doc = new DOMParser().parseFromString(data);
-        const thumbs: any = xpath.select(this.paths.thumb, doc);
-        const images = xpath.select(this.paths.image, doc);
-        return Promise.map(images, (img: any, i) => ({
-          tn: thumbs[i].value.replace('TFTP:', '/'),
-          image: img.value.replace('TFTP:', '/'),
-          name: img.value.match(/\/\S+\/(\S+\.png)/)[1]
-        }));
-      }).then(backgrounds => {
-        if(!backgrounds) return null;
-        return Promise.map(backgrounds, (bg: any) => {
-          return this.getBackground({
-            url: baseURL + bg.tn
-          }).then(img => {
-            if(!img) bg.imgPreview = 'not found';
-            else bg.imgPreview = img;
-            return bg;
-          });
-        })
-      })
-    },
-    getBackground({url}) {
-      return req.get({
-        url,
-        method: 'get',
-        responseType: 'arraybuffer'
-      }).then(resp => {
-        if(resp.status === 404) return null;
-        else return resp.data;
-      });
-    },
     cmds: {
       keys: [{
         name: 'Applications',
@@ -264,18 +205,6 @@ export const phone = (() => {
               return c;
             });
       }
-    },
-    bgXmlBuilder() {
-      let d: any = (new DOMImplementation()).createDocument('', '', null);
-      let setEl = d.createElement('setBackground'),
-        bgEl = d.createElement('background'),
-        imgEl = d.createElement('image'),
-        icnEl = d.createElement('icon');
-      bgEl.appendChild(imgEl);
-      bgEl.appendChild(icnEl);
-      setEl.appendChild(bgEl);
-      d.appendChild(setEl);
-      return d.toString();
     },
     saveBgMacro(devices) {
       let macro: any = {

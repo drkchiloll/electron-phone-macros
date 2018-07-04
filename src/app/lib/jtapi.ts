@@ -4,19 +4,17 @@ import { join } from 'path';
 import { EventEmitter } from 'events';
 import { DOMParser } from 'xmldom';
 import { req } from './requests';
-
 export class JTAPI {
   public account: any;
   private classes: string[] = [
-    './dataterminal_11_0',
-    './dataterminal_9_1_2',
-    './dataterminal_8_5'
+    './java/dataterminal_11.0.jar',
+    './java/dataterminal_9.1.2.jar',
+    './java/dataterminal_8.5.jar'
   ];
   private JtapiPeerFactory: any;
   private classpath: string;
   private provider: string;
   public Condition: any;
-  public Arrays: any;
   public CiscoTerminal: any;
   constructor(account: any) {
     this.account = account;
@@ -32,7 +30,6 @@ export class JTAPI {
     java.classpath.push(this.classpath);
     this.JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
     this.Condition = java.import('com.cisco.cti.util.Condition');
-    this.Arrays = java.import('java.util.Arrays');
     this.CiscoTerminal = java.import('DataTerminal');
   }
 

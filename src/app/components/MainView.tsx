@@ -208,7 +208,7 @@ export class MainView extends Component<any, any> {
     })
   }
 
-  handleJobChange = (e, selectedMacros) => {
+  handleJobChange = (e, indx, selectedMacros) => {
     let job: any;
     if(selectedMacros.length > 0) {
       job = selectedMacros
@@ -261,12 +261,6 @@ export class MainView extends Component<any, any> {
           macros={macros}
           change={this.handleJobChange}
         />
-        <strong
-          style={{
-            position: 'absolute',
-            top: 15,
-            left: 40
-          }}>{job}</strong>
         <div style={this.style().main}>
           <Paper zDepth={4} style={this.style().mainpaper}>
             <SearchPanel

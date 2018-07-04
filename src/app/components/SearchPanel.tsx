@@ -11,6 +11,7 @@ export class SearchPanel extends Component<any, any> {
           <div key={i}>
             <div style={{marginLeft: '10px', position: 'relative'}}>
               <TextField
+                id={`search_field_${i}`}
                 hintText='10.255.2.*'
                 name={`ip_${i}`}
                 underlineShow={true}
@@ -22,17 +23,17 @@ export class SearchPanel extends Component<any, any> {
                 onChange={this.props.changed}
               />
               <IconButton className='fa-plus'
-                style={{position: 'absolute', bottom: 15, right: 30}}
+                iconClassName='fa fa-plus'
+                iconStyle={{color: 'green'}}
+                style={{position: 'absolute', bottom: 15, right: 32}}
                 onClick={e => this.props.query(e, i)}
-              >
-                <FontIcon className='fa fa-plus fa-lg' color='green' />
-              </IconButton>
+              />
               <IconButton className='fa-minus'
+                iconClassName='fa fa-minus'
+                iconStyle={{ color: 'red' }}
                 style={{position: 'absolute', bottom: 15, right: 0}}
                 onClick={e => this.props.query(e, i)}
-              >
-                <FontIcon className='fa fa-minus fa-lg' color='red' />
-              </IconButton>
+              />
             </div>
           </div>
         )}

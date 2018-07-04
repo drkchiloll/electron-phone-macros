@@ -1,15 +1,13 @@
 import {
-  React, Component,
+  React, Component, Subheader,
   Paper, MenuItem, TextField,
   phone, blueGrey500, SelectField,
   RaisedButton, FloatingActionButton,
   blue300, MacroSequences, Api, IconButton
 } from './index';
+import * as ToggleButton from 'react-toggle-button';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
-import {
-  DragDropContext, Droppable, Draggable
-} from 'react-beautiful-dnd';
+
 
 export class MacroForm extends Component<any, any> {
   public grid = 6;
@@ -21,6 +19,7 @@ export class MacroForm extends Component<any, any> {
       cmdList: [],
       macroName: '',
       sequenceDesc: '',
+      testMode: false,
       macro: {
         name: '',
         types: [],
@@ -167,80 +166,98 @@ export class MacroForm extends Component<any, any> {
   render() {
     const {
       deviceList, selectedCmd, cmdList,
-      macroName, sequenceDesc, macro
+      macroName, sequenceDesc, macro, testMode
     } = this.state;
-    return <Paper zDepth={1} style={this.styles.mpaper}>
-      <IconButton
-        tooltip='BACK'
-        tooltipPosition='bottom-right'
-        iconClassName='fa fa-hand-o-left'
-        onClick={() => this.props.close()}
-      />
-      <div style={this.styles.pridiv}>
-        <TextField
-          name='macroName'
-          value={macroName}
-          onChange={this.handleInputs}
-          style={this.styles.name}
-          floatingLabelFixed={true}
-          floatingLabelText='Name of Macro' />
-        <SelectField
-          style={this.styles.selectDev}
-          floatingLabelFixed={true}
-          floatingLabelText='Device Type Selections'
-          multiple={true}
-          value={deviceList}
-          onChange={this.handleSelect}
-        >
-          { this._renderItem(deviceList) }
-        </SelectField>
-        <br/>
-        <SelectField
-          style={this.styles.selectcmd}
-          floatingLabelFixed={true}
-          floatingLabelText='Command List'
-          value={selectedCmd}
-          onChange={this.addCommand} >
-          { this._renderCmdList(cmdList)}
-        </SelectField>
-        <TextField
-          name='sequenceDesc'
-          value={sequenceDesc}
-          onChange={this.handleInputs}
-          style={this.styles.cmddesc}
-          floatingLabelFixed={true}
-          floatingLabelText='Description of Command to Macro' />
-        <FloatingActionButton mini={true}
-          backgroundColor={blueGrey500}
-          style={this.styles.fltbtn1}
-          onClick={this.addSequence}
-        >
-          <ContentAdd />
-        </FloatingActionButton>
-        <br/>
-        {
-          macro.cmds.length > 0 ?
-            <MacroSequences
-              macro={macro}
-              remove={this.removeSequence}
-              edit={this.editSequenceItem}
-              updateMacro={(macro) => this.setState({ macro })} /> :
-            null
-        }
-        <br/>
-        <RaisedButton
-          label='Save'
-          onClick={this.saveMacro}
-          style={{marginRight: '10px' }}
-        />
+    return (
+      <div>
+        <Paper zDepth={1} style={this.styles.mpaper}>
+          <IconButton
+            tooltip='BACK'
+            tooltipPosition='bottom-right'
+            tooltipStyles={{ top: 25 }}
+            iconClassName='fa fa-hand-o-left'
+            onClick={() => this.props.close()}
+          />
+          <IconButton
+            tooltip='Save'
+            tooltipPosition='bottom-right'
+            tooltipStyles={{ top: 25 }}
+            iconClassName='fa fa-floppy-o'
+            onClick={this.saveMacro} />
+          <div style={{ position: 'absolute', top: 12, right:20 }}>
+            <span style={{marginLeft:-10, fontSize:'.95em'}}>
+              Test Mode
+            </span><br/>
+            <ToggleButton
+              activeLabel='ON'
+              inactiveLabel='OFF'
+              value={testMode}
+              thumbStyle={{borderRadius:2}}
+              trackStyle={{borderRadius:2}}
+              onToggle={testMode => this.setState({testMode: !testMode })}
+            />
+          </div>
+          <div style={this.styles.pridiv}>
+            <TextField
+              name='macroName'
+              value={macroName}
+              onChange={this.handleInputs}
+              style={this.styles.name}
+              floatingLabelFixed={true}
+              floatingLabelText='Name of Macro' />
+            <SelectField
+              style={this.styles.selectDev}
+              floatingLabelFixed={true}
+              floatingLabelText='Device Type Selections'
+              multiple={true}
+              value={deviceList}
+              onChange={this.handleSelect}
+            >
+              { this._renderItem(deviceList) }
+            </SelectField>
+            <br/>
+            <SelectField
+              style={this.styles.selectcmd}
+              floatingLabelFixed={true}
+              floatingLabelText='Command List'
+              value={selectedCmd}
+              onChange={this.addCommand} >
+              { this._renderCmdList(cmdList)}
+            </SelectField>
+            <TextField
+              name='sequenceDesc'
+              value={sequenceDesc}
+              onChange={this.handleInputs}
+              style={this.styles.cmddesc}
+              floatingLabelFixed={true}
+              floatingLabelText='Description of Command to Macro' />
+            <FloatingActionButton mini={true}
+              backgroundColor={blueGrey500}
+              style={this.styles.fltbtn1}
+              onClick={this.addSequence}
+            >
+              <ContentAdd />
+            </FloatingActionButton>
+            <br/>
+            {
+              macro.cmds.length > 0 ?
+                <MacroSequences
+                  macro={macro}
+                  remove={this.removeSequence}
+                  edit={this.editSequenceItem}
+                  updateMacro={(macro) => this.setState({ macro })} /> :
+                null
+            }
+          </div>
+        </Paper>;
       </div>
-    </Paper>;
+    );
   }
   styles: any = {
     mpaper: {
       position: 'relative',
       marginTop: '10px',
-      width: 1024,
+      width: 880,
       height: '100%',
       overflow: 'auto'
     },
@@ -249,27 +266,27 @@ export class MacroForm extends Component<any, any> {
       marginLeft: '15px',
       marginBottom: '15px'
     },
-    name: { width: 350, marginRight: 45 },
+    name: { width: 300, marginRight: 45 },
     selectDev: {
       position: 'absolute',
       top: 48,
-      left: 385,
+      left: 335,
       width: 500
     },
     selectcmd: {
-      width: 350,
+      width: 300,
       marginTop: '10px',
       marginBottom: '10px'
     },
     cmddesc: {
       width: 500,
       position: 'absolute',
-      left: 380,
+      left: 335,
       top: 130
     },
     fltbtn1: {
       position: 'absolute',
-      left: 900,
+      left: 830,
       top: 150
     }
   }

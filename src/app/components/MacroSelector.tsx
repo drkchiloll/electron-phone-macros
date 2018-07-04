@@ -13,14 +13,6 @@ const origins: any = {
 };
 
 const menuItems = (macros: any, values: any) => {
-  // let items: any = [(
-  //   <MenuItem key='close'
-  //     disabled
-  //     style={{height:0,width:'auto',margin:0,padding:0,position:'relative'}}
-  //     rightIconButton={
-  //     }
-  //   />
-  // )];
   let items: any = [(
     <IconButton
       key='close'

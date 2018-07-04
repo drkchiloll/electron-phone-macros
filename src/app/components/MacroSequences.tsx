@@ -18,7 +18,7 @@ export class MacroSequences extends Component<any, any> {
   getListStyle = isDraggingOver => ({
     background: isDraggingOver ? '#1A237E' : 'lightgrey',
     padding: this.grid,
-    width: 985
+    width: 835
   })
   reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -87,7 +87,7 @@ export class MacroSequences extends Component<any, any> {
         className='seq-paper'
         style={{
           position: 'relative',
-          width: 970,
+          width: 825,
           height: 60,
           margin: '7px 0px 7px 7px',
           backgroundColor: isDragging ? '#0288D1' : 'lightblue',

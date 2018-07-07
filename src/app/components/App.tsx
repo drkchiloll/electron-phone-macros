@@ -81,7 +81,7 @@ export class App extends Component<any, any> {
           label='Phone Macros'
           value='templates'
         >
-          <PhoneMacros />
+          <PhoneMacros account={account} />
         </Tab>
       </Tabs>
     );

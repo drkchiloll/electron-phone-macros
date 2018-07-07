@@ -1,5 +1,6 @@
 import * as java from 'java';
 import { Promise } from 'bluebird';
+import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
 import { EventEmitter } from 'events';
 import { DOMParser } from 'xmldom';
@@ -89,19 +90,24 @@ export const jtapi = (() => {
     account: null,
     runner: new EventEmitter(),
     execMacro(terminal, dev, cmd) {
-      const timer = cmd.name.includes('Pause') ? 2000 :
-        dev.type === '7800' ? 300 : 0;
-      return new Promise((resolve, reject) => {
-        setTimeout((term, d, c) => {
-          term.execAction([d.deviceName, c.xml], (err, msg) => {
-            setTimeout(() => {
-              term.getResp((err, resp) => {
-                resolve(resp);
-              });
-            }, 1000);
-          });
-        }, timer, terminal, dev, cmd);
-      });
+      if(cmd.name.includes('Pause')) {
+        const timer = parseInt(cmd.name.replace('Key:Pause','') + '000', 10);
+        console.log(timer);
+        return new Promise((resolve, reject) =>
+          setTimeout(() => resolve('done'), timer));
+      } else {
+        return new Promise((resolve, reject) => {
+          setTimeout((term, d, c) => {
+            term.execAction([d.deviceName, c.xml], (err, msg) => {
+              setTimeout(() => {
+                term.getResp((err, resp) => {
+                  resolve(resp);
+                });
+              }, 1000);
+            });
+          }, 0, terminal, dev, cmd);
+        });
+      }
     },
     computeDevicesToPush({types, devices}) {
       return Promise.reduce(types, (a: any, type) => Promise.filter(
@@ -114,10 +120,15 @@ export const jtapi = (() => {
       return this.cti.createList(provider)
         .then(list => new this.cti.CiscoTerminal(list));
     },
-    getBackground(options) {
-      return req.get(options)
-        .then(({ data }) => data)
-        .catch(() => null);
+    getBackground(ip) {
+      let url = `http://${ip}/CGI/Screenshot`;
+      let { username, password } = this.account;
+      return req.get({
+        url,
+        method: 'get',
+        responseType: 'arraybuffer',
+        auth: { username, password }
+      }).then(({ data }) => data).catch(() => null);
     },
     updateEmitter(event, d, cmd, resp) {
       let { username, password } = this.account;
@@ -127,12 +138,7 @@ export const jtapi = (() => {
         cmd: cmd ? cmd.name : undefined,
         responseMessage: resp || undefined
       };
-      return this.getBackground({
-        url,
-        method: 'get',
-        responseType: 'arraybuffer',
-        auth: { username, password }
-      }).then(img => {
+      return this.getBackground(d.ip).then(img => {
         if(img) update['img'] = img;
         this.runner.emit(event, update);
         return;
@@ -173,6 +179,53 @@ export const jtapi = (() => {
           .then(d => this.getProvider(macro.cmds, d)
           .then(results => this.deviceRunner(results)))
       })
+    },
+    deviceQuery({ account, devices }) {
+      this.account = account;
+      const risDoc = ris.createRisDoc({
+        version: account.version,
+        query: devices
+      });
+      let device: any;
+      return req.get({
+        url: `https://${account.host}:8443${ris.risPath}`,
+        data: risDoc,
+        method: 'post',
+        headers: { 'Content-Type': 'text/xml' },
+        auth: { username: account.username, password: account.password }
+      }).then(({ data }) => {
+        device = ris.parseResponse(data)[0];
+        return this.getBackground(device.ip).then(img => {
+          device['img'] = img;
+          return device;
+        });
+      });
+    },
+    runSingle({ account, macro, device }) {
+      device['deviceName'] = device.name;
+      this.cti = new JTAPI(account);
+      this.account = account;
+      const { cmds } = macro;
+      const { deviceName } = device;
+      return this.cti.connect().then(provider => {
+          return Promise.mapSeries(cmds, (c: any, idx) => {
+            return this.terminal(provider).then(t => {
+              return this.execMacro(t, device, c).then(resp => {
+                return this.updateEmitter('update', device, c, resp)
+                  .then(() => {
+                    if(idx === cmds.length - 1) {
+                      this.runner.emit('update-end');
+                      this.runner.removeAllListeners('update');
+                      this.runner.removeAllListeners('update-end');
+                      t.close();
+                    }
+                    return;
+                  })
+                // this.runner.emit('update', c);
+              })
+            })
+          })
+        })
     }
   };
   return service;

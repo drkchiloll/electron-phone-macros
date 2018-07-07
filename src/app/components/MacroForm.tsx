@@ -5,9 +5,9 @@ import {
   RaisedButton, FloatingActionButton,
   blue300, MacroSequences, Api, IconButton
 } from './index';
-import * as ToggleButton from 'react-toggle-button';
 import ContentAdd from 'material-ui/svg-icons/content/add';
-
+import { MacroTester } from './MacroTester';
+import * as robot from 'robotjs';
 
 export class MacroForm extends Component<any, any> {
   public grid = 6;
@@ -97,36 +97,16 @@ export class MacroForm extends Component<any, any> {
       selectedCmd, cmdList,
       macro, sequenceDesc
     } = this.state;
-    let command: any;
-    if(macro.cmds.find(c => c.editing)) {
-      command = JSON.parse(JSON.stringify(cmdList.find((c: any) =>
-        c.displayName === selectedCmd)));
-      command['description'] = sequenceDesc;
-      command['editing'] = false;
-      if(command.type === 'key') {
-        command.name = `Key:${command.name}`;
-      } else {
-        command.name = `Init:${command.name}`;
-      }
-      let curIndx = macro.cmds.findIndex(c => c.editing);
-      command['sequenceId'] = curIndx + 1;
-      macro.cmds[curIndx] = command;
-    } else {
-      command = JSON.parse(JSON.stringify(cmdList.find((c: any) =>
-        c.displayName === selectedCmd)));
-      command['description'] = sequenceDesc;
-      command['sequenceId'] = macro.cmds.length + 1;
-      if(command.type === 'key') {
-        command.name = `Key:${command.name}`;
-      } else {
-        command.name = `Init:${command.name}`;
-      }
-      macro.cmds.push(command);
-    }
+    const m = phone.cmdHelper({
+      selected: selectedCmd,
+      list: cmdList,
+      macro,
+      desc: sequenceDesc 
+    });
     this.setState({
       selectedCmd: '',
       sequenceDesc: '',
-      macro
+      macro: m
     });
   }
   editSequenceItem = cmd => {
@@ -161,45 +141,31 @@ export class MacroForm extends Component<any, any> {
     macro.types = deviceList;
     macro.name = macroName;
     phone.saveMacro(macro);
-    this.props.close();
   }
   render() {
     const {
       deviceList, selectedCmd, cmdList,
       macroName, sequenceDesc, macro, testMode
     } = this.state;
+    // console.log(macro.name);
+    // if(macro.name === 'New') {
+    //   robot.keyTap('backspace');
+      // robot.keyTap('backspace');
+      // robot.keyTap('backspace');
+    // }
     return (
       <div>
         <Paper zDepth={1} style={this.styles.mpaper}>
-          <IconButton
-            tooltip='BACK'
-            tooltipPosition='bottom-right'
-            tooltipStyles={{ top: 25 }}
-            iconClassName='fa fa-hand-o-left'
-            onClick={() => this.props.close()}
-          />
           <IconButton
             tooltip='Save'
             tooltipPosition='bottom-right'
             tooltipStyles={{ top: 25 }}
             iconClassName='fa fa-floppy-o'
             onClick={this.saveMacro} />
-          <div style={{ position: 'absolute', top: 12, right:20 }}>
-            <span style={{marginLeft:-10, fontSize:'.95em'}}>
-              Test Mode
-            </span><br/>
-            <ToggleButton
-              activeLabel='ON'
-              inactiveLabel='OFF'
-              value={testMode}
-              thumbStyle={{borderRadius:2}}
-              trackStyle={{borderRadius:2}}
-              onToggle={testMode => this.setState({testMode: !testMode })}
-            />
-          </div>
           <div style={this.styles.pridiv}>
             <TextField
               name='macroName'
+              autoFocus
               value={macroName}
               onChange={this.handleInputs}
               style={this.styles.name}
@@ -249,7 +215,10 @@ export class MacroForm extends Component<any, any> {
                 null
             }
           </div>
-        </Paper>;
+          <div style={{position: 'relative'}}>
+            {testMode ? <MacroTester account={this.props.account} macro={macro} /> : null}
+          </div>
+        </Paper>
       </div>
     );
   }

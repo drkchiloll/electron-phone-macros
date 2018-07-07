@@ -5,8 +5,11 @@ import {
   Dialog, Promise, Checkbox, SelectableList,
   RaisedButton, MacroForm, Api, IconButton
 } from './index';
-import RemoveMacro from 'material-ui/svg-icons/content/clear';
+import * as ToggleButton from 'react-toggle-button';
+import { MacroTester } from './MacroTester';
+import RemoveMacroIcon from 'material-ui/svg-icons/content/clear';
 import { macroDb } from '../lib/macro-db';
+import * as robot from 'robotjs';
 
 export class PhoneMacros extends Component<any, any> {
   constructor(props) {
@@ -14,7 +17,9 @@ export class PhoneMacros extends Component<any, any> {
     this.state = {
       macros: [],
       newMacro: false,
-      clickedMacro: null
+      clickedMacro: null,
+      testMode: false,
+      mouse: null
     };
   }
   componentDidMount() {
@@ -41,36 +46,68 @@ export class PhoneMacros extends Component<any, any> {
       clickedMacro: null,
     });
     this.getMacros();
+  }
 
+  cardExpandChange = (state, macro) => {
+    let { clickedMacro } = this.state;
+    if(!clickedMacro) this.setState({ clickedMacro: macro });
+    else {
+      if(!state && macro.name === clickedMacro.name) {
+        this.setState({ clickedMacro: null });
+      } else if(state && macro.name !== clickedMacro.name) {
+        this.setState({ clickedMacro: macro });
+      }
+    }
+  }
+
+  addMacro = () => {
+    let { macros } = this.state;
+    macros.unshift({
+      _id: 'temp',
+      name: '',
+      types: ['8800'],
+      cmds: []
+    })
+    const mouse = robot.getMousePos();
+    this.setState({ macros });
+    setTimeout((m) => {
+      robot.moveMouseSmooth(m.x, m.y+50)
+      robot.mouseClick();
+    }, 500, mouse)
   }
 
   render() {
-    const { macros, newMacro, clickedMacro } = this.state;
+    const { macros, newMacro, clickedMacro, testMode } = this.state;
     return (
-      <div>{
-        newMacro ?
-          <MacroForm
-            macro={clickedMacro}
-            close={this.closeMacro}
-          /> :
-          <div>
+      <div>
+          <div style={{position: 'relative'}}>
+            <div style={{ position: 'absolute', top: 5, left: 865 }}>
+              <span style={{ marginLeft: -10, fontSize: '.95em' }}>
+                Test Mode
+            </span><br />
+              <ToggleButton
+                activeLabel='ON'
+                inactiveLabel='OFF'
+                value={testMode}
+                thumbStyle={{ borderRadius: 2 }}
+                trackStyle={{ borderRadius: 2 }}
+                onToggle={testMode => this.setState({ testMode: !testMode })}
+              />
+            </div>
             <RaisedButton label='Add New Macro' style={this.styles.addbtn}
-              onClick={() => this.setState({ newMacro: true })} />
+              onClick={this.addMacro} />
+            
             {
               macros.map((m: any, i: number) =>
                 <Card
                   key={m._id}
                   style={this.styles.card}
                   initiallyExpanded={false}
-                  onExpandChange={() => {
-                    this.setState({
-                      newMacro: true,
-                      clickedMacro: m
-                    });
-                  }}
+                  onExpandChange={state => this.cardExpandChange(state, m)}
                 >
                   <CardHeader
                     title={m.name}
+                    avatar='images/8800.jpg'
                     actAsExpander={true}
                     showExpandableButton={false}
                     subtitle={`Cisco ${m.types.join(', Cisco ')}`}
@@ -80,22 +117,35 @@ export class PhoneMacros extends Component<any, any> {
                     tooltipPosition='bottom-left'
                     iconStyle={{ height: 15, width: 15 }}
                     style={{ position: 'absolute', top: 0, right: 0 }}
-                    onClick={e => {
-                      macroDb.remove(m._id).then(() => {
-                        macros.splice(i, 1);
-                        this.setState({ macros });
-                      });
-                    }}
+                    onClick={(e) => this.removeMacro(m, i)}
                   >
-                    <RemoveMacro />
+                    <RemoveMacroIcon />
                   </IconButton>
+                  <CardText expandable={true}>
+                    <MacroForm macro={m} account={this.props.account} />
+                  </CardText>
                 </Card>
               )
             }
           </div>
-        }
+        <div style={{ position: 'relative' }}>
+          {
+            !testMode ? null :
+              <MacroTester
+                account={this.props.account}
+                macro={clickedMacro} />
+          }
+        </div>
       </div>
     );
+  }
+
+  removeMacro = (m, i) => {
+    let { macros } = this.state;
+    macroDb.remove(m._id).then(() => {
+      macros.splice(i, 1);
+      this.setState({ macros });
+    });
   }
 
   styles: any = {
@@ -103,7 +153,8 @@ export class PhoneMacros extends Component<any, any> {
     card: {
       position: 'relative',
       margin: '10px 0 10px 0',
-      width: 650
+      width: 920,
+      backgroundColor: '#B0BEC5'
     }
   }
 }

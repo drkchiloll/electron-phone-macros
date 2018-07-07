@@ -147,12 +147,6 @@ export class MacroForm extends Component<any, any> {
       deviceList, selectedCmd, cmdList,
       macroName, sequenceDesc, macro, testMode
     } = this.state;
-    // console.log(macro.name);
-    // if(macro.name === 'New') {
-    //   robot.keyTap('backspace');
-      // robot.keyTap('backspace');
-      // robot.keyTap('backspace');
-    // }
     return (
       <div>
         <Paper zDepth={1} style={this.styles.mpaper}>

@@ -49,30 +49,21 @@ export class MainView extends Component<any, any> {
     ]);
   }
 
-  updateEvents = (updates: any, action) => {
+  update = (updates: any, action) => {
     let { devices, selectedDevices } = this.state,
-      { account: { username, password }} = this.props,
       { device, img } = updates;
-    if(updates.responseMessage === 'no resp') {
-      setTimeout((dev) => {
-        this.jtapi.getBackground({
-          url: `http://${device.ip}/CGI/Screenshot`,
-          method: 'get',
-          responseType: 'arraybuffer',
-          auth: { username, password }
-        }).then(img => this.updateEvents({
-          device: dev, img, responseMessage: undefined
-        }, 'update-end'));
-      }, 3500, device);
-    }
+    const index = selectedDevices.findIndex(d =>
+      d.deviceName === device.deviceName);
     if(img) {
-      let image = `data:image/png;base64,` +
-        `${Buffer.from(img, 'binary').toString('base64')}`;
-      const indx = selectedDevices.findIndex(d =>
-        d.deviceName === device.deviceName)
-      if(indx >= 0) selectedDevices[indx]['img'] = image;
+      let image = this.processImg(img);
+      if(index >= 0) selectedDevices[index]['img'] = image;
+    } else if(action && action !== 'in progress') {
+      this.getImg(device).then(img => {
+        if(index >= 0) selectedDevices[index]['img'] = img;
+        return this.setState({ devices, selectedDevices });
+      });
     }
-    devices[device.type][device.index].cleared = action;
+    devices[device.type][device.index].cleard = action;
     this.setState({ devices, selectedDevices });
   }
 
@@ -220,6 +211,13 @@ export class MainView extends Component<any, any> {
     this.setState({ selectedMacros, job })
   }
 
+  processImg = img => `data:image/png;base64,` +
+    Buffer.from(img, 'binary').toString('base64');
+
+  getImg = device => this.jtapi
+    .getBackground(device.ip)
+    .then(bg => !bg ? null : this.processImg(bg));
+
   executeMacro = () => {
     this.setState({
       executeJobLabel: ''
@@ -239,9 +237,9 @@ export class MainView extends Component<any, any> {
     })
     setTimeout(() => {
       this.jtapi.runner.on('update', updates =>
-        this.updateEvents(updates, 'in progress'));
+        this.update(updates, 'in progress'));
       this.jtapi.runner.on('update-end', (updates: any) =>
-        this.updateEvents(updates, true));
+        this.update(updates, true));
     }, 500);
   }
 
@@ -346,32 +344,40 @@ export class MainView extends Component<any, any> {
   }
 
   handleDeviceSelect = (type, devs) => {
-    let { devices } = this.state;
+    let { devices, selectedDevices } = this.state;
     this.setState({ devices });
-    let { account: {username, password} } = this.props;
-    return Promise.reduce(devs, (a: any, d: any, idx) => {
-      if(!d.checked) return a;
-      return this.jtapi.getBackground({
-        url: `http://${d.ip}/CGI/Screenshot`,
-        method: 'get',
-        responseType: 'arraybuffer',
-        auth: { username, password }
-      }).then(img => {
-        let dprops: any = {
-          type,
-          index: idx,
-          ip: d.ip,
-          model: d.model,
-          deviceName: d.name
-        };
-        if(img) dprops['img'] = `data:image/png;base64,` +
-          `${Buffer.from(img, 'binary').toString('base64')}`;
-        a.push(dprops);
+    this.jtapi.account = this.props.account;
+    const selected = devs.reduce((a: any, d: any, idx) => {
+      const match = selectedDevices.find(sd => sd.deviceName === d.name);
+      if(!d.checked) {
+        if(match) {
+          // Remove from SelectedDevices
+          a.splice(
+            selectedDevices.findIndex(sd => sd.deviceName === d.name),
+            1
+          );
+        }
         return a;
+      }
+      if(selectedDevices.length > 0 && match) return a;
+      a.push({
+        type,
+        index: idx,
+        ip: d.ip,
+        model: d.model,
+        deviceName: d.name
       });
-    }, []).then(selectedDevices => {
+      return a;
+    }, selectedDevices);
+    return Promise.map(selected, (sel: any) => {
+      return this.getImg({ip: sel.ip})
+        .then(img => {
+          sel['img'] = img;
+          return sel;
+        });
+    }).then(selectedDevices => {
       devices[type] = devs;
-      this.setState({ devices, selectedDevices });
-    })
+      this.setState({ selectedDevices, devices });
+    });
   }
 }

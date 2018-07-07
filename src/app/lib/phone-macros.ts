@@ -1,6 +1,6 @@
 import { req } from './requests';
-import { DOMParser, DOMImplementation } from 'xmldom';
-import * as xpath from 'xpath';
+import { DOMParser, DOMImplementation as builder } from 'xmldom';
+// import * as xpath from 'xpath';
 import { Promise } from 'bluebird';
 import { macroDb } from './macro-db';
 
@@ -123,16 +123,35 @@ export const phone = (() => {
         name: 'Settings',
         displayName: 'Press Settings Key'
       }, {
-        name: 'Pause3',
-        displayName: 'Pause for 3 Seconds'
-      }, { name: 'NavUp',
+        name: 'NavUp',
         displayName: 'Navigate Up',
       }, {
         name: 'NavDwn',
         displayName: 'Navigate Down',
       }, {
+        name: 'NavLeft',
+        displayName: 'Navigate Left'
+      }, {
+        name: 'NavRight',
+        displayName: 'Navigate Right'
+      }, {
         name: 'NavSelect',
         displayName: 'Navigate Select Button'
+      }, {
+        name: 'Pause1',
+        displayName: 'Pause 1sec'
+      }, {
+        name: 'Pause2',
+        displayName: 'Pause 2sec'
+      }, {
+        name: 'Pause3',
+        displayName: 'Pause 3sec'
+      }, {
+        name: 'Pause4',
+        displayName: 'Pause 4sec'
+      }, {
+        name: 'Pause5',
+        displayName: 'Pause 5sec'
       }],
       init: {
         name: 'Services',
@@ -184,12 +203,8 @@ export const phone = (() => {
               return c;
             });
           return keys.concat([{
-            name: 'NavLeft',
-            displayName: 'Navigate Left',
-            type: 'key'
-          }, {
-            name: 'NavRight',
-            displayName: 'Navigate Right',
+            name: 'Reset',
+            displayName: 'Reset ITL Final Sequence',
             type: 'key'
           }])
         case '8900':
@@ -206,40 +221,28 @@ export const phone = (() => {
             });
       }
     },
-    saveBgMacro(devices) {
-      let macro: any = {
-        name: 'Bulk Background Change',
-        jobs: [],
-        types: []
-      };
-      macro.jobs = devices.reduce((a: any[], dev: any) => {
-        if(dev.selectedImg) {
-          macro.types = macro.types.concat(dev.types);
-          a.push({
-            types: dev.types,
-            background: {
-              tn: dev.backgrounds[dev.selectedIndx].tn,
-              img: dev.backgrounds[dev.selectedIndx].image,
-              imagePreview: dev.backgrounds[dev.selectedIndx].imgPreview,
-              xml: this.bgXmlBuilder()
-            }
-          });
-        }
-        return a;
-      }, []);
-      return macroDb.add(macro);
+    generateXml(cmd) {
+      const d = (new builder()).createDocument('', '', null),
+        el1: Element = d.createElement('CiscoIPPhoneExecute');
+      if(cmd.name === 'Key:Reset') {
+        ['Soft3', 'Soft1', 'Soft1'].forEach(c => {
+          const el = d.createElement('ExecuteItem');
+          el.setAttribute('URL', `Key:${c}`);
+          el1.appendChild(el);
+        })
+      } else {
+        const el2: Element = d.createElement('ExecuteItem');
+        el2.setAttribute('URL', cmd.name);
+        el1.appendChild(el2);
+      }
+      d.appendChild(el1);
+      return d.toString();
     },
     saveMacro(macro) {
       // Generate XML
       let { cmds } = macro;
       return Promise.map(cmds, (c: any) => {
-        let d: any = (new DOMImplementation()).createDocument('', '', null);
-        let el1: Element = d.createElement('CiscoIPPhoneExecute'),
-          el2: Element = d.createElement('ExecuteItem');
-        el2.setAttribute('URL', c.name);
-        el1.appendChild(el2);
-        d.appendChild(el1);
-        c['xml'] = d.toString();
+        c['xml'] = this.generateXml(c);
         return c;
       }).then(commands => {
         macro['cmds'] = commands;
@@ -249,6 +252,24 @@ export const phone = (() => {
           return macroDb.add(macro);
         }
       })
+    },
+    cmdHelper(params: any) {
+      let { selected, list, macro, desc } = params;
+      let mcmd = JSON.parse(JSON.stringify(list.find(c =>
+        c.displayName === selected)));
+      mcmd['description'] = desc;
+      mcmd.name = `${mcmd.type === 'key' ? 'Key:' : 'Init:'}` + mcmd.name;
+      mcmd.xml = this.generateXml(mcmd);
+      if(macro.cmds.find(c => c.editing)) {
+        mcmd['editing'] = false;
+        const index = macro.cmds.findIndex(c => c.editing);
+        mcmd['sequenceId'] = index + 1;
+        macro.cmds[index] = mcmd;
+      } else {
+        mcmd['sequenceId'] = macro.cmds.length + 1;
+        macro.cmds.push(mcmd);
+      }
+      return macro;
     }
   };
 })();

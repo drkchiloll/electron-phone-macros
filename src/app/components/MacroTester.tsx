@@ -54,21 +54,18 @@ export class MacroTester extends Component<any, any> {
     this.jtapi.runSingle({account, macro, device});
     this.jtapi.runner.on('update', update => {
       console.log(update);
-      // robotjs.moveMouseSmooth(mouse.x, mouse.y - 150);
       const img = this.processImg(update.img);
       slides.unshift({ img });
       this.setState({ slides });
     });
     this.jtapi.runner.on('update-end', () => {
-      setTimeout((dev) => {
-        this.getImg(dev)
-          .then(img => {
-            if(img != slides[0].img) {
-              slides.unshift({ img });
-              this.setState({ slides });
-            }
-          })
-      }, 2000, device);
+      this.getImg(device)
+        .then(img => {
+          if(img != slides[0].img) {
+            slides.unshift({ img });
+            this.setState({ slides });
+          }
+        })
     });
   }
   selectionClick = () => {

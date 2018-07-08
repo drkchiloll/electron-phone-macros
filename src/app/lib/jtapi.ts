@@ -68,23 +68,6 @@ export class JTAPI {
   }
 }
 
-const bgdocHandler = ({account, background}) => {
-  const doc = new DOMParser().parseFromString(background.xml);
-  const imgEl: any = doc.getElementsByTagName('image')[0];
-  imgEl.appendChild(
-    doc.createTextNode(
-      `http://${account.host}:6970${background.img}`
-    )
-  );
-  const icnEl: any = doc.getElementsByTagName('icon')[0];
-  icnEl.appendChild(
-    doc.createTextNode(
-      `http://${account.host}:6970${background.tn}`
-    )
-  );
-  return doc.toString();
-}
-
 export const jtapi = (() => {
   const service: any = {
     cti: null,

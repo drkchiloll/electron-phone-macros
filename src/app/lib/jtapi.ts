@@ -90,26 +90,32 @@ export const jtapi = (() => {
     cti: null,
     account: null,
     runner: new EventEmitter(),
+    terminals: [],
+    provider: null,
     finish(params) {
-      const { terminal, provider, device, cmd, resp } = params;
+      const { provider, device, cmd, resp, timer = 0 } = params;
+      const { terminal } = this.terminals.find(
+        td => td.device.deviceName === device.deviceName
+      );
       return new Promise((resolve, reject) => {
-        terminal.isRegistered((err, registered) => {
-          console.log(registered);
-          if(registered) return resolve(registered);
-          else return this.finish(params);
-        })
+        setTimeout((p, t) => {
+          t.isRegistered((err, registered) => {
+            if(registered) return resolve(registered);
+            else {
+              p.timer = 2500;
+              return this.finish(p);
+            }
+          })
+        }, timer, params, terminal)
       }).then(() => {
-        provider.disconnectProvider();
         this.runner.emit('update-end', {
           device, cmd, resp
         });
-        this.runner.removeAllListeners('update');
-        this.runner.removeAllListeners('update-end');
+        this.provider = provider;
         return;
       })
     },
     execMacro(terminal, dev, cmd) {
-      let ciscoTerminal;
       if(cmd.name.includes('Pause')) {
         const timer = parseInt(cmd.name.replace('Key:Pause','') + '000', 10);
         console.log(timer);
@@ -121,14 +127,16 @@ export const jtapi = (() => {
         return new Promise((resolve, reject) => {
           setTimeout((term, d, c) => {
             term.execAction([d.deviceName, c.xml], (err, phone) => {
-              if(c.sequenceId === 1) ciscoTerminal = phone;
-              setTimeout((t) => {
+              let ciscoTerminal;
+              if(c.sequenceId === 1) this.terminals.push({
+                terminal: phone,
+                device: d
+              });
+              setTimeout((t, ciscophone) => {
                 t.getDataResponse((err, resp) => {
-                  return resolve({
-                    ciscoTerminal, resp
-                  });
+                  return resolve({resp});
                 });
-              }, 1000, term);
+              }, 1000, term, ciscoTerminal);
             });
           }, 0, terminal, dev, cmd);
         });
@@ -170,22 +178,19 @@ export const jtapi = (() => {
       });
     },
     macroRunner(cmds, d, provider) {
-      let ciscoTerminal;
       return Promise.mapSeries(cmds, (cmd: any, indx) => {
         return this.terminal(provider).then(t => {
-          return this.execMacro(t, d, cmd).then(({ciscoTerminal, resp}) => {
-            if(cmd.sequenceId === 1) ciscoTerminal = ciscoTerminal;
+          return this.execMacro(t, d, cmd).then(({resp}) => {
             return this.updateEmitter(
               'update', d, cmd, resp
             ).then(() => {
               if(indx === cmds.length - 1) {
                 return this.finish({
                   provider: t,
-                  terminal: ciscoTerminal,
                   device: d,
                   cmd,
                   resp
-                });
+                })
               }
               return;
             });
@@ -196,13 +201,16 @@ export const jtapi = (() => {
     deviceRunner({cmds, provider, devices}) {
       return Promise.map(devices, (d: any) => {
         return this.macroRunner(cmds, d, provider, this);
-      })
+      });
     },
     getProvider(cmds, d) {
       return this.cti.connect()
         .then(provider => ({ cmds, provider, devices: d }));
     },
     run({ account, macros, devices }) {
+      this.runner.removeAllListeners('update');
+      this.runner.removeAllListeners('update-end');
+      if(this.terminals.length > 0) this.terminals = [];
       this.cti = new JTAPI(account);
       this.account = account;
       return Promise.map(macros, (macro: any) => {
@@ -210,7 +218,7 @@ export const jtapi = (() => {
         let compute = { types: macro.types, devices };
         return this.computeDevicesToPush(compute)
           .then(d => this.getProvider(macro.cmds, d)
-          .then(results => this.deviceRunner(results)))
+          .then(results => this.deviceRunner(results)));
       })
     },
     deviceQuery({ account, devices }) {
@@ -235,7 +243,6 @@ export const jtapi = (() => {
       });
     },
     runSingle({ account, macro, device }) {
-      let ciscoTerminal;
       device['deviceName'] = device.name;
       this.cti = new JTAPI(account);
       this.account = account;
@@ -245,21 +252,22 @@ export const jtapi = (() => {
         return Promise.mapSeries(cmds, (c: any, idx) => {
           return this.terminal(provider).then(t => {
             return this.execMacro(t, device, c).then(data => {
-              if(c.sequenceId === 1) ciscoTerminal = data.ciscoTerminal;
               return this.updateEmitter('update', device, c, data.resp)
                 .then(() => {
                   if(idx === cmds.length - 1) {
                     return this.finish({
                       provider: t,
-                      terminal: ciscoTerminal,
                       device,
                       c,
                       resp: data.resp
-                    });
+                    }).then(() => {
+                      this.provider.disconnectProvider();
+                      this.runner.removeAllListeners('update');
+                      this.runner.removeAllListeners('update-end');
+                    })
                   }
                   return;
                 })
-              // this.runner.emit('update', c);
             })
           })
         })

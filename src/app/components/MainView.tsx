@@ -52,6 +52,8 @@ export class MainView extends Component<any, any> {
   update = (updates: any, action) => {
     let { devices, selectedDevices } = this.state,
       { device, img } = updates;
+    devices[device.type][device.index].cleared = action;
+    this.setState({ devices });
     const index = selectedDevices.findIndex(d =>
       d.deviceName === device.deviceName);
     if(img) {
@@ -60,11 +62,20 @@ export class MainView extends Component<any, any> {
     } else if(action && action !== 'in progress') {
       this.getImg(device).then(img => {
         if(index >= 0) selectedDevices[index]['img'] = img;
-        return this.setState({ devices, selectedDevices });
+        selectedDevices[index]['done'] = action;
+        const notDone = selectedDevices.filter(sd => !sd.done);
+        let executeJobLabel = '';
+        if(notDone.length === 0) {
+          console.log('done');
+          this.jtapi.provider.disconnectProvider();
+          this.jtapi.runner.removeAllListeners('update');
+          this.jtapi.runner.removeAllListeners('update-end');
+          executeJobLabel = 'Execute Job';
+        }
+        return this.setState({ selectedDevices, executeJobLabel });
       });
     }
-    devices[device.type][device.index].cleard = action;
-    this.setState({ devices, selectedDevices });
+    this.setState({ selectedDevices });
   }
 
   getMacros = macroDb
@@ -110,7 +121,7 @@ export class MainView extends Component<any, any> {
       },
       cdiv: {
         position: 'absolute',
-        top: 49,
+        top: 70,
         left: 355,
         width: 900,
         display: devices ? 'block': 'none'
@@ -226,21 +237,17 @@ export class MainView extends Component<any, any> {
       selectedMacros, devices, selectedDevices
     } = this.state;
     const { account } = this.props;
-    this.jtapi.run({
-      account,
-      macros: selectedMacros,
-      devices: selectedDevices
-    }).then(() => {
-      this.setState({
-        executeJobLabel: 'Execute Job'
-      });
-    })
     setTimeout(() => {
       this.jtapi.runner.on('update', updates =>
         this.update(updates, 'in progress'));
       this.jtapi.runner.on('update-end', (updates: any) =>
         this.update(updates, true));
     }, 500);
+    this.jtapi.run({
+      account,
+      macros: selectedMacros,
+      devices: selectedDevices
+    });
   }
 
   render() {
@@ -365,7 +372,8 @@ export class MainView extends Component<any, any> {
         index: idx,
         ip: d.ip,
         model: d.model,
-        deviceName: d.name
+        deviceName: d.name,
+        done: false
       });
       return a;
     }, selectedDevices);

@@ -16,11 +16,15 @@ const menuItems = (macros: any, values: any) => {
   let items: any = [(
     <IconButton
       key='close'
-      style={{ position: 'absolute', right: 5, top: -13 }}
-      iconStyle={{ height: 18, width: 18 }}
+      style={{ position: 'absolute', right: 5, top: -13, marginBottom: 10 }}
+      iconStyle={{ height: 25, width: 25 }}
       onClick={() => {
-        robot.keyTap('escape');
-        setTimeout(() => $('#search_field_0').focus(), 0);
+        let { x, y } = robot.getMousePos();
+        robot.moveMouseSmooth(x+50, y);
+        robot.mouseClick();
+        setTimeout(() => {
+          $('#search_field_0').focus();
+        }, 0);
       }}
     >
       <CloseIcon />

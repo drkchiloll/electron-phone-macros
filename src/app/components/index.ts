@@ -9,7 +9,7 @@ import * as Datastore from 'nedb-core';
 import * as request from 'request';
 import { DOMParser as dom } from 'xmldom';
 import * as xpath from 'xpath';
-
+import * as moment from 'moment';
 import { App } from './App';
 import { Accounts } from './Accounts';
 import { MainView } from './MainView';
@@ -48,7 +48,7 @@ const SelectableList = makeSelectable(List),
 
 export {
   React, Component, ReactDOM, Promise, $,
-  Paper, TextField, Divider, Drawer,
+  Paper, TextField, Divider, Drawer, moment,
   Subheader, List, ListItem, makeSelectable,
   BottomNavigation, BottomNavigationItem,
   Toggle, Dialog, FlatButton, Chip, Avatar,

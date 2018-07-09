@@ -4,7 +4,6 @@ import { Component } from 'react';
 import * as ReactDOM from 'react-dom';
 import * as Promise from 'bluebird';
 import * as $ from 'jquery';
-import * as moment from 'moment';
 import * as path from 'path';
 import * as Datastore from 'nedb-core';
 import * as request from 'request';
@@ -56,7 +55,7 @@ export {
   indigo900, blue300, red300, blueGrey200,
   IconButton, FontIcon, Snackbar, LinearProgress,
   SelectableList, fs, App, Accounts, Cucm,
-  MenuItem, SelectField, path, Datastore, moment,
+  MenuItem, SelectField, path, Datastore,
   Api, MainView, FloatingActionButton,
   Tab, Tabs, sqlDoc, risDoc, axlHeaders,
   request, dom, headers, RaisedButton, phModelQuery,

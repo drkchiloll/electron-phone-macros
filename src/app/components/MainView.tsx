@@ -1,5 +1,5 @@
 import {
-  React, $, Promise, moment, Cucm,
+  React, $, Promise, Cucm,
   TextField, Paper, FontIcon, IconButton,
   Divider, RaisedButton, risDoc, Card,
   CardHeader, CardText, Table, TableBody,

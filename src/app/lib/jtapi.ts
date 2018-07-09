@@ -2,9 +2,11 @@ import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
+import { mkdirSync } from 'fs';
 import { EventEmitter } from 'events';
-import { DOMParser } from 'xmldom';
 import { req } from './requests';
+import { Log } from '../services/logger';
+import { writeFile } from 'fs';
 export class JTAPI {
   public account: any;
   private classes: string[] = [
@@ -22,12 +24,14 @@ export class JTAPI {
     this.account = account;
     this.provider = `${account.host};login=${account.username}`+
       `;passwd=${account.password}`;
-    this.classpath = account.version.startsWith('11') ?
-      join(__dirname, this.classes[0]) :
+    this.classpath = account.version.startsWith('12') ||
+      account.version.startsWith('11') ||
+      account.version.startsWith('10') ?
+        join(__dirname, this.classes[0]) :
       account.version.startsWith('9') ?
-      join(__dirname, this.classes[1]) :
+        join(__dirname, this.classes[1]) :
       account.version.startsWith('8') ?
-      join(__dirname, this.classes[2]) :
+        join(__dirname, this.classes[2]) :
       '';
     java.classpath.push(this.classpath);
     this.JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
@@ -73,13 +77,10 @@ export const jtapi = (() => {
     cti: null,
     account: null,
     runner: new EventEmitter(),
-    terminals: [],
     provider: null,
     finish(params) {
       const { provider, device, cmd, resp, timer = 0 } = params;
-      const { terminal } = this.terminals.find(
-        td => td.device.deviceName === device.deviceName
-      );
+      const { ctiTerminal, logging: { logger, logfile }} = device;
       return new Promise((resolve, reject) => {
         setTimeout((p, t) => {
           t.isRegistered((err, registered) => {
@@ -89,10 +90,15 @@ export const jtapi = (() => {
               return this.finish(p);
             }
           })
-        }, timer, params, terminal)
+        }, timer, params, ctiTerminal)
       }).then(() => {
         this.runner.emit('update-end', {
           device, cmd, resp
+        });
+        logger.log('info', 'final update', {
+          cmd: cmd.name,
+          cmdData: cmd.xml || 'Device is now Registered',
+          deviceResponse: resp || 'none'
         });
         this.provider = provider;
         return;
@@ -110,16 +116,12 @@ export const jtapi = (() => {
         return new Promise((resolve, reject) => {
           setTimeout((term, d, c) => {
             term.execAction([d.deviceName, c.xml], (err, phone) => {
-              let ciscoTerminal;
-              if(c.sequenceId === 1) this.terminals.push({
-                terminal: phone,
-                device: d
-              });
-              setTimeout((t, ciscophone) => {
+              if(c.sequenceId === 1) d['ctiTerminal'] = phone;
+              setTimeout(t => {
                 t.getDataResponse((err, resp) => {
                   return resolve({resp});
                 });
-              }, 1000, term, ciscoTerminal);
+              }, 1000, term);
             });
           }, 0, terminal, dev, cmd);
         });
@@ -148,13 +150,29 @@ export const jtapi = (() => {
     },
     updateEmitter(event, d, cmd, resp) {
       let { username, password } = this.account;
+      const { logging: { logger, logfile } } = d;
       const url = `http://${d.ip}/CGI/Screenshot`;
       let update: any = {
         device: d,
-        cmd: cmd ? cmd.name : undefined,
+        cmd,
         responseMessage: resp || undefined
       };
+      if(logger && logfile) {
+        logger.log('info', `CMD Sequence: ${cmd.sequenceId}`, {
+          cmd: cmd.name,
+          cmdData: cmd.xml || 'none',
+          deviceResponse: resp || undefined
+        });
+      }
       return this.getBackground(d.ip).then(img => {
+        if(logger && logfile) {
+          this.handleImgWrite({
+            device: d,
+            img,
+            index: cmd.sequenceId,
+            encoding: 'binary'
+          });
+        }
         if(img) update['img'] = img;
         this.runner.emit(event, update);
         return;
@@ -182,7 +200,17 @@ export const jtapi = (() => {
       });
     },
     deviceRunner({cmds, provider, devices}) {
+      const jobName = new Date().getTime();
+      const logpath = `./logs/${jobName}`;
+      mkdirSync(join(__dirname, logpath));
       return Promise.map(devices, (d: any) => {
+        const dlogpath = `./${d.deviceName}`;
+        mkdirSync(join(__dirname, `${logpath}/${d.deviceName}`));
+        const thispath = join(__dirname, `${logpath}/${d.deviceName}/job.log`);
+        d['logging'] = {
+          logger: Log.create(thispath),
+          logfile: jobName
+        };
         return this.macroRunner(cmds, d, provider, this);
       });
     },
@@ -193,7 +221,6 @@ export const jtapi = (() => {
     run({ account, macros, devices }) {
       this.runner.removeAllListeners('update');
       this.runner.removeAllListeners('update-end');
-      if(this.terminals.length > 0) this.terminals = [];
       this.cti = new JTAPI(account);
       this.account = account;
       return Promise.map(macros, (macro: any) => {
@@ -255,6 +282,18 @@ export const jtapi = (() => {
           })
         })
       })
+    },
+    handleImgWrite({device, img, index, encoding='base64'}) {
+      const { deviceName, logging: { logfile } } = device;
+      const filename = `${deviceName}_${index}.png`;
+      if(encoding === 'base64') {
+        img = img.replace('data:image/png;base64,', '');
+      }
+      writeFile(
+        join(__dirname, `./logs/${logfile}/${deviceName}/${filename}`),
+        new Buffer(img, encoding),
+        err => {}
+      );
     }
   };
   return service;

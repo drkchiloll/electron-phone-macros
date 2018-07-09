@@ -95,11 +95,13 @@ export const jtapi = (() => {
         this.runner.emit('update-end', {
           device, cmd, resp
         });
-        logger.log('info', 'final update', {
-          cmd: cmd.name,
-          cmdData: cmd.xml || 'Device is now Registered',
-          deviceResponse: resp || 'none'
-        });
+        if(logger && logfile) {
+          logger.log('info', 'final update', {
+            cmd: cmd.name,
+            cmdData: cmd.xml || 'Device is now Registered',
+            deviceResponse: resp || 'none'
+          });
+        }
         this.provider = provider;
         return;
       })

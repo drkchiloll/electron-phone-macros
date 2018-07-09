@@ -8,7 +8,6 @@ import {
   Component, Subheader
 } from './index';
 import { GridList, GridTile } from 'material-ui';
-
 import { DeviceTable } from './DeviceTable';
 import { SearchPanel } from './SearchPanel';
 import { MacroSelector } from './MacroSelector';
@@ -51,16 +50,29 @@ export class MainView extends Component<any, any> {
 
   update = (updates: any, action) => {
     let { devices, selectedDevices } = this.state,
-      { device, img } = updates;
-    devices[device.type][device.index].cleared = action;
-    this.setState({ devices });
+      { device, img, cmd } = updates;
     const index = selectedDevices.findIndex(d =>
       d.deviceName === device.deviceName);
+    if(cmd.sequenceId === 1) {
+      const currentImg = selectedDevices[index].img;
+      this.jtapi.handleImgWrite({
+        device,
+        img: currentImg,
+        index: 0
+      });
+    }
+    devices[device.type][device.index].cleared = action;
+    this.setState({ devices });
     if(img) {
       let image = this.processImg(img);
       if(index >= 0) selectedDevices[index]['img'] = image;
     } else if(action && action !== 'in progress') {
       this.getImg(device).then(img => {
+        this.jtapi.handleImgWrite({
+          device,
+          img,
+          index: cmd.sequenceId + 1
+        });
         if(index >= 0) selectedDevices[index]['img'] = img;
         selectedDevices[index]['done'] = action;
         const notDone = selectedDevices.filter(sd => !sd.done);
@@ -121,7 +133,7 @@ export class MainView extends Component<any, any> {
       },
       cdiv: {
         position: 'absolute',
-        top: 70,
+        top: 75,
         left: 355,
         width: 900,
         display: devices ? 'block': 'none'
@@ -250,6 +262,18 @@ export class MainView extends Component<any, any> {
     });
   }
 
+  searchIcon = () => (
+    <div style={this.style().rbdiv}>
+      <i className='fa fa-cog fa-spin fa-lg fa-fw' />
+    </div>
+  );
+
+  execIcon = () => (
+    <div style={this.style().execdiv}>
+      <i className='fa fa-circle-o-notch fa-spin fa-lg fa-fw' />
+    </div>
+  );
+
   render() {
     let {
       ipAddresses, devices,
@@ -275,20 +299,12 @@ export class MainView extends Component<any, any> {
             />
           </Paper>
           <RaisedButton style={this.style().rbtn} label={searchLabel}
-            icon={
-              <div style={this.style().rbdiv}>
-                <i className='fa fa-cog fa-spin fa-lg fa-fw'/>
-                <span className='sr-only'>Loading...</span>
-              </div>}
+            icon={this.searchIcon()}
             disabled={disabled}
             onClick={this._search} />
           <RaisedButton
             label={executeJobLabel}
-            icon={
-              <div style={this.style().execdiv}>
-                <i className='fa fa-circle-o-notch fa-spin fa-lg fa-fw' />
-                <span className='sr-only'>Loading...</span>
-              </div>}
+            icon={this.execIcon()}
             disabled={devices && selectedMacros.length > 0 ? false : true}
             backgroundColor='#607D8B'
             labelColor='#FAFAFA'
@@ -318,7 +334,6 @@ export class MainView extends Component<any, any> {
           {
             devices ?
               Object.keys(devices).map((type, i) => {
-                // console.log(type);
                 if(devices[type].length === 0) return;
                 return (
                   <Card
@@ -377,8 +392,9 @@ export class MainView extends Component<any, any> {
       });
       return a;
     }, selectedDevices);
+    this.setState({ selectedDevices });
     return Promise.map(selected, (sel: any) => {
-      return this.getImg({ip: sel.ip})
+      return this.getImg({ ip: sel.ip })
         .then(img => {
           sel['img'] = img;
           return sel;

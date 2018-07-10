@@ -7,7 +7,6 @@ import {
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import { MacroTester } from './MacroTester';
-import * as robot from 'robotjs';
 
 export class MacroForm extends Component<any, any> {
   public grid = 6;

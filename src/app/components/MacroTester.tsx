@@ -5,7 +5,6 @@ import {
 } from './index';
 import { jtapi } from '../lib/jtapi';
 import { GridList, GridTile } from 'material-ui';
-import * as robotjs from 'robotjs';
 
 export class MacroTester extends Component<any, any> {
   public jtapi = jtapi;
@@ -70,10 +69,7 @@ export class MacroTester extends Component<any, any> {
   }
   selectionClick = () => {
     let { deviceInput } = this.state;
-    this.setState({
-      deviceInput: !deviceInput,
-      mouse: robotjs.getMousePos()
-    });
+    this.setState({deviceInput: !deviceInput});
   }
   render() {
     const { deviceInput, device, input, request, slides } = this.state;

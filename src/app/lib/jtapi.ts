@@ -1,4 +1,4 @@
-// import * as java from 'java';
+import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
@@ -7,16 +7,6 @@ import { EventEmitter } from 'events';
 import { req } from './requests';
 import { Log } from '../services/logger';
 import { writeFile } from 'fs';
-import { javaChecker } from './java-check';
-var java;
-
-try {
-  java = require('java');
-} catch(e) {
-  javaChecker.run().then(() => {
-    java = require('java');
-  });
-}
 
 export class JTAPI {
   public account: any;

@@ -1,6 +1,5 @@
 import { req } from './requests';
 import { DOMParser, DOMImplementation as builder } from 'xmldom';
-// import * as xpath from 'xpath';
 import { Promise } from 'bluebird';
 import { macroDb } from './macro-db';
 

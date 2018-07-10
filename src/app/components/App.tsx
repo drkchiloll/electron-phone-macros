@@ -1,10 +1,11 @@
 import {
-  React, $, Tabs, Tab, FontIcon, Dialog, FlatButton,
-  Accounts, MainView, Api, Cucm, phModelQuery,
-  Component
+  React, Tabs, Tab,
+  Accounts, MainView,
+  Component, Promise
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
 import { accountDb } from '../lib/account-db';
+import { javaChecker } from '../lib/java-check'
 
 export class App extends Component<any, any> {
   constructor() {
@@ -18,12 +19,14 @@ export class App extends Component<any, any> {
   }
   componentWillMount() {
     let account:any;
-    accountDb.get().then((accounts: any) => {
-      if(accounts.length > 0) {
-        account = accounts.find((r: any) => r.selected);
-        this.setState({ account });
-      }
-    });
+    Promise.all([
+      accountDb.get().then((accounts: any) => {
+        if (accounts.length > 0) {
+          account = accounts.find((r: any) => r.selected);
+          this.setState({ account });
+        }
+      })
+    ])
   }
   _handleClose = () => {
     this.setState({
@@ -81,7 +84,10 @@ export class App extends Component<any, any> {
           label='Phone Macros'
           value='templates'
         >
-          <PhoneMacros account={account} />
+          {
+            tabValue !== 'templates' ? null :
+              <PhoneMacros account={account} />
+          }
         </Tab>
       </Tabs>
     );

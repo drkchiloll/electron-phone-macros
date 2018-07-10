@@ -1,6 +1,7 @@
 import * as electron from 'electron';
 import { app, BrowserWindow, Menu } from 'electron';
 import { AppMenu } from './menu';
+import { javaChecker } from '../app/lib/java-check';
 
 class MyApplication {
 	mainWindow: Electron.BrowserWindow = null;
@@ -24,13 +25,15 @@ class MyApplication {
 			minHeight: 600,
 			acceptFirstMouse: true
 		});
-		const mainURL = `file://${__dirname}/index.html`;
-		this.mainWindow.loadURL(mainURL);
+		javaChecker.run().then(() => {
+			const mainURL = `file://${__dirname}/index.html`;
+			this.mainWindow.loadURL(mainURL);
 
-		this.mainWindow.on('closed', () => {
-			this.mainWindow = null;
+			this.mainWindow.on('closed', () => {
+				this.mainWindow = null;
+			});
+			Menu.setApplicationMenu(AppMenu);
 		});
-		Menu.setApplicationMenu(AppMenu);
 	}
 }
 

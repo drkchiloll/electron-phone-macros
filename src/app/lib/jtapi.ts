@@ -1,4 +1,4 @@
-import * as java from 'java';
+// import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
@@ -7,6 +7,17 @@ import { EventEmitter } from 'events';
 import { req } from './requests';
 import { Log } from '../services/logger';
 import { writeFile } from 'fs';
+import { javaChecker } from './java-check';
+var java;
+
+try {
+  java = require('java');
+} catch(e) {
+  javaChecker.run().then(() => {
+    java = require('java');
+  });
+}
+
 export class JTAPI {
   public account: any;
   private classes: string[] = [
@@ -80,7 +91,7 @@ export const jtapi = (() => {
     provider: null,
     finish(params) {
       const { provider, device, cmd, resp, timer = 0 } = params;
-      const { ctiTerminal, logging: { logger, logfile }} = device;
+      const { ctiTerminal, logging } = device;
       return new Promise((resolve, reject) => {
         setTimeout((p, t) => {
           t.isRegistered((err, registered) => {
@@ -95,8 +106,8 @@ export const jtapi = (() => {
         this.runner.emit('update-end', {
           device, cmd, resp
         });
-        if(logger && logfile) {
-          logger.log('info', 'final update', {
+        if(logging) {
+          logging.logger.log('info', 'final update', {
             cmd: cmd.name,
             cmdData: cmd.xml || 'Device is now Registered',
             deviceResponse: resp || 'none'
@@ -152,22 +163,22 @@ export const jtapi = (() => {
     },
     updateEmitter(event, d, cmd, resp) {
       let { username, password } = this.account;
-      const { logging: { logger, logfile } } = d;
+      const { logging } = d;
       const url = `http://${d.ip}/CGI/Screenshot`;
       let update: any = {
         device: d,
         cmd,
         responseMessage: resp || undefined
       };
-      if(logger && logfile) {
-        logger.log('info', `CMD Sequence: ${cmd.sequenceId}`, {
+      if(logging) {
+        logging.logger.log('info', `CMD Sequence: ${cmd.sequenceId}`, {
           cmd: cmd.name,
           cmdData: cmd.xml || 'none',
           deviceResponse: resp || undefined
         });
       }
       return this.getBackground(d.ip).then(img => {
-        if(logger && logfile) {
+        if(logging) {
           this.handleImgWrite({
             device: d,
             img,

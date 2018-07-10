@@ -23,7 +23,7 @@ export const javaChecker = (() => {
       })
     },
     load() {
-      this.loadingWindow = new remote.BrowserWindow({
+      this.loadingWindow = new BrowserWindow({
         autoHideMenuBar: true,
         frame: false,
         alwaysOnTop: true

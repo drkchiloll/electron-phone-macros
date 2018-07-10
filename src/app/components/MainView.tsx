@@ -1,11 +1,8 @@
 import {
-  React, $, Promise, Cucm,
-  TextField, Paper, FontIcon, IconButton,
-  Divider, RaisedButton, risDoc, Card,
-  CardHeader, CardText, Table, TableBody,
-  TableHeader, TableHeaderColumn, TableRow,
-  TableRowColumn, devAssQuery, updDevAssoc,
-  Component, Subheader
+  React, $, Promise, Cucm, Paper,
+  RaisedButton, risDoc, Card,
+  CardHeader, CardText,
+  devAssQuery, Component
 } from './index';
 import { GridList, GridTile } from 'material-ui';
 import { DeviceTable } from './DeviceTable';

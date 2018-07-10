@@ -1,5 +1,5 @@
 {
-  "name": "electron-cucm-itldelete",
+  "name": "electron-phone-macros",
   "version": "1.0.0",
   "description": "A Standalone Application for the removal of ITL Certs on Cisco IP Phones",
   "main": "./dist/main.bundle.js",
@@ -13,12 +13,13 @@
     "build:win:dist": "SET \"NODE_ENV=production\" && webpack --define process.env.NODE_ENV=\"production\" --progress --colors",
     "start": "electron .",
     "package:macos": "node_modules/.bin/electron-packager ./ coHuslin Phone Macro Builder --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
-    "package:win64": "node_modules/.bin/electron-packager ./ coHuslin Phone Macro Builder --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/touch10_panel.ico",
+    "package:win64": "node_modules/.bin/electron-packager ./ coHuslin_Phone_Macro_Builder --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
     "clean": "cd dist && rm *.js* && cd ..",
     "clean_jtapi": "rm CiscoJtapi*"
   },
   "dependencies": {
-    "java": "^0.10.0"
+    "java": "^0.10.0",
+    "robotjs": "^0.5.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
@@ -55,13 +56,13 @@
     "react-styled-flexboxgrid": "^2.4.0",
     "react-toggle-button": "^2.2.0",
     "request": "^2.87.0",
-    "robotjs": "^0.5.1",
     "style-loader": "^0.13.1",
     "styled-components": "^3.3.3",
     "systeminformation": "^3.17.3",
+    "targz": "^1.0.1",
     "ts-loader": "^0.8.2",
     "typescript": "^2.9.2",
-    "uglifyjs-webpack-plugin": "^1.2.6",
+    "uglifyjs-webpack-plugin": "^1.2.7",
     "url-loader": "^0.5.6",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.8",

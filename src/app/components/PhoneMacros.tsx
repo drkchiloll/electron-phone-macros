@@ -9,7 +9,7 @@ import * as ToggleButton from 'react-toggle-button';
 import { MacroTester } from './MacroTester';
 import RemoveMacroIcon from 'material-ui/svg-icons/content/clear';
 import { macroDb } from '../lib/macro-db';
-import * as robot from 'robotjs';
+// import * as robot from 'robotjs';
 
 export class PhoneMacros extends Component<any, any> {
   constructor(props) {
@@ -68,12 +68,12 @@ export class PhoneMacros extends Component<any, any> {
       types: ['8800'],
       cmds: []
     })
-    const mouse = robot.getMousePos();
+    // const mouse = robot.getMousePos();
     this.setState({ macros });
-    setTimeout((m) => {
-      robot.moveMouseSmooth(m.x, m.y+50)
-      robot.mouseClick();
-    }, 500, mouse)
+    // setTimeout((m) => {
+    //   robot.moveMouseSmooth(m.x, m.y+50)
+    //   robot.mouseClick();
+    // }, 500, mouse)
   }
 
   render() {

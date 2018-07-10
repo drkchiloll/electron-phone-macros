@@ -18,15 +18,14 @@ class MyApplication {
 
 	onReady(){
 		this.mainWindow = new BrowserWindow({
-			width: 1280,
-			height: 780,
-			minWidth: 1280,
+			width: 1370,
+			height: 900,
+			minWidth: 1370,
 			minHeight: 600,
 			acceptFirstMouse: true
 		});
-
-		// this.mainWindow.webContents.openDevTools();
-		this.mainWindow.loadURL('file://' + __dirname + '/index.html');
+		const mainURL = `file://${__dirname}/index.html`;
+		this.mainWindow.loadURL(mainURL);
 
 		this.mainWindow.on('closed', () => {
 			this.mainWindow = null;
@@ -35,4 +34,4 @@ class MyApplication {
 	}
 }
 
-const myapp = new MyApplication(app);
+const myapp = new MyApplication(app)

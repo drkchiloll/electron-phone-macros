@@ -130,7 +130,8 @@ export class MacroTester extends Component<any, any> {
       top: 150,
       height: 'auto',
       left: 940,
-      overflow: 'auto'
+      overflow: 'auto',
+      overflowX: 'hidden'
     },
     device: {
       width: 200,

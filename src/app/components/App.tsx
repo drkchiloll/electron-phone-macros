@@ -42,6 +42,8 @@ export class App extends Component<any, any> {
       tabValue
     });
   }
+  updateAccount = account => this.setState({ account });
+
   render() {
     const { account, openAcct, tabValue } = this.state;
     return (
@@ -61,7 +63,8 @@ export class App extends Component<any, any> {
         >
           <Accounts account={account}
             openDia={openAcct}
-            acctClose={this._handleClose} />
+            acctClose={this._handleClose}
+            setAccount={this.updateAccount} />
         </Tab>
         <Tab icon={
             <span className='fa-stack fa-lg'>

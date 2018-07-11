@@ -7,13 +7,11 @@ import {
   SelectableList, Cucm, moment, Component
 } from './index';
 import { accountDb } from '../lib/account-db';
-import { dbService } from '../lib/api';
 
 export class Accounts extends Component<any,any> {
   constructor() {
     super();
     this.state = {
-      api: null,
       accounts: [{
         name: 'New Account', host: '', version: '8.5',
         username: '', password: '', selected: true
@@ -56,28 +54,25 @@ export class Accounts extends Component<any,any> {
     console.log('this component dismounted');
   }
   handleAccountsToggle = () => {
-    this.setState({ openAccounts: !this.state.openAccounts });
+    let { openAccounts } = this.state;
+    this.setState({openAccounts: !openAccounts});
   }
   changeAcctValues = (e:any, val:any) => {
     let { name } = e.target,
-      accounts = this.state.accounts,
-      selectedAcct = this.state.selectedAcct;
+      { accounts, selectedAcct } = this.state;
     accounts[selectedAcct][name] = val;
     this.setState({ accounts });
   }
-  setAccounts = () => [{
-    name: 'New',
-    host: '',
-    version: '8.5',
-    username: '',
-    password: ''
-  }]
+
+  passAccountProps = account => this.props.setAccount(account);
+
   save = () => {
-    let accounts = this.state.accounts,
-      account = this.state.accounts[this.state.selectedAcct],
+    let { accounts, selectedAcct } = this.state,
+      account = accounts[selectedAcct],
       acctMsg: string;
     if(account._id) {
       // Update
+      this.passAccountProps(account);
       accountDb.update(account).then(() => {
         acctMsg = `${account.name} updated successfully`;
         this.setState({ accounts, openSnack: true, acctMsg });
@@ -86,9 +81,10 @@ export class Accounts extends Component<any,any> {
       account['status'] = 'red';
       account['lastTested'] = null;
       accountDb.add(account).then((doc) => {
+        this.passAccountProps(doc);
         account._id = doc._id;
         acctMsg = `${account.name} added successfully`;
-        this.setState({ accounts, openSnack: true, acctMsg });
+        this.setState({ accounts, openSnack: true, acctMsg, account });
       });
     }
   }
@@ -115,10 +111,52 @@ export class Accounts extends Component<any,any> {
       });
     })
   }
+  selectAccount = (e: any, selected: number) => {
+    let { accounts, selectedAcct, api } = this.state;
+    accounts[selected].selected = true;
+    accounts[selectedAcct].selected = false;
+    const account = accounts[selected],
+      lastaccount = accounts[selectedAcct];
+    this.passAccountProps(account);
+    this.setState({
+      selectedAcct: selected,
+      accounts,
+      account
+    });
+    Promise.all([
+      accountDb.update(account),
+      accountDb.update(lastaccount)
+    ]);
+  }
+  removeAccount = () => {
+    let { accounts, selectedAcct } = this.state,
+      { _id, name } = accounts[selectedAcct];
+    if(accounts.length === 1) {
+      this.setState({
+        acctMsg: `Don't delete your last Account..Just Overwrite It..`,
+        openSnack: true
+      })
+      return;
+    }
+    if(selectedAcct === 0) ++selectedAcct;
+    else --selectedAcct;
+    this.passAccountProps(accounts[selectedAcct]);
+    accountDb.remove(_id).then(() => {
+      accounts.splice(selectedAcct, 1);
+      this.setState({
+        selectedAcct,
+        accounts,
+        acctMsg: `${name} removed successfully`,
+        openSnack: true
+      });
+    });
+  }
   render() {
+    let { accounts, selectedAcct, openSnack, acctMsg } = this.state;
+    let account = accounts[selectedAcct];
     let testColor: string;
-    if (this.state.account && this.state.account.status) {
-      testColor = this.state.account.status;
+    if(account && account.status) {
+      testColor = account.status;
     } else {
       testColor = 'red';
     }
@@ -146,10 +184,6 @@ export class Accounts extends Component<any,any> {
         }}
       />
     ];
-    let accounts = this.state.accounts;
-    if (!accounts || accounts.length === 0) {
-      accounts = this.setAccounts();
-    }
     return (
       <div>
         <Dialog
@@ -159,35 +193,23 @@ export class Accounts extends Component<any,any> {
           onRequestClose={this.props.acctClose}>
           <div>
             <Drawer open={true} width={225}>
-              <SelectableList value={this.state.selectedAcct}
-                onChange={(e: any) => {
-                  let accounts = this.state.accounts,
-                    prevSelected =
-                      JSON.parse(JSON.stringify(this.state.selectedAcct)),
-                    acctName = $(e.target).text();
-                  let selectedAcct = accounts.findIndex(acct => acct.name === acctName);
-                  if (selectedAcct === -1) selectedAcct = 0;
-                  let account = accounts[selectedAcct],
-                    prevAcct = accounts[prevSelected];
-                  account.selected = true;
-                  prevAcct.selected = false;
-                  this.setState({ selectedAcct });
-                  let { api } = this.state;
-                  Promise.all([
-                    api.update(account), api.update(prevAcct)
-                  ]).then(() => {
-                    this.setState({ selectedAcct });
-                  })
-                }} >
+              <SelectableList value={selectedAcct}
+                onChange={this.selectAccount} >
                 <Subheader>Account List</Subheader>
                 {
-                  this.state.accounts.map((acct, i) => {
+                  accounts.map((acct, i) => {
                     return (
                       <ListItem
                         key={`acct_${i}`}
                         value={i}
                         primaryText={acct.name}
-                        rightIcon={<FontIcon color={acct.status} className='fa fa-dot-circle-o' />} />
+                        rightIcon={
+                          <FontIcon
+                            color={acct.status}
+                            className='fa fa-dot-circle-o'
+                          />
+                        }
+                      />
                     );
                   })
                 }
@@ -200,8 +222,6 @@ export class Accounts extends Component<any,any> {
                       label="Account"
                       icon={<FontIcon className='fa fa-user-plus' />}
                       onClick={() => {
-                        console.log('add account');
-                        let accounts = this.state.accounts;
                         accounts.push({
                           name: 'New Account', host: '',
                           version: '8.5', username: '',
@@ -216,27 +236,7 @@ export class Accounts extends Component<any,any> {
                     <BottomNavigationItem
                       label="Remove"
                       icon={<FontIcon color='red' className='fa fa-trash' />}
-                      onClick={() => {
-                        console.log('remove touched');
-                        let accounts = this.state.accounts,
-                          acctIdx = this.state.selectedAcct,
-                          { _id, name } = accounts[acctIdx];
-                        accountDb.remove(_id).then(() => {
-                          accounts.splice(acctIdx, 1);
-                          if (accounts.length === 0) {
-                            accounts.push({
-                              name: 'New Account', host: '', version: '8.0',
-                              username: '', password: ''
-                            })
-                          }
-                          this.setState({
-                            selectedAcct: 0,
-                            accounts,
-                            acctMsg: `${name} removed successfully`,
-                            openSnack: true
-                          });
-                        });
-                      }}
+                      onClick={this.removeAccount}
                     />
                   </BottomNavigation>
                 </Paper>
@@ -251,7 +251,7 @@ export class Accounts extends Component<any,any> {
                 underlineShow={true}
                 floatingLabelFixed={true}
                 floatingLabelText='Account Name'
-                value={this.state.accounts[this.state.selectedAcct].name}
+                value={accounts[selectedAcct].name}
                 onChange={this.changeAcctValues}
                 errorText='' />
               <TextField
@@ -261,21 +261,17 @@ export class Accounts extends Component<any,any> {
                 underlineShow={true}
                 floatingLabelFixed={true}
                 floatingLabelText='CUCM Server'
-                value={this.state.accounts[this.state.selectedAcct].host}
+                value={accounts[selectedAcct].host}
                 onChange={this.changeAcctValues} />
               <Divider />
               <SelectField floatingLabelText='UCM Version'
                 style={style}
-                value={this.state.accounts[this.state.selectedAcct].version}
+                value={accounts[selectedAcct].version}
                 onChange={(e, i, val) => {
-                  let accounts = this.state.accounts,
-                    account = this.state.accounts[this.state.selectedAcct];
                   account.version = val
                   this.setState({ accounts });
                 }} >
-                {['8.0', '8.5', '9.0', '9.1', '10.0', '10.5', '11.0', '11.5'].map((ver, i) => {
-                  return <MenuItem value={ver} key={`version_${i}`} primaryText={ver} />
-                })}
+                { this._renderVersions() }
               </SelectField>
               <TextField
                 hintText="user_name"
@@ -284,7 +280,7 @@ export class Accounts extends Component<any,any> {
                 underlineShow={true}
                 floatingLabelFixed={true}
                 floatingLabelText='UserName'
-                value={this.state.accounts[this.state.selectedAcct].username}
+                value={accounts[selectedAcct].username}
                 onChange={this.changeAcctValues} />
               <TextField
                 type='password'
@@ -294,20 +290,33 @@ export class Accounts extends Component<any,any> {
                 underlineShow={true}
                 floatingLabelFixed={true}
                 floatingLabelText='Password'
-                value={this.state.accounts[this.state.selectedAcct].password}
+                value={accounts[selectedAcct].password}
                 onChange={this.changeAcctValues} />
               <Divider />
             </Paper>
           </div>
         </Dialog>
         <Snackbar
-          open={this.state.openSnack}
-          message={this.state.acctMsg}
+          open={openSnack}
+          message={acctMsg}
           autoHideDuration={2500}
-          onRequestClose={() => {
-            this.setState({ openSnack: false, acctMsg: '' });
-          }} />
+          onRequestClose={() =>
+            this.setState({ openSnack: false, acctMsg: '' })}
+        />
       </div>
     );
+  }
+  _renderVersions = () => {
+    const versions = [
+      '8.0', '8.5', '9.0', '9.1', '10.0',
+      '10.5', '11.0', '11.5', '12.0'
+    ];
+    return versions.map(v =>
+      <MenuItem
+        key={v}
+        value={v}
+        primaryText={v}
+      />
+    )
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "electron-phone-macros",
+  "name": "imperium-phone-controller",
   "version": "1.0.0",
   "description": "A Standalone Application for the removal of ITL Certs on Cisco IP Phones",
   "main": "./dist/main.bundle.js",
@@ -9,16 +9,18 @@
     "build_java": "npm run rebuild && npm run postinst_java",
     "build_java_win": "npm run rebuild_java_win && npm run postinst_java",
     "rebuild_java_win": "node_modules/.bin/electron-rebuild.cmd -p -t \"dev,prod,optional\"",
+    "build_robotjs": "node-gyp rebuild --runtime=electron --target=2.0.4 --disturl=https://atom.io/download/atom-shell",
     "build:dev": "webpack --mode development --watch --profile",
     "build:dist": "node_modules/.bin/webpack --config webpack.config.js --mode production --progress --colors",
     "start": "node_modules/.bin/electron .",
-    "package:macos": "node_modules/.bin/electron-packager ./ coHuslin Phone Macro Builder --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
-    "package:win64": "node_modules/.bin/electron-packager ./ coHustle_Imperium --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
+    "package:macos": "node_modules/.bin/electron-packager ./ Imperium_Control --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
+    "package:win64": "node_modules/.bin/electron-packager ./ Imperium_Control --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
     "clean": "cd dist && rm *.js* && cd ..",
     "clean_jtapi": "rm CiscoJtapi*"
   },
   "dependencies": {
-    "java": "^0.10.0"
+    "java": "^0.10.0",
+    "robotjs": "^0.5.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",

@@ -138,13 +138,17 @@ export class Accounts extends Component<any,any> {
       })
       return;
     }
-    if(selectedAcct === 0) ++selectedAcct;
-    else --selectedAcct;
     this.passAccountProps(accounts[selectedAcct]);
     accountDb.remove(_id).then(() => {
       accounts.splice(selectedAcct, 1);
+      const account = accounts[
+        selectedAcct === 0 ? 0 : --selectedAcct
+      ];
+      account.selected = true;
+      accountDb.update(account);
       this.setState({
-        selectedAcct,
+        account,
+        selectedAcct: selectedAcct === 0 ? 0 : --selectedAcct,
         accounts,
         acctMsg: `${name} removed successfully`,
         openSnack: true
@@ -188,7 +192,7 @@ export class Accounts extends Component<any,any> {
       <div>
         <Dialog
           actions={actions}
-          modal={false}
+          modal={true}
           open={this.props.openDia}
           onRequestClose={this.props.acctClose}>
           <div>

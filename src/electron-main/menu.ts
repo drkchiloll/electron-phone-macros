@@ -62,12 +62,26 @@ let menuTemplate:any = [{
   }]
 }]
 
+if(process.platform === 'win32') {
+  menuTemplate[menuTemplate.length - 1].submenu.push({
+    label: 'Check for Updates...',
+    click(item: any, focusedWindow: any) {
+      focusedWindow.webContents.send('update');
+    }
+  });
+}
+
 if(process.platform === 'darwin') {
   const name = app.getName()
   menuTemplate.unshift({
     label: name,
     submenu: [{
       role: 'about'
+    }, {
+      label: 'Check for Updates...',
+      click(item: any, focusedWindow: any) {
+        focusedWindow.webContents.send('update');
+      }
     }, {
       type: 'separator'
     }, {

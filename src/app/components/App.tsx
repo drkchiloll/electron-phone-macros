@@ -4,8 +4,9 @@ import {
   Component, Promise
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
+import { Update } from './Update';
 import { accountDb } from '../lib/account-db';
-import { javaChecker } from '../lib/java-check'
+import { ipcRenderer } from 'electron';
 
 export class App extends Component<any, any> {
   constructor() {
@@ -14,7 +15,8 @@ export class App extends Component<any, any> {
       tabValue: 'device-search',
       openAcct: false,
       tabIndx: 1,
-      account: null
+      account: null,
+      update: false
     };
   }
   componentWillMount() {
@@ -26,7 +28,8 @@ export class App extends Component<any, any> {
           this.setState({ account });
         }
       })
-    ])
+    ]);
+    ipcRenderer.on('update', () => this.setState({ update: true }));
   }
   _handleClose = () => {
     this.setState({
@@ -45,54 +48,58 @@ export class App extends Component<any, any> {
   updateAccount = account => this.setState({ account });
 
   render() {
-    const { account, openAcct, tabValue } = this.state;
+    const { account, openAcct, tabValue, update } = this.state;
     return (
-      <Tabs className='tabs-container'
-        inkBarStyle={{ background: 'black' }}
-        tabItemContainerStyle={{width: 600, marginBottom: 10 }}
-        initialSelectedIndex={this.state.tabIdx}
-        value={tabValue}
-        onChange={this._tabSelect}>
-        <Tab icon={
-            <span className='fa-stack fa-lg'>
-              <i className='fa fa-server fa-lg'/>
-            </span>
-          }
-          label='Accounts'
-          value='accounts'
-        >
-          <Accounts account={account}
-            openDia={openAcct}
-            acctClose={this._handleClose}
-            setAccount={this.updateAccount} />
-        </Tab>
-        <Tab icon={
-            <span className='fa-stack fa-lg'>
-              <i className='fa fa-phone fa-lg' />
-            </span>
-          }
-          label='Device Search'
-          value='device-search'
-        >
-          {
-            tabValue !== 'device-search' ? null :
-              <MainView account={account} />
-          }
-        </Tab>
-        <Tab icon={
-            <span className='fa-stack fa-lg'>
-              <i className='fa fa-superpowers fa-lg' />
-            </span>
-          }
-          label='Phone Macros'
-          value='templates'
-        >
-          {
-            tabValue !== 'templates' ? null :
-              <PhoneMacros account={account} />
-          }
-        </Tab>
-      </Tabs>
+      <div style={{position: 'relative'}}>
+        <Tabs className='tabs-container'
+          inkBarStyle={{ background: 'black' }}
+          tabItemContainerStyle={{width: 500, marginBottom: 10 }}
+          initialSelectedIndex={this.state.tabIdx}
+          value={tabValue}
+          onChange={this._tabSelect}>
+          <Tab icon={
+              <span className='fa-stack fa-lg'>
+                <i className='fa fa-server fa-lg'/>
+              </span>
+            }
+            label='Accounts'
+            value='accounts'
+          >
+            <Accounts account={account}
+              openDia={openAcct}
+              acctClose={this._handleClose}
+              setAccount={this.updateAccount} />
+          </Tab>
+          <Tab icon={
+              <span className='fa-stack fa-lg'>
+                <i className='fa fa-phone fa-lg' />
+              </span>
+            }
+            label='Device Search'
+            value='device-search'
+          >
+            {
+              tabValue !== 'device-search' ? null :
+                <MainView account={account} />
+            }
+          </Tab>
+          <Tab icon={
+              <span className='fa-stack fa-lg'>
+                <i className='fa fa-superpowers fa-lg' />
+              </span>
+            }
+            label='Phone Macros'
+            value='templates'
+          >
+            {
+              tabValue !== 'templates' ? null :
+                <PhoneMacros account={account} />
+            }
+          </Tab>
+        </Tabs>
+        <Update update={update} close={this.closeUpdator} />
+      </div>
     );
   }
+  closeUpdator = () => this.setState({ update: false })
 }

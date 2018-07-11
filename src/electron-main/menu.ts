@@ -1,4 +1,5 @@
 import { app, Menu } from 'electron';
+const { NODE_ENV } = process.env;
 
 let menuTemplate:any = [{
   label: 'Edit',
@@ -60,8 +61,11 @@ let menuTemplate:any = [{
     label: 'Learn More',
     click () { require('electron').shell.openExternal('http://electron.atom.io') }
   }]
-}]
+}];
 
+if(NODE_ENV === 'production') {
+  menuTemplate[1].submenu.splice(1, 1);
+}
 if(process.platform === 'win32') {
   menuTemplate[menuTemplate.length - 1].submenu.push({
     label: 'Check for Updates...',

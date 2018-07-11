@@ -58,6 +58,13 @@ module.exports = (env, options) => {
           use: 'node-loader'
         }]
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('development')
+        }
+      }),
+    ],
     externals: nodeModules
   };
 
@@ -84,7 +91,10 @@ module.exports = (env, options) => {
       })
     ]
   };
-  if (options.mode === 'production') return merge(dev, prod)
+  if (options.mode === 'production') {
+    delete dev['plugins'];
+    return merge(dev, prod);
+  }
   else return dev;
 };
 

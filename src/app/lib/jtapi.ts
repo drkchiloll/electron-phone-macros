@@ -5,8 +5,11 @@ import { join } from 'path';
 import { mkdirSync } from 'fs';
 import { EventEmitter } from 'events';
 import { req } from './requests';
-import { Log } from '../services/logger';
+import { Log, errorLog } from '../services/logger';
 import { writeFile } from 'fs';
+
+const logpath = process.platform === 'win32' ?
+  `C:\\PhoneMacros\\logs\\` : __dirname;
 
 export class JTAPI {
   public account: any;
@@ -42,15 +45,21 @@ export class JTAPI {
 
   private getProvider(provider, peer) {
     return new Promise((resolve, reject) => {
-      peer.getProvider(provider, (err, jtapiProvider) =>
-        resolve(jtapiProvider));
+      peer.getProvider(provider, (err, jtapiProvider) => {
+        if(err) errorLog.log('error', 'JTAPI Provider Error', { err });
+        resolve(jtapiProvider)
+      })
     });
   }
 
   getPeer() {
-    // const JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
     return new Promise((resolve, reject) => {
-      this.JtapiPeerFactory.getJtapiPeer(null, (err, peer) => resolve(peer));
+      this.JtapiPeerFactory
+        .getJtapiPeer(null, (err, peer) => {
+          if(err)
+            errorLog.log('error', 'JTAPI Peer Error', { err });
+          resolve(peer)
+        });
     });
   }
 
@@ -149,7 +158,13 @@ export const jtapi = (() => {
         method: 'get',
         responseType: 'arraybuffer',
         auth: { username, password }
-      }).then(({ data }) => data).catch(() => null);
+      }).then(({ data }) => data).catch(error => {
+        errorLog.log('error', 'Getting BackGround', {
+          forDevice: ip,
+          error
+        });
+        return null;
+      });
     },
     updateEmitter(event, d, cmd, resp) {
       let { username, password } = this.account;
@@ -200,16 +215,21 @@ export const jtapi = (() => {
             });
           });
         });
-      });
+      }).catch(error => {
+        errorLog.log('error', 'Macro Runner Error', {
+          onDevice: d,
+          error
+        });
+      })
     },
     deviceRunner({cmds, provider, devices}) {
       const jobName = new Date().getTime();
-      const logpath = `./logs/${jobName}`;
-      mkdirSync(join(__dirname, logpath));
+      const logPath = `./${jobName}`;
+      mkdirSync(join(logpath, logPath));
       return Promise.map(devices, (d: any) => {
         const dlogpath = `./${d.deviceName}`;
-        mkdirSync(join(__dirname, `${logpath}/${d.deviceName}`));
-        const thispath = join(__dirname, `${logpath}/${d.deviceName}/job.log`);
+        mkdirSync(join(logpath, `${logPath}/${d.deviceName}`));
+        const thispath = join(logpath, `${logPath}/${d.deviceName}/job.log`);
         d['logging'] = {
           logger: Log.create(thispath),
           logfile: jobName
@@ -293,7 +313,7 @@ export const jtapi = (() => {
         img = img.replace('data:image/png;base64,', '');
       }
       writeFile(
-        join(__dirname, `./logs/${logfile}/${deviceName}/${filename}`),
+        join(logpath, `./${logfile}/${deviceName}/${filename}`),
         new Buffer(img, encoding),
         err => {}
       );

@@ -3,6 +3,7 @@ import {
   sqlDoc, risDoc, axlHeaders,
   headers, xpath
 } from '../components/index';
+import { errorLog } from '../services/logger';
 
 export class Cucm {
   readonly doc = sqlDoc;
@@ -54,6 +55,9 @@ export class Cucm {
   }
 
   parseErrorResp(data: any) {
+    errorLog.log('error', 'CUCM RISDB Error', {
+      data
+    });
     console.log(data);
     if (data.statusCode === 599) {
       return new Promise((resolve, reject) => {
@@ -77,13 +81,6 @@ export class Cucm {
         rows: [[{ Error: `AxlError: ${errCode} ${errMessage}` }]]
       });
     });
-  }
-
-  dataGridColumnize(data: any) {
-    let keys = Object.keys(data[0]);
-    return Promise.map(keys, (key) => ({
-      key, name: key, editable: true, resizeable: true
-    }))
   }
 
   fixDataGridColumnize(data: any) {
@@ -259,9 +256,15 @@ export class Cucm {
   private _req(options: any) {
     return new Promise((resolve, reject) => {
       request(options, (err:any, res:any, body:any) => {
-        if (err) return reject({ error: err });
-        if (res.statusCode >= 500 && res.statusCode <= 599) return reject(res);
-        if (res.statusCode === 200) return resolve(body);
+        if(err) {
+          errorLog.log('error', err.toString());
+          return reject({ error: err });
+        }
+        if(res.statusCode >= 500 && res.statusCode <= 599) {
+          errorLog.log('error', `${res.statusCode+''}`, { res });
+          return reject(res);
+        }
+        if(res.statusCode === 200) return resolve(body);
         return resolve();
       });
     });

@@ -181,6 +181,16 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
+          keys.push({
+            name: '7900-StarStarPound',
+            displayName: 'Unlock Key Sequence (**#)',
+            type: 'key'
+          })
+          keys.push({
+            name: '7900-ResetPhone',
+            displayName: 'Reset Phone (**#**)',
+            type: 'key'
+          });
           return keys.concat([{ type: 'init', ...this.cmds.init }]);
         case '7800':
           return this.cmds.keys
@@ -203,7 +213,7 @@ export const phone = (() => {
             });
           return keys.concat([{
             name: 'Reset',
-            displayName: 'Reset ITL Final Sequence',
+            displayName: 'Reset ITL Final Seq. (8811+)',
             type: 'key'
           }])
         case '8900':
@@ -220,19 +230,25 @@ export const phone = (() => {
             });
       }
     },
+    docBuilderHelper(doc, element, cmd) {
+      const el = doc.createElement('ExecuteItem');
+      el.setAttribute('URL', `Key:${cmd}`);
+      element.appendChild(el);
+    },
     generateXml(cmd) {
       const d = (new builder()).createDocument('', '', null),
         el1: Element = d.createElement('CiscoIPPhoneExecute');
       if(cmd.name === 'Key:Reset') {
-        ['Soft3', 'Soft1', 'Soft1'].forEach(c => {
-          const el = d.createElement('ExecuteItem');
-          el.setAttribute('URL', `Key:${c}`);
-          el1.appendChild(el);
-        })
+        ['Soft3', 'Soft1', 'Soft1'].forEach(c =>
+          this.docBuilderHelper(d, el1, c));
+      } else if(cmd.name === 'Key:7900-StarStarPound') {
+        ['KeyPadStar', 'KeyPadStar', 'KeyPadPound'].forEach(c =>
+          this.docBuilderHelper(d, el1, c))
+      } else if(cmd.name === 'Key:7900-ResetPhone') {
+        ['KeyPadStar','KeyPadStar','KeyPadPound','KeyPadStar','KeyPadStar']
+          .forEach(c => this.docBuilderHelper(d, el1, c));
       } else {
-        const el2: Element = d.createElement('ExecuteItem');
-        el2.setAttribute('URL', cmd.name);
-        el1.appendChild(el2);
+        this.docBuilderHelper(d, el1, cmd.name);
       }
       d.appendChild(el1);
       return d.toString();

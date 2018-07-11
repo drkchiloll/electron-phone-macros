@@ -139,6 +139,7 @@ export class MacroForm extends Component<any, any> {
     } = this.state;
     macro.types = deviceList;
     macro.name = macroName;
+    if(macro._id === 'temp') delete macro._id;
     phone.saveMacro(macro);
   }
   render() {

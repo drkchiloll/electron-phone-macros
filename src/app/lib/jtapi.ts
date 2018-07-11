@@ -2,7 +2,7 @@ import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
-import { mkdirSync } from 'fs';
+import { mkdirSync, existsSync, mkdir } from 'fs';
 import { EventEmitter } from 'events';
 import { req } from './requests';
 import { Log, errorLog } from '../services/logger';
@@ -222,10 +222,19 @@ export const jtapi = (() => {
         });
       })
     },
+    logPathDir(path) {
+      if(process.platform === 'win32') {
+        if(!existsSync(logpath)) {
+          mkdirSync(logpath);
+        }
+      }
+      mkdirSync(join(logpath, path));
+      return;
+    },
     deviceRunner({cmds, provider, devices}) {
       const jobName = new Date().getTime();
       const logPath = `./${jobName}`;
-      mkdirSync(join(logpath, logPath));
+      this.logPathDir(logPath);
       return Promise.map(devices, (d: any) => {
         const dlogpath = `./${d.deviceName}`;
         mkdirSync(join(logpath, `${logPath}/${d.deviceName}`));

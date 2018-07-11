@@ -3,6 +3,7 @@ import {
   Subheader, darkBlack, $
 } from './index';
 // const robot = require('robotjs');
+import * as robot from 'robotjs';
 
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
 
@@ -19,9 +20,9 @@ const menuItems = (macros: any, values: any) => {
       style={{ position: 'absolute', right: 5, top: -13, marginBottom: 10 }}
       iconStyle={{ height: 25, width: 25 }}
       onClick={() => {
-        // let { x, y } = robot.getMousePos();
-        // robot.moveMouseSmooth(x+50, y);
-        // robot.mouseClick();
+        let { x, y } = robot.getMousePos();
+        robot.moveMouseSmooth(x+50, y);
+        robot.mouseClick();
         setTimeout(() => {
           $('#search_field_0').focus();
         }, 0);

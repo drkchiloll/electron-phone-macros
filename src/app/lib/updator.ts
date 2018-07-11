@@ -39,7 +39,7 @@ export class Updator {
 
   processFiles(files: any[]) {
     return Promise.map(files, f =>
-      this.requestor.get(f.url).then(({ data }) =>
+      this.requestor.get(f.uri).then(({ data }) =>
         Object.assign(f, {
           content: new Buffer(data.content, 'base64').toString('utf-8')
         })));
@@ -63,6 +63,7 @@ export class Updator {
     return Promise.reduce(files, (a, { name, content }) => {
       return this.getLocalFile({ rootdir, name })
         .then(local => {
+          console.log(local);
           if(local != content) a.push({ name, content });
           return a;
         });

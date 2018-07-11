@@ -36,7 +36,6 @@ export class MainView extends Component<any, any> {
   }
 
   componentDidMount() {
-    console.log(process.env.PATH)
     if(this.props.account) {
       this.setState({ account: this.props.account });
     }

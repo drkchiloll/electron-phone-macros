@@ -52,8 +52,8 @@ export class App extends Component<any, any> {
     return (
       <div style={{position: 'relative'}}>
         <Tabs className='tabs-container'
-          inkBarStyle={{ background: 'black' }}
-          tabItemContainerStyle={{width: 500, marginBottom: 10 }}
+          inkBarStyle={{ background: '#546E7A', border: '.5px solid #546E7A' }}
+          tabItemContainerStyle={{width: 500, height: 75}}
           initialSelectedIndex={this.state.tabIdx}
           value={tabValue}
           onChange={this._tabSelect}>

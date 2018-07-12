@@ -3,9 +3,10 @@ import {
   TableHeaderColumn, TableRow, TableRowColumn,
   FontIcon
 } from './index';
-import { IconButton, CircularProgress } from 'material-ui';
+import { jtapi } from '../lib/jtapi';
 
 export class DeviceTable extends Component<any, any> {
+  public jtapi = jtapi;
   constructor() {
     super();
   }
@@ -23,20 +24,24 @@ export class DeviceTable extends Component<any, any> {
   handleRowSelect = selections => {
     // all none Number[]
     let { devices } = this.props;
-    devices = devices.map((d, indx) => {
-      if(selections === 'all') d.checked = true;
-      else if(selections === 'none') d.checked = false;
-      else {
-        const match: number = selections.indexOf(indx);
-        if(d.checked) {
-          if(match === -1) d.checked = false;
-        } else {
-          if(match !== -1) d.checked = true;
-        }
-      }
-      return d;
-    })
-    this.props.updateSelection(devices);
+    this.jtapi.deviceTableHandling({devices, selections})
+      .then(devs => {
+        this.props.updateSelection(devs);
+      });
+    // devices = devices.map((d, indx) => {
+    //   if(selections === 'all') d.checked = true;
+    //   else if(selections === 'none') d.checked = false;
+    //   else {
+    //     const match: number = selections.indexOf(indx);
+    //     if(d.checked) {
+    //       if(match === -1) d.checked = false;
+    //     } else {
+    //       if(match !== -1) d.checked = true;
+    //     }
+    //   }
+    //   return d;
+    // })
+    // this.props.updateSelection(devices);
   }
 
   render() {

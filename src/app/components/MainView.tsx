@@ -120,7 +120,7 @@ export class MainView extends Component<any, any> {
     const { searchLabel, devices, executeJobLabel } = this.state;
     return {
       main: { width: 350 },
-      mainpaper: { background: '#d7dddd' },
+      mainpaper: { background: '#CFD8DC' },
       rbtn: { width: 350 },
       rbdiv: {
         display: searchLabel ? 'none': 'block'
@@ -136,7 +136,9 @@ export class MainView extends Component<any, any> {
         display: devices ? 'block': 'none'
       },
       card: {
-        marginBottom: 10
+        border: '1px solid #B0BEC5',
+        marginBottom: 10,
+        backgroundColor: '#CFD8DC'
       },
       gdiv: {
         marginTop: 20,
@@ -273,6 +275,7 @@ export class MainView extends Component<any, any> {
       executeJobLabel
     } = this.state;
     const { account } = this.props;
+    this.jtapi.account = account;
     const disabled = (account && ipAddresses[0]) ? false : true;
     return (
       <div>
@@ -293,11 +296,13 @@ export class MainView extends Component<any, any> {
           <RaisedButton style={this.style().rbtn} label={searchLabel}
             icon={this.searchIcon()}
             disabled={disabled}
+            disabledBackgroundColor='#ECEFF1'
             onClick={this._search} />
           <RaisedButton
             label={executeJobLabel}
             icon={this.execIcon()}
             disabled={devices && selectedMacros.length > 0 ? false : true}
+            disabledBackgroundColor='#ECEFF1'
             backgroundColor='#607D8B'
             labelColor='#FAFAFA'
             fullWidth={true}
@@ -329,6 +334,7 @@ export class MainView extends Component<any, any> {
                 if(devices[type].length === 0) return;
                 return (
                   <Card
+                    zDepth={0}
                     key={i}
                     style={this.style().card}
                     initiallyExpanded={true}
@@ -360,7 +366,6 @@ export class MainView extends Component<any, any> {
   handleDeviceSelect = (type, devs) => {
     let { devices, selectedDevices } = this.state;
     this.setState({ devices });
-    this.jtapi.account = this.props.account;
     const selected = devs.reduce((a: any, d: any, idx) => {
       const match = selectedDevices.find(sd => sd.deviceName === d.name);
       if(!d.checked) {
@@ -374,26 +379,30 @@ export class MainView extends Component<any, any> {
         return a;
       }
       if(selectedDevices.length > 0 && match) return a;
+      if(d.img) {
+        d.img = this.processImg(d.img);
+      }
       a.push({
         type,
         index: idx,
         ip: d.ip,
         model: d.model,
         deviceName: d.name,
-        done: false
+        done: false,
+        img: d.img || undefined
       });
       return a;
     }, selectedDevices);
     this.setState({ selectedDevices });
-    return Promise.map(selected, (sel: any) => {
-      return this.getImg({ ip: sel.ip })
-        .then(img => {
-          sel['img'] = img;
-          return sel;
-        });
-    }).then(selectedDevices => {
-      devices[type] = devs;
-      this.setState({ selectedDevices, devices });
-    });
+    // return Promise.map(selected, (sel: any) => {
+    //   return this.getImg({ ip: sel.ip })
+    //     .then(img => {
+    //       sel['img'] = img;
+    //       return sel;
+    //     });
+    // }).then(selectedDevices => {
+    //   devices[type] = devs;
+    //   this.setState({ selectedDevices, devices });
+    // });
   }
 }

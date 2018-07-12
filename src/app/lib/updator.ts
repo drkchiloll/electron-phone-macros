@@ -30,8 +30,9 @@ export class Updator {
   }
 
   filterRepo(files: any[]) {
-    return Promise.filter(files, f =>
-      f.name.includes('bundle.js') || f.name === 'index.html'
+    return Promise.filter(files, ({name, git_url}) =>
+      name.includes('bundle.js') || name === 'index.html' ||
+      name.includes('.jar')
     ).then(files => Promise.map(files, f =>
       ({ name: f.name, uri: f.git_url })
     ))
@@ -39,31 +40,47 @@ export class Updator {
 
   processFiles(files: any[]) {
     return Promise.map(files, f =>
-      this.requestor.get(f.uri).then(({ data }) =>
-        Object.assign(f, {
-          content: new Buffer(data.content, 'base64').toString('utf-8')
-        })));
+      this.requestor.get(f.uri).then(({data:{content}}) => {
+        let encoding = 'base64';
+        if(f.name.includes('jar')) {
+          return Object.assign(f, {
+            content: new Buffer(content)
+          })
+        }
+        return Object.assign(f, {
+          content: new Buffer(content, 'base64')
+            .toString('utf-8')
+        });
+      }));
   }
 
   getLocalFile({rootdir, name}) {
-    return new Promise(resolve =>
+    return new Promise(resolve => {
       readFile(`${rootdir}/${name}`, 'utf-8', (err, file) =>
         resolve(file))
-    );
+    });
   }
 
   writeLocal({rootdir, name, content}) {
-    return new Promise(resolve => 
-      writeFile(`${rootdir}/${name}`, content, 'utf-8', (err) =>
+    return new Promise(resolve => {
+      let encoding = 'utf-8';
+      if(name.includes('.jar')) {
+        rootdir = rootdir + '/java';
+        encoding = null;
+      }
+      writeFile(`${rootdir}/${name}`, content, encoding, (err) =>
         resolve('done'))
-    )
+    })
   }
 
   compareFiles(files: any[], rootdir) {
     return Promise.reduce(files, (a, { name, content }) => {
+      if(name.includes('.jar')) {
+        a.push({ name, content });
+        return a;
+      }
       return this.getLocalFile({ rootdir, name })
         .then(local => {
-          console.log(local);
           if(local != content) a.push({ name, content });
           return a;
         });

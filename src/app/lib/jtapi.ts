@@ -16,6 +16,7 @@ export class JTAPI {
   private classes: string[] = [
     // './java/dataterminal_11.0.jar',
     './java/phoneterm_11_5.jar',
+    './java/phoneterm_9.1.2.jar',
     './java/dataterminal_9.1.2.jar',
     './java/dataterminal_8.5.jar'
   ];
@@ -28,15 +29,23 @@ export class JTAPI {
     this.account = account;
     this.provider = `${account.host};login=${account.username}`+
       `;passwd=${account.password}`;
-    this.classpath = account.version.startsWith('12') ||
-      account.version.startsWith('11') ||
-      account.version.startsWith('10') ?
-        join(__dirname, this.classes[0]) :
-      account.version.startsWith('9') ?
-        join(__dirname, this.classes[1]) :
-      account.version.startsWith('8') ?
-        join(__dirname, this.classes[2]) :
-      '';
+    const { version } = account;
+    switch(version) {
+      case version.startsWith('12'):
+      case version.startsWith('11'):
+      case version.startsWith('10'):
+        this.classpath = join(__dirname, this.classes[0]);
+        break;
+      case version.startsWith('9'):
+        if(!existsSync(join(__dirname, this.classes[1]))) {
+          this.classpath = join(__dirname, this.classes[2]);
+        } else {
+          this.classpath = join(__dirname, this.classes[1]);
+        }
+        break;
+      case version.startsWith('8'):
+        this.classpath = join(__dirname, this.classes[3]);
+    }
     java.classpath.push(this.classpath);
     this.JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
     this.Condition = java.import('com.cisco.cti.util.Condition');

@@ -2,7 +2,6 @@ import * as targz from 'targz'
 import { Promise, resolve } from 'bluebird';
 import { join } from 'path';
 import { exists } from 'fs';
-import { platform } from 'os';
 import { exec } from 'child_process';
 import { BrowserWindow } from 'electron';
 
@@ -43,8 +42,7 @@ export const javaChecker = (() => {
       })
     },
     run() {
-      console.log(platform())
-      if(platform() !== 'darwin') {
+      if(process.platform !== 'darwin') {
         return Promise.all([
           this.setHomeAndPath(),
           this.present().then(present => {

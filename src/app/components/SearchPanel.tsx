@@ -21,6 +21,11 @@ export class SearchPanel extends Component<any, any> {
                 style={{ left: 0, width: 230 }}
                 value={s}
                 onChange={this.props.changed}
+                onKeyPress={e => {
+                  if(e.keyCode === 13 || e.which === 13) {
+                    this.props.cr();
+                  }
+                }}
               />
               <IconButton className='fa-plus'
                 iconClassName='fa fa-plus'

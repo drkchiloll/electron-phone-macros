@@ -287,6 +287,7 @@ export class MainView extends Component<any, any> {
               searches={ipAddresses}
               changed={this.handleSearchChange}
               query={this.queryClick}
+              cr={this._search}
             />
           </Paper>
           <RaisedButton style={this.style().rbtn} label={searchLabel}

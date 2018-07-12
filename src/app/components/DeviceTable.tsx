@@ -65,22 +65,38 @@ export class DeviceTable extends Component<any, any> {
               selectable={device.associated ? true : false}
               selected={device.checked}
             >
-              <TableRowColumn>{device.ip}</TableRowColumn>
-              <TableRowColumn style={{width: 155}}>{device.name}</TableRowColumn>
-              <TableRowColumn >{device.model}</TableRowColumn>
               <TableRowColumn>
-                {device.associated ?
-                  <FontIcon className='fa fa-check fa-lg' /> :
-                  <FontIcon className='fa fa-times fa-2x' />
-                }
+                <div onClick={e => e.stopPropagation()}>
+                  {device.ip}
+                </div>
+              </TableRowColumn>
+              <TableRowColumn style={{width: 155}}>
+                <div onClick={e => e.stopPropagation()}>
+                  {device.name}
+                </div>
               </TableRowColumn>
               <TableRowColumn>
-                {device.cleared === 'in progress' ?
-                  <FontIcon className='fa fa-spinner fa-spin fa-lg fa-fw' /> :
-                 device.cleared ?
-                  <FontIcon className='fa fa-check' /> :
-                  <FontIcon className='fa fa-times-circle fa-2x' />
-                }
+                <div onClick={e => e.stopPropagation()}>
+                  {device.model}
+                </div>
+              </TableRowColumn>
+              <TableRowColumn>
+                <div onClick={e => e.stopPropagation()}>
+                  {device.associated ?
+                    <FontIcon className='fa fa-check fa-lg' /> :
+                    <FontIcon className='fa fa-times fa-2x' />
+                  }
+                </div>
+              </TableRowColumn>
+              <TableRowColumn>
+                <div onClick={e => e.stopPropagation()}>
+                  {device.cleared === 'in progress' ?
+                    <FontIcon className='fa fa-spinner fa-spin fa-lg fa-fw' /> :
+                  device.cleared ?
+                    <FontIcon className='fa fa-check' /> :
+                    <FontIcon className='fa fa-times-circle fa-2x' />
+                  }
+                </div>
               </TableRowColumn>
             </TableRow>
           ))}

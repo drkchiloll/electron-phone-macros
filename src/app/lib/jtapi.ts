@@ -14,9 +14,7 @@ const logpath = process.platform === 'win32' ?
 export class JTAPI {
   public account: any;
   private classes: string[] = [
-    // './java/dataterminal_11.0.jar',
     './java/phoneterm_11_5.jar',
-    './java/phoneterm_9.1.2.jar',
     './java/dataterminal_9.1.2.jar',
     './java/dataterminal_8.5.jar'
   ];
@@ -29,23 +27,15 @@ export class JTAPI {
     this.account = account;
     this.provider = `${account.host};login=${account.username}`+
       `;passwd=${account.password}`;
-    const { version } = account;
-    switch(version) {
-      case version.startsWith('12'):
-      case version.startsWith('11'):
-      case version.startsWith('10'):
-        this.classpath = join(__dirname, this.classes[0]);
-        break;
-      case version.startsWith('9'):
-        if(!existsSync(join(__dirname, this.classes[1]))) {
-          this.classpath = join(__dirname, this.classes[2]);
-        } else {
-          this.classpath = join(__dirname, this.classes[1]);
-        }
-        break;
-      case version.startsWith('8'):
-        this.classpath = join(__dirname, this.classes[3]);
-    }
+    this.classpath = account.version.startsWith('12') ||
+      account.version.startsWith('11') ||
+      account.version.startsWith('10') ?
+      join(__dirname, this.classes[0]) :
+      account.version.startsWith('9') ?
+        join(__dirname, this.classes[1]) :
+        account.version.startsWith('8') ?
+          join(__dirname, this.classes[2]) :
+          '';
     java.classpath.push(this.classpath);
     this.JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
     this.Condition = java.import('com.cisco.cti.util.Condition');
@@ -335,6 +325,32 @@ export const jtapi = (() => {
         new Buffer(img, encoding),
         err => {}
       );
+    },
+    deviceTableHandling({ selections, devices }) {
+      return Promise.map(devices, (d: any, indx) => {
+        if(selections === 'all') {
+          d.checked = true;
+          return this.getBackground(d.ip).then(img => {
+            d.img = img;
+            return d;
+          })
+        } else if(selections === 'none') d.checked = false;
+        else {
+          const select: number = selections.indexOf(indx);
+          if(d.checked) {
+            if(select === -1) d.checked = false;
+          } else {
+            if(select !== -1) {
+              d.checked = true;
+              return this.getBackground(d.ip).then(img => {
+                d.img = img;
+                return d;
+              });
+            }
+          }
+        }
+        return d;
+      })
     }
   };
   return service;

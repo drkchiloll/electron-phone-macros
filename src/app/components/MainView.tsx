@@ -179,12 +179,6 @@ export class MainView extends Component<any, any> {
         }, []).then((results) => {
           this.setState({ devices: cucm.models });
           return;
-          // return Promise.each(results, (devicename:string) =>
-          //   cucm.update(
-          //     updDevAssoc
-          //       .replace('%devicename%', devicename)
-          //       .replace('%userid%', cucm.profile.username)
-          //   ))
         });
       });
     })

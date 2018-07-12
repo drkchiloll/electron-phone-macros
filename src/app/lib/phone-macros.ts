@@ -232,12 +232,20 @@ export const phone = (() => {
     },
     docBuilderHelper(doc, element, cmd) {
       const el = doc.createElement('ExecuteItem');
+      if(cmd.includes('Key:')) {
+        cmd = cmd.replace('Key:', '');
+      }
       el.setAttribute('URL', `Key:${cmd}`);
       element.appendChild(el);
     },
     generateXml(cmd) {
-      const d = (new builder()).createDocument('', '', null),
+      const d = (new builder()).createDocument(null, null, null),
         el1: Element = d.createElement('CiscoIPPhoneExecute');
+      d.appendChild(
+        d.createProcessingInstruction(
+          'xml', 'version="1.0" encoding="utf-8" standalone="yes"'
+        )
+      );
       if(cmd.name === 'Key:Reset') {
         ['Soft3', 'Soft1', 'Soft1'].forEach(c =>
           this.docBuilderHelper(d, el1, c));
@@ -251,6 +259,7 @@ export const phone = (() => {
         this.docBuilderHelper(d, el1, cmd.name);
       }
       d.appendChild(el1);
+      console.log(d.toString());
       return d.toString();
     },
     saveMacro(macro) {

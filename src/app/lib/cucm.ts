@@ -234,11 +234,6 @@ export class Cucm {
       .catch((err:any) => {
         console.log(err);
         return;
-        // return new Promise((resolve, reject) => {
-        //   setTimeout(() => {
-        //     resolve(this._req(params));
-        //   }, 5000);
-        // });
       })
   }
 
@@ -260,8 +255,8 @@ export class Cucm {
           errorLog.log('error', err.toString());
           return reject({ error: err });
         }
-        if(res.statusCode >= 500 && res.statusCode <= 599) {
-          errorLog.log('error', `${res.statusCode+''}`, { res });
+        if(res.statusCode >= 400 && res.statusCode <= 599) {
+          errorLog.log('error', `${res.statusCode+' '+res.statusMessage}`, { res });
           return reject(res);
         }
         if(res.statusCode === 200) return resolve(body);

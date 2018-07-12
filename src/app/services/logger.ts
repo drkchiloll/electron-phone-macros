@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { createLogger, transports, format, Logger } from 'winston';
 const { combine, prettyPrint, timestamp } = format;
 import * as moment from 'moment';
@@ -22,12 +23,17 @@ export class Log {
     });
   }
 }
+
 const logpath = process.platform === 'win32' ?
   `C:\\PhoneMacros\\logs` : __dirname;
+if(process.platform === 'win32') {
+  if(!existsSync(logpath)) {
+    mkdirSync(logpath);
+  }
+}
 export const errorLog: Logger = Log.create(
   join(logpath, './errors.log'), {
     maxsize: 2048,
-    zippedArchive: true,
     maxFiles: 10
   }
 );

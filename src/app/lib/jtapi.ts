@@ -161,7 +161,7 @@ export const jtapi = (() => {
       }).then(({ data }) => data).catch(error => {
         errorLog.log('error', 'Getting BackGround', {
           forDevice: ip,
-          error
+          errors: error.toStrin()
         });
         return null;
       });

@@ -96,6 +96,7 @@ export class MacroForm extends Component<any, any> {
       selectedCmd, cmdList,
       macro, sequenceDesc
     } = this.state;
+    console.log(macro);
     const m = phone.cmdHelper({
       selected: selectedCmd,
       list: cmdList,

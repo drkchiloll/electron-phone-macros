@@ -234,8 +234,10 @@ export const phone = (() => {
       const el = doc.createElement('ExecuteItem');
       if(cmd.includes('Key:')) {
         cmd = cmd.replace('Key:', '');
+        el.setAttribute('URL', `Key:${cmd}`);
+      } else {
+        el.setAttribute('URL', cmd);
       }
-      el.setAttribute('URL', `Key:${cmd}`);
       element.appendChild(el);
     },
     generateXml(cmd) {
@@ -259,7 +261,6 @@ export const phone = (() => {
         this.docBuilderHelper(d, el1, cmd.name);
       }
       d.appendChild(el1);
-      console.log(d.toString());
       return d.toString();
     },
     saveMacro(macro) {

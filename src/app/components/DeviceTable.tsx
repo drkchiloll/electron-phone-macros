@@ -3,9 +3,10 @@ import {
   TableHeaderColumn, TableRow, TableRowColumn,
   FontIcon
 } from './index';
-import { IconButton, CircularProgress } from 'material-ui';
+import { jtapi } from '../lib/jtapi';
 
 export class DeviceTable extends Component<any, any> {
+  public jtapi = jtapi;
   constructor() {
     super();
   }
@@ -20,23 +21,42 @@ export class DeviceTable extends Component<any, any> {
       </TableHeaderColumn>
     );
 
-  handleRowSelect = selections => {
-    // all none Number[]
+  handleSelectAll = selection => {
+    if(selection === 'all' || selection === 'none')
+      this.handleRowSelect(selection);
+  }
+
+  handleRowSelect = selection => {
     let { devices } = this.props;
-    devices = devices.map((d, indx) => {
-      if(selections === 'all') d.checked = true;
-      else if(selections === 'none') d.checked = false;
-      else {
-        const match: number = selections.indexOf(indx);
-        if(d.checked) {
-          if(match === -1) d.checked = false;
-        } else {
-          if(match !== -1) d.checked = true;
-        }
+    if(selection != 'all' && selection != 'none') {
+      let d = devices[selection];
+      if(!d.checked) {
+        this.props.renderLoader({
+          deviceName: d.name,
+          ip: d.ip,
+          model: d.model,
+          done: false,
+          img: 'images/loading.gif',
+          index: selection
+        });
       }
-      return d;
-    })
-    this.props.updateSelection(devices);
+    } else if(selection === 'all') {
+      const DEVICES = devices.map(d =>
+        ({
+          deviceName: d.name,
+          ip: d.ip,
+          model: d.model,
+          done: false,
+          img: 'images/loading.gif'
+        }))
+      this.props.renderLoader(DEVICES);
+    }
+    return this.jtapi.deviceTableHandling({devices, selection})
+      .then(devs => {
+        if(devs) {
+          return this.props.updateSelection(devs);
+        }
+      });
   }
 
   render() {
@@ -46,7 +66,8 @@ export class DeviceTable extends Component<any, any> {
         fixedHeader={true}
         selectable={true}
         multiSelectable={true}
-        onRowSelection={this.handleRowSelect}
+        onRowSelection={this.handleSelectAll}
+        onCellClick={this.handleRowSelect}
       >
         <TableHeader
           displaySelectAll={true}

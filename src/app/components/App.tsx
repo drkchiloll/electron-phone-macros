@@ -50,10 +50,17 @@ export class App extends Component<any, any> {
   render() {
     const { account, openAcct, tabValue, update } = this.state;
     return (
-      <div style={{position: 'relative'}}>
+      <div style={{ position: 'relative' }}>
         <Tabs className='tabs-container'
-          inkBarStyle={{ background: 'black' }}
-          tabItemContainerStyle={{width: 500, marginBottom: 10 }}
+          inkBarStyle={{ background: '#546E7A', border: '.5px solid #546E7A' }}
+          tabItemContainerStyle={{
+            width: 500,
+            height: 75,
+            borderTop: '.5px solid #B0BEC5',
+            borderRight: '.5px solid #B0BEC5',
+            borderLeft: '.5px solid #B0BEC5',
+            borderBottom: '.25px dashed #B0BEC5'
+          }}
           initialSelectedIndex={this.state.tabIdx}
           value={tabValue}
           onChange={this._tabSelect}>

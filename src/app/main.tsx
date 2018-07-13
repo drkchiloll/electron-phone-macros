@@ -9,7 +9,7 @@ const lightMuiTheme = getMuiTheme({
   tabs: {
     selectedTextColor: darkBlack,
     textColor: darkBlack,
-    backgroundColor: '#d7dddd',
+    backgroundColor: '#CFD8DC'
   },
   textField: {
     floatingLabelColor: darkBlack
@@ -21,14 +21,15 @@ const lightMuiTheme = getMuiTheme({
     textColor: fullWhite
   },
   palette: {
-    primary1Color: '#01579B'
+    primary1Color: '#546E7A'
   },
   menuItem: {
     selectedTextColor: '#1A237E'
   },
   tableRow: {
-    stripeColor: '#CFD8DC',
-    selectedColor: '#90CAF9',
+    hoverColor: '#78909C',
+    stripeColor: '#ECEFF1',
+    selectedColor: '#78909C'
   }
 });
 

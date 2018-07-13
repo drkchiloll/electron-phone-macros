@@ -120,7 +120,7 @@ export class MainView extends Component<any, any> {
     const { searchLabel, devices, executeJobLabel } = this.state;
     return {
       main: { width: 350 },
-      mainpaper: { background: '#d7dddd' },
+      mainpaper: { background: '#CFD8DC', borderRadius: '4%' },
       rbtn: { width: 350 },
       rbdiv: {
         display: searchLabel ? 'none': 'block'
@@ -130,13 +130,16 @@ export class MainView extends Component<any, any> {
       },
       cdiv: {
         position: 'absolute',
-        top: 75,
+        top: 74,
         left: 355,
         width: 900,
         display: devices ? 'block': 'none'
       },
       card: {
-        marginBottom: 10
+        border: '1px solid #B0BEC5',
+        marginBottom: 10,
+        backgroundColor: '#CFD8DC',
+        boxShadow: 0
       },
       gdiv: {
         marginTop: 20,
@@ -255,13 +258,17 @@ export class MainView extends Component<any, any> {
 
   searchIcon = () => (
     <div style={this.style().rbdiv}>
-      <i className='fa fa-cog fa-spin fa-lg fa-fw' />
+      <i style={{color: '#B0BEC5'}}
+        className='fa fa-cog fa-spin fa-lg fa-fw'
+      />
     </div>
   );
 
   execIcon = () => (
     <div style={this.style().execdiv}>
-      <i className='fa fa-circle-o-notch fa-spin fa-lg fa-fw' />
+      <i style={{ color: '#B0BEC5' }}
+        className='fa fa-circle-o-notch fa-spin fa-lg fa-fw'
+      />
     </div>
   );
 
@@ -273,6 +280,7 @@ export class MainView extends Component<any, any> {
       executeJobLabel
     } = this.state;
     const { account } = this.props;
+    this.jtapi.account = account;
     const disabled = (account && ipAddresses[0]) ? false : true;
     return (
       <div>
@@ -282,7 +290,7 @@ export class MainView extends Component<any, any> {
           change={this.handleJobChange}
         />
         <div style={this.style().main}>
-          <Paper zDepth={4} style={this.style().mainpaper}>
+          <Paper zDepth={1} style={this.style().mainpaper}>
             <SearchPanel
               searches={ipAddresses}
               changed={this.handleSearchChange}
@@ -293,11 +301,13 @@ export class MainView extends Component<any, any> {
           <RaisedButton style={this.style().rbtn} label={searchLabel}
             icon={this.searchIcon()}
             disabled={disabled}
+            disabledBackgroundColor='#ECEFF1'
             onClick={this._search} />
           <RaisedButton
             label={executeJobLabel}
             icon={this.execIcon()}
             disabled={devices && selectedMacros.length > 0 ? false : true}
+            disabledBackgroundColor='#ECEFF1'
             backgroundColor='#607D8B'
             labelColor='#FAFAFA'
             fullWidth={true}
@@ -340,9 +350,20 @@ export class MainView extends Component<any, any> {
                       showExpandableButton={true} />
                     <CardText expandable={true}>
                       <DeviceTable
+                        renderLoader={d => {
+                          if(d instanceof Array) {
+                            this.handleSelectionLoad(d, type);
+                          } else {
+                            d['type'] = type;
+                            this.handleSelectLoad(d);
+                          }
+                        }}
                         devices={devices[type]}
                         updateSelection={
-                          devs => this.handleDeviceSelect(type, devs)
+                          devs => {
+                            this.handleSelect(type, devs);
+                            // this.handleDeviceSelect(type, devs)
+                          }
                         }
                       />
                     </CardText>
@@ -357,10 +378,57 @@ export class MainView extends Component<any, any> {
     );
   }
 
-  handleDeviceSelect = (type, devs) => {
+  handleSelectionLoad = (devs, type) => {
+    let timer = 1500;
+    if(devs.length === 1) timer = 0;
+    setTimeout((devices, t) => {
+      let { selectedDevices } = this.state;
+      devices.forEach((d, indx) => {
+        d['type'] = t;
+        d['index'] = indx;
+        const existing = selectedDevices.find(sd =>
+          sd.deviceName === d.deviceName)
+        if(!existing) {
+          selectedDevices.push(d);
+        }
+      });
+      this.setState({ selectedDevices });
+    }, timer, devs, type)
+  }
+
+  handleSelectLoad = dev => {
+    let { selectedDevices } = this.state;
+    selectedDevices.push(dev);
+    this.setState({ selectedDevices });
+  }
+
+  handleSelect = (type, devs) => {
     let { devices, selectedDevices } = this.state;
     this.setState({ devices });
-    this.jtapi.account = this.props.account;
+    const selected = devs.reduce((a: any, d: any, idx) => {
+      const index = selectedDevices.findIndex(sd =>
+        sd.deviceName === d.name);
+      if(!d.checked) {
+        if(index !== -1) {
+          a.splice(index, 1);
+        }
+        return a;
+      }
+      if(index !== -1) {
+        selectedDevices[index]['img'] = d.img;
+        return a;
+      }
+      return a;
+    }, selectedDevices);
+    this.setState({ selectedDevices: selected });
+  }
+
+  handleDeviceSelect = (type, devs) => {
+    let { devices, selectedDevices } = this.state;
+    const loadingIndx = selectedDevices
+      .findIndex(sd => sd.deviceName === 'LOADING...');
+    if(loadingIndx !== -1) selectedDevices.splice(loadingIndx, 1);
+    this.setState({ devices });
     const selected = devs.reduce((a: any, d: any, idx) => {
       const match = selectedDevices.find(sd => sd.deviceName === d.name);
       if(!d.checked) {
@@ -380,20 +448,11 @@ export class MainView extends Component<any, any> {
         ip: d.ip,
         model: d.model,
         deviceName: d.name,
-        done: false
+        done: false,
+        img: d.img || undefined
       });
       return a;
     }, selectedDevices);
     this.setState({ selectedDevices });
-    return Promise.map(selected, (sel: any) => {
-      return this.getImg({ ip: sel.ip })
-        .then(img => {
-          sel['img'] = img;
-          return sel;
-        });
-    }).then(selectedDevices => {
-      devices[type] = devs;
-      this.setState({ selectedDevices, devices });
-    });
   }
 }

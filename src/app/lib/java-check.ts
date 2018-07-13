@@ -34,6 +34,7 @@ export const javaChecker = (() => {
     },
     setHomeAndPath() {
       return new Promise(resolve => {
+        if(process.env['JAVA_HOME']) return resolve('done');
         const home = `setx JAVA_HOME "C:\\PhoneMacros\\Java\\jdk-10.0.1"`,
           path = `setx PATH "%PATH%;%JAVA_HOME%\\bin`;
         exec(home, (e, sout, serr) => {

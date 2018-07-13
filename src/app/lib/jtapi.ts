@@ -326,31 +326,30 @@ export const jtapi = (() => {
         err => {}
       );
     },
-    deviceTableHandling({ selections, devices }) {
-      return Promise.map(devices, (d: any, indx) => {
-        if(selections === 'all') {
+    deviceTableHandling({ selection, devices }) {
+      return Promise.mapSeries(devices, (d: any, indx) => {
+        if(selection === 'all') {
           d.checked = true;
           return this.getBackground(d.ip).then(img => {
-            d.img = img;
+            d.img = d.img = `data:image/png;base64,` +
+              Buffer.from(img, 'binary').toString('base64');
             return d;
           })
-        } else if(selections === 'none') d.checked = false;
-        else {
-          const select: number = selections.indexOf(indx);
-          if(d.checked) {
-            if(select === -1) d.checked = false;
-          } else {
-            if(select !== -1) {
-              d.checked = true;
-              return this.getBackground(d.ip).then(img => {
-                d.img = img;
-                return d;
-              });
-            }
+        } else if(selection === 'none') {
+          d.checked = false;
+        } else if(selection === indx) {
+          if(d.checked) d.checked = false;
+          else {
+            d.checked = true;
+            return this.getBackground(d.ip).then(img => {
+              d.img = `data:image/png;base64,` +
+                Buffer.from(img, 'binary').toString('base64');
+              return d;
+            });
           }
         }
         return d;
-      })
+      });
     }
   };
   return service;

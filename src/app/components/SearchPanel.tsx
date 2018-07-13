@@ -8,7 +8,7 @@ export class SearchPanel extends Component<any, any> {
     return (
       <div>
         { searches.map((s: any, i: number) =>
-          <div key={i}>
+          <div key={i} style={{border: '1px solid #B0BEC5'}}>
             <div style={{marginLeft: '10px', position: 'relative'}}>
               <TextField
                 id={`search_field_${i}`}

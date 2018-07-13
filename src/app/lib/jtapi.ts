@@ -93,6 +93,16 @@ export const jtapi = (() => {
       return new Promise((resolve, reject) => {
         setTimeout((p, t) => {
           t.isRegistered((err, registered) => {
+            if(err) {
+              errorLog.log('error', 'Terminal Error', {
+                error: err,
+                onDevice: {
+                  name: p.device.deviceName,
+                  ip: p.device.ip,
+                  model: p.device.model
+                }
+              });
+            }
             if(registered) return resolve(registered);
             else {
               p.timer = 2500;
@@ -127,7 +137,20 @@ export const jtapi = (() => {
         return new Promise((resolve, reject) => {
           setTimeout((term, d, c) => {
             term.execAction([d.deviceName, c.xml], (err, phone) => {
-              if(c.sequenceId === 1) d['ctiTerminal'] = phone;
+              if(c.sequenceId === 1) {
+                if(err) {
+                  errorLog.log('error', 'Error On Terminal', {
+                    error: err,
+                    onDevice: {
+                      name: d.deviceName,
+                      ip: d.ip,
+                      model: d.model,
+                      ctiTerminal: phone
+                    }
+                  });
+                }
+                d['ctiTerminal'] = phone;
+              }
               setTimeout(t => {
                 t.getDataResponse((err, resp) => {
                   return resolve({resp});

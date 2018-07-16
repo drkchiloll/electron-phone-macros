@@ -93,10 +93,9 @@ export class MainView extends Component<any, any> {
 
   updateMacros = macros => this.setState({ macros });
 
-  handleSearchChange = (e: any, value: string) => {
+  handleSearchChange = ({index, search}) => {
     let { ipAddresses } = this.state;
-    const searchIdx = e.target.name.split('_')[1];
-    ipAddresses[searchIdx] = value;
+    ipAddresses[index] = search;
     this.setState({ ipAddresses });
   }
 
@@ -130,7 +129,7 @@ export class MainView extends Component<any, any> {
       },
       cdiv: {
         position: 'absolute',
-        top: 74,
+        top: 80,
         left: 355,
         width: 900,
         display: devices ? 'block': 'none'

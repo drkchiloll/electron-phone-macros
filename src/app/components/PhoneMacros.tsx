@@ -28,7 +28,14 @@ export class PhoneMacros extends Component<any, any> {
 
   getMacros = () => {
     macroDb.get()
-      .then(macros => this.setState({ macros }))
+      .then((macros: any) => {
+        macros.forEach((m: any) => {
+          const badtype: any = m.types.findIndex(t => t === '8800');
+          if(badtype !== -1) m.types.splice(badtype, 1);
+          macroDb.update(m);
+        });
+        this.setState({ macros })
+      })
       .then(() => {
         macroDb.macroEvent.on('m-add', this.updateMacros);
         macroDb.macroEvent.on('m-update', this.updateMacros);
@@ -65,7 +72,7 @@ export class PhoneMacros extends Component<any, any> {
     macros.unshift({
       _id: 'temp',
       name: '',
-      types: ['8800'],
+      types: [],
       cmds: []
     })
     const mouse = robot.getMousePos();

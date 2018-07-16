@@ -191,7 +191,7 @@ export const phone = (() => {
             displayName: 'Reset Phone (**#**)',
             type: 'key'
           });
-          return keys.concat([{ type: 'init', ...this.cmds.init }]);
+          return keys;
         case '7800':
           return this.cmds.keys
             .filter((c: any) =>
@@ -234,8 +234,12 @@ export const phone = (() => {
       const el = doc.createElement('ExecuteItem');
       if(cmd.includes('Key:')) {
         cmd = cmd.replace('Key:', '');
+        el.setAttribute('URL', `Key:${cmd}`);
+      } else if(cmd.includes('Init:')) {
+        el.setAttribute('URL', cmd);
+      } else {
+        el.setAttribute('URL', `Key:${cmd}`);
       }
-      el.setAttribute('URL', `Key:${cmd}`);
       element.appendChild(el);
     },
     generateXml(cmd) {

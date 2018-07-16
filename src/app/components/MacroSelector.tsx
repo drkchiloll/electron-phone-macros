@@ -17,8 +17,8 @@ const menuItems = (macros: any, values: any) => {
   let items: any = [(
     <IconButton
       key='close'
-      style={{ position: 'absolute', right: 5, top: -13, marginBottom: 10 }}
-      iconStyle={{ height: 25, width: 25 }}
+      style={{ position: 'absolute', right: 5, top: -15 }}
+      iconStyle={{ height: 19, width: 19 }}
       onClick={() => {
         let { x, y } = robot.getMousePos();
         robot.moveMouseSmooth(x+50, y);
@@ -53,7 +53,7 @@ export const MacroSelector = props => {
       onChange={props.change}
       fullWidth={true}
       style={{marginLeft: 5, width: 'auto', minWidth: 335}}
-      menuStyle={{autoWidth: true}}
+      menuStyle={{autoWidth: true, margin:20}}
       iconStyle={{outlineColor: fullBlack}}
     >
       { menuItems(macros, values) }

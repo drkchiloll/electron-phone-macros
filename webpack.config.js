@@ -11,8 +11,8 @@ let nodeModules = {};
 
 fs.readdirSync('node_modules')
   .filter(function (x) {
-    return ['.bin'].indexOf(x) === -1 && (x === 'java' ||
-      x === 'robotjs')
+    return ['.bin'].indexOf(x) === -1 &&
+      (x === 'java' || x === 'robotjs')
   })
   .forEach(function (mod) {
     nodeModules[mod] = 'commonjs ' + mod;
@@ -53,10 +53,10 @@ module.exports = (env, options) => {
       }, {
         test: /.woff$|.woff2$|.ttf$|.eot$|.svg$|.jpg$/,
         loader: 'url-loader'
-        }, {
-          test: /\.node$/,
-          use: 'node-loader'
-        }]
+      }, {
+        test: /\.node$/,
+        use: 'node-loader'
+      }]
     },
     plugins: [
       new webpack.DefinePlugin({
@@ -70,13 +70,7 @@ module.exports = (env, options) => {
 
   let prod = {
     plugins: [
-      // new UglifyJsPlugin({
-      //   cache: false,
-      //   uglifyOptions: {
-      //     compress: { inline: false }
-      //   },
-      //   sourceMap: true
-      // }),
+      new UglifyJsPlugin(),
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('production')

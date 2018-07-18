@@ -17,7 +17,7 @@ const menuItems = (macros: any, values: any) => {
   let items: any = [(
     <IconButton
       key='close'
-      style={{ position: 'absolute', right: 5, top: -15 }}
+      style={{ position: 'absolute', right: 5, top: -13 }}
       iconStyle={{ height: 19, width: 19 }}
       onClick={() => {
         let { x, y } = robot.getMousePos();
@@ -31,11 +31,14 @@ const menuItems = (macros: any, values: any) => {
       <CloseIcon />
     </IconButton>
   )]
-  return macros.reduce((a: any, m) => {
+  return macros.reduce((a: any, m, index) => {
     a.push(<MenuItem
       key={m._id}
       value={m}
       checked={values && values.findIndex(v => v._id === m._id) > -1}
+      innerDivStyle={{
+        marginTop: index===0 ? 8: 0
+      }}
       primaryText={m.name}
     />);
     return a;
@@ -53,7 +56,7 @@ export const MacroSelector = props => {
       onChange={props.change}
       fullWidth={true}
       style={{marginLeft: 5, width: 'auto', minWidth: 335}}
-      menuStyle={{autoWidth: true, margin:20}}
+      menuStyle={{autoWidth: true}}
       iconStyle={{outlineColor: fullBlack}}
     >
       { menuItems(macros, values) }

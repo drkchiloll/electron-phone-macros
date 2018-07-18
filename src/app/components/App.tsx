@@ -4,6 +4,7 @@ import {
   Component, Promise
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
+import { FeatureButtons } from './FeatureButtons';
 import { Update } from './Update';
 import { accountDb } from '../lib/account-db';
 import { ipcRenderer } from 'electron';
@@ -104,6 +105,7 @@ export class App extends Component<any, any> {
             }
           </Tab>
         </Tabs>
+        <FeatureButtons />
         <Update update={update} close={this.closeUpdator} />
       </div>
     );

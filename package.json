@@ -14,13 +14,14 @@
     "build:dist": "node_modules/.bin/webpack --config webpack.config.js --mode production --progress --colors",
     "start": "node_modules/.bin/electron .",
     "package:macos": "node_modules/.bin/electron-packager ./ Imperium_Control --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
-    "package:win64": "node_modules/.bin/electron-packager ./ Imperium_Control --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
+    "package:win64": "node_modules/.bin/electron-packager ./ imperium --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
     "clean": "cd dist && rm *.js* && cd ..",
     "clean_jtapi": "rm CiscoJtapi*"
   },
   "dependencies": {
     "java": "^0.10.0",
-    "robotjs": "^0.5.1"
+    "robotjs": "^0.5.1",
+    "targz": "^1.0.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
@@ -60,7 +61,6 @@
     "request": "^2.87.0",
     "style-loader": "^0.13.1",
     "styled-components": "^3.3.3",
-    "targz": "^1.0.1",
     "ts-loader": "^0.8.2",
     "typescript": "^2.9.2",
     "uglifyjs-webpack-plugin": "^1.2.7",

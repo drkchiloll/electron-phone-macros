@@ -45,9 +45,7 @@ export const javaChecker = (() => {
     run() {
       if(process.platform !== 'darwin') {
         return Promise.all([
-          this.setHomeAndPath(),
           this.present().then(present => {
-            console.log(present)
             if(!present) {
               this.load();
               return this.xtractJava().then(() => {

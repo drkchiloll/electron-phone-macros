@@ -129,7 +129,7 @@ export class MainView extends Component<any, any> {
       },
       cdiv: {
         position: 'absolute',
-        top: 80,
+        top: 0,
         left: 355,
         width: 900,
         display: devices ? 'block': 'none'
@@ -288,90 +288,92 @@ export class MainView extends Component<any, any> {
           macros={macros}
           change={this.handleJobChange}
         />
-        <div style={this.style().main}>
-          <Paper zDepth={1} style={this.style().mainpaper}>
-            <SearchPanel
-              searches={ipAddresses}
-              changed={this.handleSearchChange}
-              query={this.queryClick}
-              cr={this._search}
-            />
-          </Paper>
-          <RaisedButton style={this.style().rbtn} label={searchLabel}
-            icon={this.searchIcon()}
-            disabled={disabled}
-            disabledBackgroundColor='#ECEFF1'
-            onClick={this._search} />
-          <RaisedButton
-            label={executeJobLabel}
-            icon={this.execIcon()}
-            disabled={devices && selectedMacros.length > 0 ? false : true}
-            disabledBackgroundColor='#ECEFF1'
-            backgroundColor='#607D8B'
-            labelColor='#FAFAFA'
-            fullWidth={true}
-            onClick={this.executeMacro} />
-          {selectedDevices.length > 0 ?
-            <div style={this.style().gdiv}>
-              <GridList style={this.style().glist}
-                cellHeight={225}
-                cols={1}
-              >
-                {selectedDevices.map((d: any) =>
-                  <GridTile
-                    key={d.deviceName}
-                    title={<strong>{d.deviceName}</strong>}
-                    titleStyle={this.style().tilestyle}
-                    titleBackground={this.style().tbg}
-                  >
-                    <img width={350} src={d.img} alt='background' />
-                  </GridTile>)}
-              </GridList>
-            </div> :
-            null
-          }
-        </div>
-        <div style={this.style().cdiv}>
-          {
-            devices ?
-              Object.keys(devices).map((type, i) => {
-                if(devices[type].length === 0) return;
-                return (
-                  <Card
-                    key={i}
-                    style={this.style().card}
-                    initiallyExpanded={true}
-                  >
-                    <CardHeader title={`Cisco ${type}`}
-                      subtitle={`Total: ${devices[type].length}`}
-                      avatar={`./images/${type}.jpg`}
-                      actAsExpander={true}
-                      showExpandableButton={true} />
-                    <CardText expandable={true}>
-                      <DeviceTable
-                        renderLoader={d => {
-                          if(d instanceof Array) {
-                            this.handleSelectionLoad(d, type);
-                          } else {
-                            d['type'] = type;
-                            this.handleSelectLoad(d);
-                          }
-                        }}
-                        devices={devices[type]}
-                        updateSelection={
-                          devs => {
-                            this.handleSelect(type, devs);
-                            // this.handleDeviceSelect(type, devs)
-                          }
-                        }
-                      />
-                    </CardText>
-                  </Card>
-                );
-              })
-              :
+        <div style={{position: 'relative'}}>
+          <div style={this.style().main}>
+            <Paper zDepth={1} style={this.style().mainpaper}>
+              <SearchPanel
+                searches={ipAddresses}
+                changed={this.handleSearchChange}
+                query={this.queryClick}
+                cr={this._search}
+              />
+            </Paper>
+            <RaisedButton style={this.style().rbtn} label={searchLabel}
+              icon={this.searchIcon()}
+              disabled={disabled}
+              disabledBackgroundColor='#ECEFF1'
+              onClick={this._search} />
+            <RaisedButton
+              label={executeJobLabel}
+              icon={this.execIcon()}
+              disabled={devices && selectedMacros.length > 0 ? false : true}
+              disabledBackgroundColor='#ECEFF1'
+              backgroundColor='#607D8B'
+              labelColor='#FAFAFA'
+              fullWidth={true}
+              onClick={this.executeMacro} />
+            {selectedDevices.length > 0 ?
+              <div style={this.style().gdiv}>
+                <GridList style={this.style().glist}
+                  cellHeight={225}
+                  cols={1}
+                >
+                  {selectedDevices.map((d: any) =>
+                    <GridTile
+                      key={d.deviceName}
+                      title={<strong>{d.deviceName}</strong>}
+                      titleStyle={this.style().tilestyle}
+                      titleBackground={this.style().tbg}
+                    >
+                      <img width={350} src={d.img} alt='background' />
+                    </GridTile>)}
+                </GridList>
+              </div> :
               null
-          }
+            }
+          </div>
+          <div style={this.style().cdiv}>
+            {
+              devices ?
+                Object.keys(devices).map((type, i) => {
+                  if(devices[type].length === 0) return;
+                  return (
+                    <Card
+                      key={i}
+                      style={this.style().card}
+                      initiallyExpanded={true}
+                    >
+                      <CardHeader title={`Cisco ${type}`}
+                        subtitle={`Total: ${devices[type].length}`}
+                        avatar={`./images/${type}.jpg`}
+                        actAsExpander={true}
+                        showExpandableButton={true} />
+                      <CardText expandable={true}>
+                        <DeviceTable
+                          renderLoader={d => {
+                            if(d instanceof Array) {
+                              this.handleSelectionLoad(d, type);
+                            } else {
+                              d['type'] = type;
+                              this.handleSelectLoad(d);
+                            }
+                          }}
+                          devices={devices[type]}
+                          updateSelection={
+                            devs => {
+                              this.handleSelect(type, devs);
+                              // this.handleDeviceSelect(type, devs)
+                            }
+                          }
+                        />
+                      </CardText>
+                    </Card>
+                  );
+                })
+                :
+                null
+            }
+          </div>
         </div>
       </div>
     );

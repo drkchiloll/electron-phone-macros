@@ -2,7 +2,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 import * as electron from 'electron';
 import { app, BrowserWindow, Menu } from 'electron';
 import { AppMenu } from './menu';
-import { javaChecker } from '../app/lib/java-check';
+// import { javaChecker } from '../app/lib/java-check';
 import * as ContextMenu from 'electron-context-menu';
 
 class MyApplication {
@@ -30,15 +30,13 @@ class MyApplication {
     ContextMenu({
       window: this.mainWindow
     });
-    javaChecker.run().then(() => {
-      const mainURL = `file://${__dirname}/index.html`;
-      this.mainWindow.loadURL(mainURL);
+    const mainURL = `file://${__dirname}/index.html`;
+    this.mainWindow.loadURL(mainURL);
 
-      this.mainWindow.on('closed', () => {
-        this.mainWindow = null;
-      });
-      Menu.setApplicationMenu(AppMenu);
+    this.mainWindow.on('closed', () => {
+      this.mainWindow = null;
     });
+    Menu.setApplicationMenu(AppMenu);
   }
 }
 

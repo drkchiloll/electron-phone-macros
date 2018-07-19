@@ -9,7 +9,7 @@ import { Log, errorLog } from '../services/logger';
 import { writeFile } from 'fs';
 
 const logpath = process.platform === 'win32' ?
-  `C:\\PhoneMacros\\logs\\` : join(__dirname, './logs');
+  `C:\\ProgramData\\Imperium\\logs\\` : join(__dirname, './logs');
 
 export class JTAPI {
   public account: any;

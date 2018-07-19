@@ -25,7 +25,7 @@ export class Log {
 }
 
 const logpath = process.platform === 'win32' ?
-  `C:\\PhoneMacros\\logs` : join(__dirname, './logs');
+  `C:\\ProgramData\\Imperium\\logs` : join(__dirname, './logs');
 if(process.platform === 'win32') {
   if(!existsSync(logpath)) {
     mkdirSync(logpath);

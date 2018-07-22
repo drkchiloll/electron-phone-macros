@@ -31,6 +31,7 @@ export class SearchPanel extends Component<any, any> {
           <div key={i} style={{border: '1px solid #B0BEC5'}}>
             <div style={{marginLeft: '10px', position: 'relative'}}>
               <AutoComplete
+                id={`search_field_${i}`}
                 hintText='10.255.2.* (wildcard)'
                 dataSource={this.remember()}
                 name={`ip_${i}`}

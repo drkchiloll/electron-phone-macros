@@ -3,7 +3,8 @@ import {
   CardHeader, CardText, Paper,
   phone, Avatar, List, ListItem, blueGrey200,
   Dialog, Promise, Checkbox, SelectableList,
-  RaisedButton, MacroForm, Api, IconButton
+  RaisedButton, MacroForm, Api, IconButton,
+  Subheader
 } from './index';
 import * as ToggleButton from 'react-toggle-button';
 import { MacroTester } from './MacroTester';
@@ -88,10 +89,18 @@ export class PhoneMacros extends Component<any, any> {
     return (
       <div>
           <div style={{position: 'relative'}}>
-            <div style={{ position: 'absolute', top: 5, left: 865 }}>
-              <span style={{ marginLeft: -10, fontSize: '.95em' }}>
+            <div style={{ position: 'absolute', top: 12, left: 855 }}>
+              <Subheader
+                style={{
+                  margin:0,
+                  padding:0,
+                  lineHeight:'1.4em',
+                  fontFamily: 'Arial'
+                }}
+              >
                 Test Mode
-            </span><br />
+              </Subheader>
+              <div style={{marginLeft: 5}}>
               <ToggleButton
                 activeLabel='ON'
                 inactiveLabel='OFF'
@@ -100,6 +109,7 @@ export class PhoneMacros extends Component<any, any> {
                 trackStyle={{ borderRadius: 2 }}
                 onToggle={testMode => this.setState({ testMode: !testMode })}
               />
+              </div>
             </div>
             <RaisedButton label='Add New Macro' style={this.styles.addbtn}
               onClick={this.addMacro} />

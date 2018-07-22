@@ -7,6 +7,7 @@ import { EventEmitter } from 'events';
 import { req } from './requests';
 import { Log, errorLog } from '../services/logger';
 import { writeFile } from 'fs';
+import { ModelEnum } from './model-db';
 
 const logpath = process.platform === 'win32' ?
   `C:\\ProgramData\\Imperium\\logs\\` : join(__dirname, './logs');
@@ -15,7 +16,7 @@ export class JTAPI {
   public account: any;
   private classes: string[] = [
     './java/phoneterm_11_5.jar',
-    './java/dataterminal_9.1.2.jar',
+    './java/phoneterm_9.1.2.jar',
     './java/dataterminal_8.5.jar'
   ];
   private JtapiPeerFactory: any;
@@ -28,13 +29,13 @@ export class JTAPI {
     this.provider = `${account.host};login=${account.username}`+
       `;passwd=${account.password}`;
     this.classpath = account.version.startsWith('12') ||
-      account.version.startsWith('11') ||
+      account.version.startsWith('11')  ?
+        join(__dirname, this.classes[0]) :
+      account.version.startsWith('9') ||
       account.version.startsWith('10') ?
-      join(__dirname, this.classes[0]) :
-      account.version.startsWith('9') ?
         join(__dirname, this.classes[1]) :
-        account.version.startsWith('8') ?
-          join(__dirname, this.classes[2]) :
+      account.version.startsWith('8') ?
+        join(__dirname, this.classes[2]) :
           '';
     java.classpath.push(this.classpath);
     this.JtapiPeerFactory = java.import('javax.telephony.JtapiPeerFactory');
@@ -172,8 +173,13 @@ export const jtapi = (() => {
       return this.cti.createList(provider)
         .then(list => new this.cti.CiscoTerminal(list));
     },
-    getBackground(ip) {
-      let url = `http://${ip}/CGI/Screenshot`;
+    getBackground(ip, model?) {
+      let url: string;
+      if(model && model.startsWith('69')) {
+        url = `http://${ip}/CGI/lcd4.bmp`;
+      } else {
+        url = `http://${ip}/CGI/Screenshot`;
+      }
       let { username, password } = this.account;
       return req.get({
         url,
@@ -204,7 +210,7 @@ export const jtapi = (() => {
           deviceResponse: resp || undefined
         });
       }
-      return this.getBackground(d.ip).then(img => {
+      return this.getBackground(d.ip, d.model).then(img => {
         if(logging) {
           this.handleImgWrite({
             device: d,
@@ -300,11 +306,22 @@ export const jtapi = (() => {
         auth: { username: account.username, password: account.password }
       }).then(({ data }) => {
         device = ris.parseResponse(data)[0];
-        return this.getBackground(device.ip).then(img => {
+        return ModelEnum.get().then((models: any[]) => {
+          if(models.findIndex(m => m.modelnumber === device.model) !== -1) {
+            device['model'] =
+              models.find(m => m.modelnumber === device.model).modelname.replace(
+                'Cisco ', ''
+              );
+          }
+          console.log(device);
+          return;
+        });
+      }).then(() => {
+        return this.getBackground(device.ip, device.model).then(img => {
           device['img'] = img;
           return device;
         });
-      });
+      })
     },
     runSingle({ account, macro, device }) {
       device['deviceName'] = device.name;
@@ -364,9 +381,11 @@ export const jtapi = (() => {
           if(d.checked) d.checked = false;
           else {
             d.checked = true;
-            return this.getBackground(d.ip).then(img => {
-              d.img = `data:image/png;base64,` +
-                Buffer.from(img, 'binary').toString('base64');
+            console.log(this.account);
+            return this.getBackground(d.ip, d.model).then(img => {
+              d.img = img;
+              d.img = `data:image/bmp;base64,` +
+                Buffer.from(img).toString('base64');
               return d;
             });
           }

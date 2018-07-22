@@ -5,6 +5,7 @@ import {
 } from './index';
 import { jtapi } from '../lib/jtapi';
 import { GridList, GridTile } from 'material-ui';
+import { ModelEnum } from '../lib/model-db';
 
 export class MacroTester extends Component<any, any> {
   public jtapi = jtapi;
@@ -43,7 +44,7 @@ export class MacroTester extends Component<any, any> {
   }
 
   getImg = device => this.jtapi
-    .getBackground(device.ip)
+    .getBackground(device.ip, device.model)
     .then(bg => !bg ? null : this.processImg(bg));
 
   execMacro = () => {

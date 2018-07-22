@@ -3,10 +3,12 @@ import {
   Paper, MenuItem, TextField,
   phone, blueGrey500, SelectField,
   RaisedButton, FloatingActionButton,
-  blue300, MacroSequences, Api, IconButton
+  blue300, MacroSequences, Api, IconButton,
+  $
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import { MacroTester } from './MacroTester';
+import * as robot from 'robotjs';
 
 export class MacroForm extends Component<any, any> {
   public grid = 6;
@@ -19,6 +21,7 @@ export class MacroForm extends Component<any, any> {
       macroName: '',
       sequenceDesc: '',
       testMode: false,
+      digits: '',
       macro: {
         name: '',
         types: [],
@@ -85,6 +88,7 @@ export class MacroForm extends Component<any, any> {
   addCommand = (e, indx, value) => {
     if(!value) return;
     this.setState({ selectedCmd: value });
+    setTimeout(() => $('#digits').focus(), 100);
   }
   handleInputs = (e, value) => {
     if(e.target.name === 'macroName')
@@ -109,10 +113,22 @@ export class MacroForm extends Component<any, any> {
     });
   }
   editSequenceItem = cmd => {
+    let { cmdList, digits } = this.state;
+    if(cmd.displayName.includes('Dial') ||
+      cmd.displayName.includes('Send')) {
+        let index = cmdList.findIndex(c => c.displayName === cmd.displayName);
+        cmdList.splice(index, 1);
+        let temp = cmd.displayName.split(':');
+        cmd.displayName = temp[0] + ':'
+        digits = temp[1];
+      }
     this.setState({
+      cmdList,
       selectedCmd: cmd.displayName,
-      sequenceDesc: cmd.description
+      sequenceDesc: cmd.description,
+      digits
     });
+    if(digits) setTimeout(() => $('#digits').focus(), 200);
     let { macro } = this.state;
     macro.cmds.forEach(c => {
       if(c.sequenceId === cmd.sequenceId) {
@@ -143,8 +159,8 @@ export class MacroForm extends Component<any, any> {
     phone.saveMacro(macro);
   }
   render() {
-    const {
-      deviceList, selectedCmd, cmdList,
+    let {
+      deviceList, selectedCmd, cmdList, digits,
       macroName, sequenceDesc, macro, testMode
     } = this.state;
     return (
@@ -176,14 +192,43 @@ export class MacroForm extends Component<any, any> {
               { this._renderItem(deviceList) }
             </SelectField>
             <br/>
-            <SelectField
-              style={this.styles.selectcmd}
-              floatingLabelFixed={true}
-              floatingLabelText='Command List'
-              value={selectedCmd}
-              onChange={this.addCommand} >
-              { this._renderCmdList(cmdList)}
-            </SelectField>
+            <div style={{position: 'relative'}}>
+              <SelectField
+                style={this.styles.selectcmd}
+                floatingLabelFixed={true}
+                floatingLabelText='Command List'
+                value={selectedCmd}
+                onChange={this.addCommand} >
+                { this._renderCmdList(cmdList)}
+              </SelectField>
+              {
+                selectedCmd == 'Dial:' || selectedCmd == 'SendDigits:' ?
+                <TextField
+                  id='digits'
+                  value={digits}
+                  onChange={(e, digits) => this.setState({ digits })}
+                  onBlur={() => {
+                    if(digits) {
+                      cmdList.push({
+                        name: selectedCmd + ' ' + digits + '_' + cmdList.length + 1,
+                        displayName: selectedCmd + digits
+                      });
+                    }
+                    this.setState({
+                      selectedCmd: selectedCmd + digits,
+                      digits: ''
+                    });
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: selectedCmd.includes('SendDigits:') ? 92 : 45,
+                    top: 33,
+                    width: 175
+                  }}
+                  hintText='Enter Digits' /> :
+                null
+              }
+            </div>
             <TextField
               name='sequenceDesc'
               value={sequenceDesc}

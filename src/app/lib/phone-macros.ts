@@ -155,6 +155,14 @@ export const phone = (() => {
       init: {
         name: 'Services',
         displayName: 'Init: Clears Display (out of Menus etc)'
+      },
+      dial: {
+        name: 'Dial',
+        displayName: 'Dial:'
+      },
+      sendDigits: {
+        name: 'SendDigits',
+        displayName: 'SendDigits:'
       }
     },
     commands(deviceType) {
@@ -170,7 +178,11 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
-          return keys.concat([{ type: 'init', ...this.cmds.init }]);
+          return keys.concat([{
+            type: 'init', ...this.cmds.init
+          }, {
+            type: 'dial', ...this.cmds.dial
+          }]);
         case '7900':
           keys = this.cmds.keys
             .filter((c: any) =>
@@ -191,9 +203,10 @@ export const phone = (() => {
             displayName: 'Reset Phone (**#**)',
             type: 'key'
           });
+          keys.push(...this.cmds.dial);
           return keys;
         case '7800':
-          return this.cmds.keys
+          keys = this.cmds.keys
             .filter((c: any) =>
               c.name !== 'Onhook' &&
               c.name !== 'Offhook' &&
@@ -202,6 +215,8 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
+          keys.push(...this.cmds.dial);
+          return keys;
         case '8800':
           keys = this.cmds.keys
             .filter((c: any) => 
@@ -215,10 +230,10 @@ export const phone = (() => {
             name: 'Reset',
             displayName: 'Reset ITL Final Seq. (8811+)',
             type: 'key'
-          }])
+          }, ...this.cmds.dial, ...this.cmds.sendDigits ])
         case '8900':
         case '9900':
-          return this.cmds.keys
+          keys = this.cmds.keys
             .filter((c: any) =>
               name !== 'Directories' &&
               name !== 'Hold' &&
@@ -228,6 +243,11 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
+          keys.concat([
+            ...this.cmds.dial,
+            ...this.cmds.sendDigits
+          ]);
+          return keys;
       }
     },
     docBuilderHelper(doc, element, cmd) {
@@ -235,7 +255,9 @@ export const phone = (() => {
       if(cmd.includes('Key:')) {
         cmd = cmd.replace('Key:', '');
         el.setAttribute('URL', `Key:${cmd}`);
-      } else if(cmd.includes('Init:')) {
+      } else if(cmd.includes('Init:') ||
+        cmd.includes('Dial') || cmd.includes('Send')
+      ) {
         el.setAttribute('URL', cmd);
       } else {
         el.setAttribute('URL', `Key:${cmd}`);
@@ -286,7 +308,11 @@ export const phone = (() => {
       let mcmd = JSON.parse(JSON.stringify(list.find(c =>
         c.displayName === selected)));
       mcmd['description'] = desc;
-      mcmd.name = `${mcmd.type === 'key' ? 'Key:' : 'Init:'}` + mcmd.name;
+      if(mcmd.name.includes('Send') || mcmd.name.includes('Dial')) {
+        mcmd.name = selected;
+      } else {
+        mcmd.name = `${mcmd.type === 'key' ? 'Key:' : 'Init:'}` + mcmd.name;
+      }
       mcmd.xml = this.generateXml(mcmd);
       if(macro.cmds.find(c => c.editing)) {
         mcmd['editing'] = false;

@@ -227,11 +227,14 @@ export class MainView extends Component<any, any> {
     this.setState({ selectedMacros, job })
   }
 
-  processImg = img => `data:image/png;base64,` +
-    Buffer.from(img, 'binary').toString('base64');
+  processImg = img => {
+    return URL.createObjectURL(new Blob([img], { type: 'png' }));
+  }
+  // `data:image/png;base64,` +
+  //   Buffer.from(img, 'binary').toString('base64');
 
   getImg = device => this.jtapi
-    .getBackground(device.ip)
+    .getBackground(device.ip, device.model)
     .then(bg => !bg ? null : this.processImg(bg));
 
   executeMacro = () => {

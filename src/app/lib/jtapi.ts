@@ -313,7 +313,6 @@ export const jtapi = (() => {
                 'Cisco ', ''
               );
           }
-          console.log(device);
           return;
         });
       }).then(() => {

@@ -109,12 +109,6 @@ export const phone = (() => {
       }, {
         name: 'Mute',
         displayName: 'Press Mute Key'
-      }, {
-        name: 'Onhook',
-        displayName: 'Press Onhook Key'
-      }, {
-        name: 'Offhook',
-        displayName: 'Press Offhook Key'
       }, {// Hold for 69/89/99
         name: 'FixedFeature3',
         displayName: 'Hold Key for 69/89/9900 Series Phones'
@@ -186,9 +180,7 @@ export const phone = (() => {
         case '7900':
           keys = this.cmds.keys
             .filter((c: any) =>
-              c.name !== 'Applications' &&
-              c.name !== 'Onhook' &&
-              c.name !== 'Offhook')
+              c.name !== 'Applications')
             .map(c => {
               c['type'] = 'key'
               return c;
@@ -208,8 +200,6 @@ export const phone = (() => {
         case '7800':
           keys = this.cmds.keys
             .filter((c: any) =>
-              c.name !== 'Onhook' &&
-              c.name !== 'Offhook' &&
               c.name !== 'Soft5')
             .map(c => {
               c['type'] = 'key'
@@ -219,9 +209,6 @@ export const phone = (() => {
           return keys;
         case '8800':
           keys = this.cmds.keys
-            .filter((c: any) => 
-              c.name !== 'Onhook' &&
-              c.name !== 'Offhook')
             .map(c => {
               c['type'] = 'key'
               return c;
@@ -236,9 +223,7 @@ export const phone = (() => {
           keys = this.cmds.keys
             .filter((c: any) =>
               name !== 'Directories' &&
-              name !== 'Hold' &&
-              name !== 'Onhook' &&
-              name !== 'Offhook')
+              name !== 'Hold')
             .map(c => {
               c['type'] = 'key'
               return c;

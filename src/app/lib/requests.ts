@@ -10,7 +10,12 @@ const request: AxiosInstance = axios.create({
 
 export const req = (() => {
   const serv = {
+    handleResponse() {},
     get(options: any) {
+      return request(options);
+    },
+    post(options: any) {
+      options['method'] = 'post';
       return request(options);
     }
   };

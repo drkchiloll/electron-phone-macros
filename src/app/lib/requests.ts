@@ -8,27 +8,24 @@ const request: AxiosInstance = axios.create({
   httpsAgent: new Agent({ rejectUnauthorized: false })
 })
 
-export const req = (() => {
-  const serv = {
-    handleResponse(resp?, err?) {
-      if(resp.status >= 200 && resp.status <= 204)
-        return resp.data;
-      else if(resp.status >= 400 || resp.status <= 599) {
-        if(resp.status === 599) console.log(resp.data);
-        return {
-          error: { status: resp.status, message: resp.statusText }
-        };
-      }
-    },
-    get(options: any) {
-      return request(options);
-    },
-    post(options: any) {
-      options['method'] = 'post';
-      return request(options)
-        .then(this.handleResponse)
-        .catch(this.handleResponse);
+export const req = {
+  handleResponse(resp?, err?) {
+    if(resp.status >= 200 && resp.status <= 204)
+      return resp.data;
+    else if(resp.status >= 400 || resp.status <= 599) {
+      if(resp.status === 599) console.log(resp.data);
+      return {
+        error: { status: resp.status, message: resp.statusText }
+      };
     }
-  };
-  return serv;
-})()
+  },
+  get(options: any) {
+    return request(options);
+  },
+  post(options: any) {
+    options['method'] = 'post';
+    return request(options)
+      .then(this.handleResponse)
+      .catch(this.handleResponse);
+  }
+};

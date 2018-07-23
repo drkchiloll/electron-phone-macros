@@ -10,36 +10,6 @@ let sqlDoc = (
       </soapenv:Body>
     </soapenv:Envelope>`
   ),
-  risDoc = (
-    `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                xmlns:soap="http://schemas.cisco.com/ast/soap"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <soap:selectCmDevice xmlns:ns1="http://schemas.cisco.com/ast/soap/"
-                              soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-                              xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
-            <soap:StateInfo/>
-            <soap:CmSelectionCriteria>
-              <soap:MaxReturnedDevices>1000</soap:MaxReturnedDevices>
-              <soap:Class>Phone</soap:Class>
-              <soap:DeviceClass>Phone</soap:DeviceClass>
-              <soap:Model>255</soap:Model>
-              <soap:Status>Registered</soap:Status>
-              <soap:NodeName xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-              <soap:SelectBy>IPV4Address</soap:SelectBy>
-              <soap:SelectItems>
-                  <soap:item>
-                    <soap:Item>%ipaddress%</soap:Item>
-                  </soap:item>
-              </soap:SelectItems>
-              <soap:Protocol>Any</soap:Protocol>
-              <soap:DownloadStatus>Any</soap:DownloadStatus>
-            </soap:CmSelectionCriteria>
-        </soap:selectCmDevice>
-      </soapenv:Body>
-    </soapenv:Envelope>`
-  ),
   axlHeaders = {
     'Content-Type': 'text/xml',
     'SOAPAction': 'CUCM:DB ver='
@@ -76,5 +46,5 @@ let sqlDoc = (
   );
 
 export {
-  sqlDoc, risDoc, axlHeaders, headers, phModelQuery, devAssQuery, updDevAssoc
+  sqlDoc, axlHeaders, headers, phModelQuery, devAssQuery, updDevAssoc
 };

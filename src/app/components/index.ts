@@ -21,7 +21,7 @@ import { Api } from '../lib/api';
 import { Cucm } from '../lib/cucm';
 import { phone } from '../lib/phone-macros';
 import {
-  sqlDoc, risDoc, axlHeaders, headers,
+  sqlDoc, axlHeaders, headers,
   phModelQuery, devAssQuery, updDevAssoc
 } from '../lib/configs';
 
@@ -57,7 +57,7 @@ export {
   SelectableList, fs, App, Accounts, Cucm,
   MenuItem, SelectField, path, Datastore,
   Api, MainView, FloatingActionButton,
-  Tab, Tabs, sqlDoc, risDoc, axlHeaders,
+  Tab, Tabs, sqlDoc, axlHeaders,
   request, dom, headers, RaisedButton, phModelQuery,
   xpath, Card, CardHeader, CardText, Table, TableBody,
   TableHeader, TableHeaderColumn, TableRow, TableRowColumn,

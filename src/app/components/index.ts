@@ -6,7 +6,6 @@ import * as Promise from 'bluebird';
 import * as $ from 'jquery';
 import * as path from 'path';
 import * as Datastore from 'nedb-core';
-import * as request from 'request';
 import { DOMParser as dom } from 'xmldom';
 import * as xpath from 'xpath';
 import * as moment from 'moment';
@@ -58,7 +57,7 @@ export {
   MenuItem, SelectField, path, Datastore,
   Api, MainView, FloatingActionButton,
   Tab, Tabs, sqlDoc, axlHeaders,
-  request, dom, headers, RaisedButton, phModelQuery,
+  dom, headers, RaisedButton, phModelQuery,
   xpath, Card, CardHeader, CardText, Table, TableBody,
   TableHeader, TableHeaderColumn, TableRow, TableRowColumn,
   devAssQuery, updDevAssoc, darkBlack, darkWhite, getMuiTheme,

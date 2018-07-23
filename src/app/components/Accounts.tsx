@@ -94,8 +94,7 @@ export class Accounts extends Component<any,any> {
       { host, version, username, password } = account;
     let cucm = new Cucm({ host, version, username, password }),
       statement = cucm.testAxlQuery;
-    cucm.query(statement, true).then((resp) => {
-      console.log(resp);
+    cucm.query(statement, true).then((resp: any) => {
       account['lastTested'] = moment().toDate();
       if (resp && resp instanceof Array) {
         account['status'] = 'green';
@@ -175,7 +174,9 @@ export class Accounts extends Component<any,any> {
       />,
       <FlatButton
         label='Test'
-        icon={<FontIcon color={testColor} className='fa fa-plug' />}
+        icon={
+          <FontIcon color={testColor} className='fa fa-plug' />
+        }
         primary={true}
         onClick={this.testAccount}
       />,

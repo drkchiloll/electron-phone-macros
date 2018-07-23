@@ -4,6 +4,7 @@ import {
   headers, xpath
 } from '../components/index';
 import { errorLog } from '../services/logger';
+import { req } from './requests';
 
 export class Cucm {
   readonly doc = sqlDoc;
@@ -26,7 +27,8 @@ export class Cucm {
     this.axlUrl = `https://${this.profile.host}:8443/axl/`;
     this.risPort8Url = `https://${this.profile.host}:8443/${risPath8}`;
     this.risPortUrl = `https://${this.profile.host}:8443/${risPath}`;
-    this.axlHeaders = axlHeaders + params.version;
+    this.axlHeaders = axlHeaders;
+    this.axlHeaders.SOAPAction = this.axlHeaders.SOAPAction + params.version;
   }
 
   setDoc(params: any) {
@@ -103,33 +105,20 @@ export class Cucm {
 
   query(statement: string, simple: boolean = false) {
     let doc = this.setDoc({ action: 'Query', statement }),
-        uri = this.axlUrl,
+        url = this.axlUrl,
         headers = this.axlHeaders;
-    // console.log(doc);
-    let csvRows: any;
-    return this._req(this._options({ uri, headers, body: doc }))
-      .then((data: string) => this.parseResp(data))
-      .then((moreData: any) => {
-        if (simple) return moreData;
-        if (moreData.length === 0) return undefined;
-        csvRows = moreData;
-        return Promise.all([
-          this.fixDataGridColumnize(moreData), this.fixedDataRowify(moreData)
-        ]);
-      })
-      .then((results: any) => {
-        if (results && simple) return results;
-        if (!results) {
-          results = [];
-          results[0] = ['RESULT'];
-          results[1] = [[{ RESULT: 'No Results from Query' }]];
-        }
-        return {
-          columns: results[0],
-          rows: results[1],
-          csvRows
-        };
-      }).catch(this.parseErrorResp);
+    return req.post({
+      url, headers, data: doc, auth: {
+        username: this.profile.username,
+        password: this.profile.password
+      }
+    }).then((result: any) => {
+      if(!result.error) return ['SUCCESS'];
+      else {
+        alert(`Status: ${result.error.status}; Message: ${result.error.message}`);
+        return result;
+      }
+    });
   }
 
   update(statement: string) {

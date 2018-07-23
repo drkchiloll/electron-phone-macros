@@ -1,13 +1,12 @@
 import {
-  React, Tabs, Tab,
-  Accounts, MainView,
-  Component, Promise
+  React, Tabs, Tab, Accounts, MainView, Component
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
 import { FeatureButtons } from './FeatureButtons';
 import { Update } from './Update';
 import { accountDb } from '../lib/account-db';
 import { ipcRenderer } from 'electron';
+import { LogViewer } from './LogViewer';
 
 export class App extends Component<any, any> {
   constructor() {
@@ -22,14 +21,12 @@ export class App extends Component<any, any> {
   }
   componentWillMount() {
     let account:any;
-    Promise.all([
-      accountDb.get().then((accounts: any) => {
-        if (accounts.length > 0) {
-          account = accounts.find((r: any) => r.selected);
-          this.setState({ account });
-        }
-      })
-    ]);
+    accountDb.get().then((accounts: any) => {
+      if (accounts.length > 0) {
+        account = accounts.find((r: any) => r.selected);
+        this.setState({ account });
+      }
+    })
     ipcRenderer.on('update', () => this.setState({ update: true }));
   }
   _handleClose = () => {
@@ -40,7 +37,6 @@ export class App extends Component<any, any> {
     });
   }
   _tabSelect = tabValue => {
-    console.log(tabValue);
     this.setState({
       openAcct: (tabValue === 'accounts') ? true: false,
       tabValue
@@ -55,7 +51,7 @@ export class App extends Component<any, any> {
         <Tabs className='tabs-container'
           inkBarStyle={{ background: '#546E7A', border: '.5px solid #546E7A' }}
           tabItemContainerStyle={{
-            width: 500,
+            width: 505,
             height: 75,
             borderTop: '.5px solid #B0BEC5',
             borderRight: '.5px solid #B0BEC5',
@@ -83,7 +79,7 @@ export class App extends Component<any, any> {
                 <i className='fa fa-phone fa-lg' />
               </span>
             }
-            label='Device Search'
+            label='MACRO-RUNNER'
             value='device-search'
           >
             {
@@ -96,7 +92,8 @@ export class App extends Component<any, any> {
                 <i className='fa fa-superpowers fa-lg' />
               </span>
             }
-            label='Phone Macros'
+            label='Macros'
+            style={{marginLeft:10}}
             value='templates'
           >
             {
@@ -104,6 +101,16 @@ export class App extends Component<any, any> {
                 <PhoneMacros account={account} />
             }
           </Tab>
+          {/* <Tab icon={
+            <span className='fa-stack fa-lg'>
+              <i className='fa fa-file-code-o fa-lg' />
+            </span>
+          }
+            label='Logs'
+            value='logs'
+          >
+            <LogViewer />
+          </Tab> */}
         </Tabs>
         <FeatureButtons />
         <Update update={update} close={this.closeUpdator} />

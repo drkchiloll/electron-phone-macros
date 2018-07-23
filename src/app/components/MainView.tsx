@@ -88,8 +88,7 @@ export class MainView extends Component<any, any> {
   }
 
   getMacros = macroDb
-    .get()
-    .then(macros => this.setState({ macros }))
+    .get().then(macros => this.setState({ macros }))
 
   updateMacros = macros => this.setState({ macros });
 
@@ -229,8 +228,6 @@ export class MainView extends Component<any, any> {
   processImg = img => {
     return URL.createObjectURL(new Blob([img], { type: 'png' }));
   }
-  // `data:image/png;base64,` +
-  //   Buffer.from(img, 'binary').toString('base64');
 
   getImg = device => this.jtapi
     .getBackground(device.ip, device.model)
@@ -362,10 +359,7 @@ export class MainView extends Component<any, any> {
                           }}
                           devices={devices[type]}
                           updateSelection={
-                            devs => {
-                              this.handleSelect(type, devs);
-                              // this.handleDeviceSelect(type, devs)
-                            }
+                            devs => this.handleSelect(type, devs)
                           }
                         />
                       </CardText>
@@ -424,38 +418,5 @@ export class MainView extends Component<any, any> {
       return a;
     }, selectedDevices);
     this.setState({ selectedDevices: selected });
-  }
-
-  handleDeviceSelect = (type, devs) => {
-    let { devices, selectedDevices } = this.state;
-    const loadingIndx = selectedDevices
-      .findIndex(sd => sd.deviceName === 'LOADING...');
-    if(loadingIndx !== -1) selectedDevices.splice(loadingIndx, 1);
-    this.setState({ devices });
-    const selected = devs.reduce((a: any, d: any, idx) => {
-      const match = selectedDevices.find(sd => sd.deviceName === d.name);
-      if(!d.checked) {
-        if(match) {
-          // Remove from SelectedDevices
-          a.splice(
-            selectedDevices.findIndex(sd => sd.deviceName === d.name),
-            1
-          );
-        }
-        return a;
-      }
-      if(selectedDevices.length > 0 && match) return a;
-      a.push({
-        type,
-        index: idx,
-        ip: d.ip,
-        model: d.model,
-        deviceName: d.name,
-        done: false,
-        img: d.img || undefined
-      });
-      return a;
-    }, selectedDevices);
-    this.setState({ selectedDevices });
   }
 }

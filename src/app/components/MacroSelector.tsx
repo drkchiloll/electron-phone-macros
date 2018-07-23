@@ -50,7 +50,7 @@ export const MacroSelector = props => {
   return (
     <SelectField
       id='macro-selector'
-      floatingLabelText={'SELECT JOBS TO RUN'}
+      floatingLabelText={'SELECT MACROS TO RUN'}
       multiple={true}
       value={values}
       onChange={props.change}

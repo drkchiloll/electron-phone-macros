@@ -9,7 +9,7 @@ const styles:any = {
   nav: {
     position: 'absolute',
     top: 0,
-    left: 505,
+    left: 515,
     height: 75,
     width: 265,
     backgroundColor: '#CFD8DC'

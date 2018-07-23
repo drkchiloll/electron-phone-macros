@@ -1,12 +1,11 @@
 import {
-  Promise, request, dom,
+  Promise, dom,
   sqlDoc, axlHeaders,
   headers
 } from '../components/index';
 import { errorLog } from '../services/logger';
 import { req } from './requests';
 import { RisQuery } from 'cucm-risdevice-query';
-import { resolve } from '../../../node_modules/@types/bluebird';
 
 export class Cucm {
   readonly doc = sqlDoc;
@@ -87,24 +86,6 @@ export class Cucm {
     });
   }
 
-  fixDataGridColumnize(data: any) {
-    return Object.keys(data[0]);
-  }
-
-  fixedDataRowify(data: any) {
-    let keys = Object.keys(data[0]);
-    return Promise.reduce(keys, (a:any, key:any) => {
-      return Promise.map(data, (obj:any) => {
-        let o:any = {};
-        o[key] = obj[key];
-        return o;
-      }).then((arrs) => {
-        a.push(arrs);
-        return a;
-      })
-    }, []);
-  }
-
   query(statement: string, simple: boolean = false) {
     let doc = this.setDoc({ action: 'Query', statement }),
         url = this.axlUrl,
@@ -117,26 +98,13 @@ export class Cucm {
     }).then((result: any) => {
       if(!result.error) return this.parseResp(result);
       else {
-        alert(`Status: ${result.error.status}; Message: ${result.error.message}`);
+        alert(
+          `Status: ${result.error.status};` + 
+          `Message: ${result.error.message}`
+        );
         return result;
       }
     });
-  }
-
-  update(statement: string) {
-    let doc = this.setDoc({ action: 'Update', statement }),
-        uri = this.axlUrl,
-        headers = this.axlHeaders;
-    // console.log(doc);
-    return this._req(
-      this._options({
-        uri,
-        headers,
-        body: doc 
-      })).then((data: string) => {
-      console.log(data);
-      return data;
-    })
   }
 
   createRisDoc({ip}) {
@@ -178,44 +146,28 @@ export class Cucm {
   }
   
   risquery(params:any) {
-    let { body } = params,
+    let { body, modelNum } = params,
         { version } = this.profile,
         uri = (version.startsWith('8')) ? this.risPort8Url :
           this.risPortUrl;
     // console.log(body);
-    return this._req(this._options({ uri, headers, body }))
-      .then((data:string) => this.parseRisDoc(data, params.modelNum))
-      .catch((err:any) => {
-        console.log(err);
-        return;
-      })
-  }
-
-  private _options({ uri, headers, body }) {
-    return {
-      uri,
+    return req.post({
+      url: uri,
       headers,
-      strictSSL: false,
-      method: 'POST',
-      auth: { user: this.profile.username, pass: this.profile.password },
-      body
-    };
-  }
-
-  private _req(options: any) {
-    return new Promise((resolve, reject) => {
-      request(options, (err:any, res:any, body:any) => {
-        if(err) {
-          errorLog.log('error', err.toString());
-          return reject({ error: err });
-        }
-        if(res.statusCode >= 400 && res.statusCode <= 599) {
-          errorLog.log('error', `${res.statusCode+' '+res.statusMessage}`, { res });
-          return reject(res);
-        }
-        if(res.statusCode === 200) return resolve(body);
-        return resolve();
-      });
+      data: body,
+      auth: {
+        username: this.profile.username,
+        password: this.profile.password
+      }
+    }).then((result: any) => {
+      if(!result.error) return this.parseRisDoc(result, modelNum);
+      else {
+        alert(
+          `Status: ${result.error.status};` +
+          `Message: ${result.error.message}`
+        );
+        return result;
+      }
     });
   }
 }

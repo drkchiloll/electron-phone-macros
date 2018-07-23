@@ -39,7 +39,7 @@
     "awesome-typescript-loader": "^5.1.1",
     "axios": "^0.18.0",
     "css-loader": "^0.26.1",
-    "cucm-risdevice-query": "^1.0.7",
+    "cucm-risdevice-query": "^1.0.8",
     "electron": "^2.0.4",
     "electron-context-menu": "^0.10.0",
     "electron-packager": "^8.5.2",

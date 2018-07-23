@@ -1,10 +1,12 @@
 import {
   Promise, request, dom,
-  sqlDoc, risDoc, axlHeaders,
-  headers, xpath
+  sqlDoc, axlHeaders,
+  headers
 } from '../components/index';
 import { errorLog } from '../services/logger';
 import { req } from './requests';
+import { RisQuery } from 'cucm-risdevice-query';
+import { resolve } from '../../../node_modules/@types/bluebird';
 
 export class Cucm {
   readonly doc = sqlDoc;
@@ -113,7 +115,7 @@ export class Cucm {
         password: this.profile.password
       }
     }).then((result: any) => {
-      if(!result.error) return ['SUCCESS'];
+      if(!result.error) return this.parseResp(result);
       else {
         alert(`Status: ${result.error.status}; Message: ${result.error.message}`);
         return result;
@@ -137,19 +139,13 @@ export class Cucm {
     })
   }
 
-  createRisDoc({doc, ip}) {
-    let xml = new dom().parseFromString(doc),
-        classElement;
-    if(this.profile.version.startsWith('8')) {
-      classElement = xml.getElementsByTagName('soap:DeviceClass')[0];
-      xml.getElementsByTagName('soap:SelectItems')[0]
-         .setAttribute('xsi:type', 'soapenc:Array');
-    } else {
-      classElement = xml.getElementsByTagName('soap:Class')[0];
-    }
-    classElement.parentNode.removeChild(classElement);
-    return new Promise((resolve, reject) => 
-      resolve(xml.toString().replace('%ipaddress%', ip)));
+  createRisDoc({ip}) {
+    return Promise.resolve(
+      RisQuery.createRisDoc({
+        version: this.profile.version,
+        query: ip
+      })
+    );
   }
 
   getDeviceModel() {
@@ -159,57 +155,26 @@ export class Cucm {
   }
 
   parseRisDoc(xml:string, modelNum) {
-    let doc = new dom().parseFromString(xml),
-        ipNodes,modelNodes,nameNodes,fwNodes;
-    if(!this.models) this.models = this.getDeviceModel();
-    if(this.profile.version.startsWith('8')) {}
-    else {
-      const cmDevicesTag = doc.getElementsByTagNameNS(
-        'http://schemas.cisco.com/ast/soap',
-        'CmDevices'
-      );
-      const devDoc = new dom().parseFromString(cmDevicesTag.toString());
-      let ns1Select = xpath.useNamespaces({
-        ns1: 'http://schemas.cisco.com/ast/soap'
-      });
-      ipNodes = ns1Select('//ns1:IP', devDoc);
-      modelNodes = ns1Select('//ns1:Model', devDoc);
-      nameNodes = ns1Select('//ns1:Name', devDoc);
-      fwNodes = ns1Select('//ns1:ActiveLoadID', devDoc);
-    }
-    return Promise.map(ipNodes, (node:any, i) => {
-      return {
-        modelNumber : modelNodes[i].firstChild.data,
-        ip: node.firstChild.data,
-        name: nameNodes[i].firstChild.data,
-        firmware: (() => {
-          if(fwNodes[i] && fwNodes[i].firstChild) {
-            return fwNodes[i].firstChild.data;
-          } else {
-            'UNKNOWN'
-          }
-        })(),
-        cleared: false,
-        checked: false
-      };
-    }).then((phones:any) => {
-      return Promise.reduce(phones, (a:any, phone:any) => {
-        let model = modelNum.find((m:any) =>
-          m.modelnumber === phone.modelNumber);
-        if(model) {
-          phone['model'] = model.modelname;
-          a.push(phone);
+    const devices: any = RisQuery.parseResponse(xml);
+    let models = this.getDeviceModel();
+    return Promise
+      .filter(devices, (d: any) =>
+        modelNum.find(m => m.modelnumber === d.modelNumber))
+      .reduce((item: any, d:any) => {
+        d.cleared = false;
+        d.checked = false;
+        let model = modelNum.find(m => m.modelnumber === d.modelNumber);
+        d.model = model.modelname.split(' ')[1];
+        if(d.model === 8831) {
+          item[d.model].push(d);
+        } else {
+          item[d.model.substring(0,2) + '00'].push(d);
         }
-        return a;
-      }, []);
-    }).then((results) => {
-      return Promise.map(results, (result:any) => {
-        result.model = result.model.split(' ')[1];
-        if(result.model === '8831') this.models[result.model].push(result);
-        else this.models[result.model.substring(0, 2) + '00'].push(result);
-        return;
+        return item;
+      }, models).then(results => {
+        this.models = results;
+        return this.models;
       });
-    }).then(() => this.models);
   }
   
   risquery(params:any) {

@@ -1,6 +1,6 @@
 import {
   React, $, Promise, Cucm, Paper,
-  RaisedButton, risDoc, Card,
+  RaisedButton, Card,
   CardHeader, CardText,
   devAssQuery, Component
 } from './index';
@@ -178,9 +178,8 @@ export class MainView extends Component<any, any> {
             }
             return a;
           }, {concurrency:1})
-        }, []).then((results) => {
+        }, []).then(devices => {
           this.setState({ devices: cucm.models });
-          return;
         });
       });
     })
@@ -207,8 +206,8 @@ export class MainView extends Component<any, any> {
     cucm.models = null;
     let devices: any;
     return Promise.each(ipAddresses, (addrs:string) => {
-      let risdoc: any = { doc: risDoc, ip: addrs },
-          newAddresses = [];
+      let risdoc: any = { ip: addrs },
+      newAddresses = [];
       return this._addrsquery(cucm, risdoc, filteredTypes);
     }).then(() => {
       this.setState({ devices: cucm.models, searchLabel: 'Search' });

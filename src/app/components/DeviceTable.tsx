@@ -36,7 +36,7 @@ export class DeviceTable extends Component<any, any> {
           ip: d.ip,
           model: d.model,
           done: false,
-          img: 'images/loading.gif',
+          img: d.img || undefined,
           index: selection
         });
       }
@@ -47,7 +47,7 @@ export class DeviceTable extends Component<any, any> {
           ip: d.ip,
           model: d.model,
           done: false,
-          img: 'images/loading.gif'
+          img: d.img || undefined
         }))
       this.props.renderLoader(DEVICES);
     }
@@ -60,11 +60,11 @@ export class DeviceTable extends Component<any, any> {
   }
 
   render() {
-    const { devices } = this.props;
+    const { devices, check } = this.props;
     return (
       <Table height={'auto'}
         fixedHeader={true}
-        selectable={true}
+        selectable={check}
         multiSelectable={true}
         onRowSelection={this.handleSelectAll}
         onCellClick={this.handleRowSelect}
@@ -83,7 +83,7 @@ export class DeviceTable extends Component<any, any> {
           {devices.map((device: any, i: number) => (
             <TableRow
               key={i}
-              selectable={device.associated ? true : false}
+              selectable={device.associated && check ? true : false}
               selected={device.checked}
             >
               <TableRowColumn>

@@ -29,7 +29,10 @@ export class Cucm {
     this.risPort8Url = `https://${this.profile.host}:8443/${risPath8}`;
     this.risPortUrl = `https://${this.profile.host}:8443/${risPath}`;
     this.axlHeaders = axlHeaders;
-    this.axlHeaders.SOAPAction = this.axlHeaders.SOAPAction + params.version;
+    const { SOAPAction } = this.axlHeaders;
+    if(!SOAPAction.split('=')[1]) {
+      this.axlHeaders.SOAPAction = this.axlHeaders.SOAPAction + params.version;
+    }
   }
 
   setDoc(params: any) {
@@ -123,6 +126,7 @@ export class Cucm {
   }
 
   parseRisDoc(xml:string, modelNum) {
+    // console.log(xml);
     const devices: any = RisQuery.parseResponse(xml);
     let models = this.getDeviceModel();
     return Promise
@@ -147,7 +151,7 @@ export class Cucm {
   
   risquery(params:any) {
     let { body, modelNum } = params,
-        { version } = this.profile,
+        { version, username, password } = this.profile,
         uri = (version.startsWith('8')) ? this.risPort8Url :
           this.risPortUrl;
     // console.log(body);
@@ -155,10 +159,7 @@ export class Cucm {
       url: uri,
       headers,
       data: body,
-      auth: {
-        username: this.profile.username,
-        password: this.profile.password
-      }
+      auth: { username, password }
     }).then((result: any) => {
       if(!result.error) return this.parseRisDoc(result, modelNum);
       else {
@@ -166,8 +167,8 @@ export class Cucm {
           `Status: ${result.error.status};` +
           `Message: ${result.error.message}`
         );
-        return result;
       }
+      return result;
     });
   }
 }

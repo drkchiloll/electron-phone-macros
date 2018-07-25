@@ -25,6 +25,7 @@ export class SearchPanel extends Component<any, any> {
   }
   render() {
     const { searches } = this.props;
+    console.log(searches);
     return (
       <div>
         { searches.map((s: any, i: number) =>
@@ -32,6 +33,8 @@ export class SearchPanel extends Component<any, any> {
             <div style={{marginLeft: '10px', position: 'relative'}}>
               <AutoComplete
                 id={`search_field_${i}`}
+                autoFocus
+                searchText={s}
                 hintText='10.255.2.* (wildcard)'
                 dataSource={this.remember()}
                 name={`ip_${i}`}

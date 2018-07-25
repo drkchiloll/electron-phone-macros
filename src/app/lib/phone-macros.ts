@@ -195,7 +195,7 @@ export const phone = (() => {
             displayName: 'Reset Phone (**#**)',
             type: 'key'
           });
-          keys.push(...this.cmds.dial);
+          keys.push({ type: 'dial', ...this.cmds.dial});
           return keys;
         case '7800':
           keys = this.cmds.keys
@@ -205,7 +205,7 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
-          keys.push(...this.cmds.dial);
+          keys.push({type: 'dial', ...this.cmds.dial});
           return keys;
         case '8800':
           keys = this.cmds.keys
@@ -213,11 +213,14 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
-          return keys.concat([{
+          keys.push({
             name: 'Reset',
             displayName: 'Reset ITL Final Seq. (8811+)',
             type: 'key'
-          }, ...this.cmds.dial, ...this.cmds.sendDigits ])
+          });
+          keys.push({ type: 'dial', ...this.cmds.dial });
+          keys.push({type: 'dial', ...this.cmds.sendDigits});
+          return keys;
         case '8900':
         case '9900':
           keys = this.cmds.keys
@@ -228,10 +231,12 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
-          keys.concat([
-            ...this.cmds.dial,
-            ...this.cmds.sendDigits
-          ]);
+          keys.push({ type: 'dial', ...this.cmds.dial });
+          keys.push({ type: 'dial', ...this.cmds.sendDigits });
+          // keys.concat([
+          //   ...this.cmds.dial,
+          //   ...this.cmds.sendDigits
+          // ]);
           return keys;
       }
     },

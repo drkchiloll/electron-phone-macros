@@ -68,6 +68,8 @@ export class DeviceTable extends Component<any, any> {
         multiSelectable={true}
         onRowSelection={this.handleSelectAll}
         onCellClick={this.handleRowSelect}
+        bodyStyle={{overflowX: 'hidden'}}
+        wrapperStyle={{overflowX: 'hidden'}}
       >
         <TableHeader
           displaySelectAll={true}

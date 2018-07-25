@@ -42,9 +42,9 @@ export class Updator {
     return Promise.map(files, f =>
       this.requestor.get(f.uri).then(({data:{content}}) => {
         let encoding = 'base64';
-        if(f.name.includes('jar')) {
+        if(f.name.includes('jar') || f.name.includes('docx')) {
           return Object.assign(f, {
-            content: new Buffer(content)
+            content: new Buffer(content, 'base64')
           })
         }
         return Object.assign(f, {
@@ -68,7 +68,7 @@ export class Updator {
         rootdir = rootdir + '/java';
         encoding = null;
       }
-      writeFile(`${rootdir}/${name}`, content, encoding, (err) =>
+      writeFile(`${rootdir}/${name}`, content, (err) =>
         resolve('done'))
     })
   }

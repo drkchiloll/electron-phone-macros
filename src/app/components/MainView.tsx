@@ -359,7 +359,7 @@ export class MainView extends Component<any, any> {
                     setTimeout(() => {
                       return this.jtapi.removeFile(docx)
                         .then(() => this.setState(mainState.init()));
-                    }, 500)
+                    }, 1500)
                   }}
                 /> : null
             }

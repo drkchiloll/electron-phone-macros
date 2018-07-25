@@ -11,24 +11,14 @@ import { MacroSelector } from './MacroSelector';
 import { ModelEnum } from '../lib/model-db';
 import { macroDb } from '../lib/macro-db';
 import { jtapi } from '../lib/jtapi';
+import { shell } from 'electron';
+import { mainState } from '../lib/main-state';
 
 export class MainView extends Component<any, any> {
   public jtapi = jtapi;
   constructor() {
     super();
-    this.state = {
-      ipAddresses: [''],
-      account: null,
-      searchLabel: 'Search',
-      devices: null,
-      modelNum: null,
-      job: 'Select Job(s) to Run:',
-      macros: [],
-      selectedMacros: [],
-      selectedDevices: [],
-      devicesWithImages: [],
-      executeJobLabel: 'Execute Job'
-    };
+    this.state = mainState.init();
   }
 
   componentWillUnmount() {
@@ -50,41 +40,41 @@ export class MainView extends Component<any, any> {
       { device, img, cmd } = updates;
     const index = selectedDevices.findIndex(d =>
       d.deviceName === device.deviceName);
-    if(cmd.sequenceId === 1) {
-      const currentImg = selectedDevices[index].img;
-      this.jtapi.handleImgWrite({
-        device,
-        img: currentImg,
-        index: 0
-      });
-    }
-    devices[device.type][device.index].cleared = action;
-    this.setState({ devices });
-    if(img) {
-      let image = this.processImg(img);
-      if(index >= 0) selectedDevices[index]['img'] = image;
-    } else if(action && action !== 'in progress') {
-      this.getImg(device).then(img => {
-        this.jtapi.handleImgWrite({
-          device,
-          img,
-          index: cmd.sequenceId + 1
+      devices[device.type][device.index].cleared = action;
+      this.setState({ devices });
+      if(img) {
+        let image = this.processImg(img);
+        if(index >= 0) selectedDevices[index]['img'] = image;
+      } else if(action && action !== 'in progress') {
+        return this.getImg(device).then(image => {
+          this.jtapi.handleImgWrite({
+            device,
+            img: (() => {
+              let i = image.replace('data:image/png;base64,', '');
+              return Buffer.from(i, 'base64').toString('binary');
+            })(),
+            index: cmd.sequenceId + 1,
+            cmd: { description: 'Resulting ScreenShot' }
+          });
+          if(index >= 0) selectedDevices[index]['img'] = image;
+          selectedDevices[index]['done'] = action;
+          const notDone = selectedDevices.filter(sd => !sd.done);
+          let executeJobLabel = '';
+          if(notDone.length === 0) {
+            console.log('done');
+            this.jtapi.provider.disconnectProvider();
+            this.jtapi.runner.removeAllListeners('update');
+            this.jtapi.runner.removeAllListeners('update-end');
+            executeJobLabel = 'Execute Job';
+            this.jtapi.createDoc().then(filename => {
+              this.setState({ openDoc: true, docx: filename });
+            });
+          }
+          return this.setState({ selectedDevices, executeJobLabel });
         });
-        if(index >= 0) selectedDevices[index]['img'] = img;
-        selectedDevices[index]['done'] = action;
-        const notDone = selectedDevices.filter(sd => !sd.done);
-        let executeJobLabel = '';
-        if(notDone.length === 0) {
-          console.log('done');
-          this.jtapi.provider.disconnectProvider();
-          this.jtapi.runner.removeAllListeners('update');
-          this.jtapi.runner.removeAllListeners('update-end');
-          executeJobLabel = 'Execute Job';
-        }
-        return this.setState({ selectedDevices, executeJobLabel });
-      });
-    }
-    this.setState({ selectedDevices });
+      }
+      this.setState({ selectedDevices });
+    // })
   }
 
   getMacros = macroDb
@@ -140,7 +130,7 @@ export class MainView extends Component<any, any> {
         boxShadow: 0
       },
       gdiv: {
-        marginTop: 20,
+        marginTop: 10,
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
@@ -166,14 +156,17 @@ export class MainView extends Component<any, any> {
         cucm.query(devAssQuery.replace('%user%', cucm.profile.username), true)
       ]).then((resp: any) => {
         devices = resp[0];
+        this.setState({ devices });
         let associations = resp[1];
         return Promise.reduce(Object.keys(devices), (a: any, types: string) => {
           return Promise.map(devices[types], ({ name }:any, i) => {
+            let device = devices[types][i];
             if(!associations.find(({ devicename }) => devicename === name)) {
-              devices[types][i]['associated'] = false;
+              device['associated'] = false;
               a.push(name);
             } else {
-              devices[types][i]['associated'] = true;
+              device['associated'] = true;
+              return this.getImg(device).then(img => device.img = img);
             }
             return a;
           }, {concurrency:1})
@@ -182,6 +175,32 @@ export class MainView extends Component<any, any> {
         });
       });
     })
+  }
+
+  _adrquery = (cucm:any, o:any, modelNum) => {
+    const { username } = cucm.profile;
+    let devices: any;
+    return cucm.createRisDoc(o).then(d => cucm.risquery({body: d, modelNum}))
+      .then(d => devices = d)
+      .then(() => cucm.query(devAssQuery.replace('%user%', username), true))
+      .then((ass: any) => {
+        this.setState({ devices });
+        return Promise.reduce(Object.keys(devices), (a: any, types: string) => {
+          return Promise.map(devices[types], ({ name }: any, i) => {
+            let device = devices[types][i];
+            if(!ass.find(({ devicename }) => devicename === name)) {
+              device['associated'] = false;
+              a.push(name);
+            } else {
+              device['associated'] = true;
+              return this.getImg(device).then(img => device.img = img);
+            }
+            return a;
+          }, { concurrency: 1 })
+        }, []).then(devices => {
+          this.setState({ devices: cucm.models });
+        });
+      })
   }
 
   _search = () => {
@@ -207,9 +226,9 @@ export class MainView extends Component<any, any> {
     return Promise.each(ipAddresses, (addrs:string) => {
       let risdoc: any = { ip: addrs },
       newAddresses = [];
-      return this._addrsquery(cucm, risdoc, filteredTypes);
+      return this._adrquery(cucm, risdoc, filteredTypes);
     }).then(() => {
-      this.setState({ devices: cucm.models, searchLabel: 'Search' });
+      this.setState({ searchLabel: 'Search' });
     })
   }
 
@@ -225,9 +244,8 @@ export class MainView extends Component<any, any> {
     this.setState({ selectedMacros, job })
   }
 
-  processImg = img => {
-    return URL.createObjectURL(new Blob([img], { type: 'png' }));
-  }
+  processImg = img => `data:image/png;base64,` +
+    `${Buffer.from(img).toString('base64')}`
 
   getImg = device => this.jtapi
     .getBackground(device.ip, device.model)
@@ -275,7 +293,7 @@ export class MainView extends Component<any, any> {
       ipAddresses, devices,
       searchLabel, job, macros,
       selectedMacros, selectedDevices,
-      executeJobLabel
+      executeJobLabel, openDoc, docx
     } = this.state;
     const { account } = this.props;
     this.jtapi.account = account;
@@ -330,6 +348,21 @@ export class MainView extends Component<any, any> {
               </div> :
               null
             }
+            {
+              openDoc ?
+                <RaisedButton
+                  label='Open Results'
+                  style={this.style().rbtn}
+                  primary={true}
+                  onClick={() => {
+                    shell.openItem(docx);
+                    setTimeout(() => {
+                      return this.jtapi.removeFile(docx)
+                        .then(() => this.setState(mainState.init()));
+                    }, 500)
+                  }}
+                /> : null
+            }
           </div>
           <div style={this.style().cdiv}>
             {
@@ -349,6 +382,7 @@ export class MainView extends Component<any, any> {
                         showExpandableButton={true} />
                       <CardText expandable={true}>
                         <DeviceTable
+                          check={searchLabel ? true : false}
                           renderLoader={d => {
                             if(d instanceof Array) {
                               this.handleSelectionLoad(d, type);

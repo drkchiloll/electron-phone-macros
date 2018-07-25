@@ -2,15 +2,31 @@ import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
-import { mkdirSync, existsSync, mkdir } from 'fs';
+import { readFileSync, unlink } from 'fs';
 import { EventEmitter } from 'events';
 import { req } from './requests';
-import { Log, errorLog } from '../services/logger';
+import { errorLog } from '../services/logger';
 import { writeFile } from 'fs';
 import { ModelEnum } from './model-db';
+import { moment } from '../components';
 
-const logpath = process.platform === 'win32' ?
-  `C:\\ProgramData\\Imperium\\logs\\` : join(__dirname, './logs');
+import * as JSZip from 'jszip';
+import * as DocX from 'docxtemplater';
+import * as ImageModule from 'open-docxtemplater-image-module';
+import { resolve } from 'dns';
+
+const docTemplate = readFileSync(join(__dirname, './doc_template.docx'), 'binary');
+const zip = new JSZip(docTemplate);
+const imageMod = new ImageModule({
+  centered: false,
+  fileType: 'docx',
+  getImage: (tagValue, tagName) => {
+    return tagValue;
+  },
+  getSize: (img, tagValue, tagName) => {
+    return [450, 300];
+  }
+});
 
 export class JTAPI {
   public account: any;
@@ -88,6 +104,7 @@ export const jtapi = (() => {
     account: null,
     runner: new EventEmitter(),
     provider: null,
+    runnerLog: null,
     finish(params) {
       const { provider, device, cmd, resp, timer = 0 } = params;
       const { ctiTerminal, logging } = device;
@@ -115,13 +132,13 @@ export const jtapi = (() => {
         this.runner.emit('update-end', {
           device, cmd, resp
         });
-        if(logging) {
-          logging.logger.log('info', 'final update', {
-            cmd: cmd.name,
-            cmdData: cmd.xml || 'Device is now Registered',
-            deviceResponse: resp || 'none'
-          });
-        }
+        // if(logging) {
+        //   logging.logger.log('info', 'final update', {
+        //     cmd: cmd.name,
+        //     cmdData: cmd.xml || 'Device is now Registered',
+        //     deviceResponse: resp || 'none'
+        //   });
+        // }
         this.provider = provider;
         return;
       })
@@ -196,28 +213,21 @@ export const jtapi = (() => {
     },
     updateEmitter(event, d, cmd, resp) {
       let { username, password } = this.account;
-      const { logging } = d;
       const url = `http://${d.ip}/CGI/Screenshot`;
       let update: any = {
         device: d,
         cmd,
         responseMessage: resp || undefined
       };
-      if(logging) {
-        logging.logger.log('info', `CMD Sequence: ${cmd.sequenceId}`, {
-          cmd: cmd.name,
-          cmdData: cmd.xml || 'none',
-          deviceResponse: resp || undefined
-        });
-      }
       return this.getBackground(d.ip, d.model).then(img => {
-        if(logging) {
+        if(this.runnerLog) {
           this.handleImgWrite({
             device: d,
             img,
             index: cmd.sequenceId,
-            encoding: 'binary'
-          });
+            encoding: 'binary',
+            cmd
+          });          
         }
         if(img) update['img'] = img;
         this.runner.emit(event, update);
@@ -250,27 +260,30 @@ export const jtapi = (() => {
         });
       })
     },
-    logPathDir(path) {
-      if(process.platform === 'win32') {
-        if(!existsSync(logpath)) {
-          mkdirSync(logpath);
-        }
-      }
-      mkdirSync(join(logpath, path));
-      return;
-    },
     deviceRunner({cmds, provider, devices}) {
-      const jobName = new Date().getTime();
-      const logPath = `./${jobName}`;
-      this.logPathDir(logPath);
+      if(!this.runnerLog) {
+        this.runnerLog = {
+          name: moment().format('dddd, MMMM Do YYYY, h:mm:ss a'),
+          totalDevices: devices.length,
+          devices: []
+        }
+      } else {
+        const { totalDevices } = this.runnerLog;
+        this.runnerLog.totalDevices = totalDevices + devices.length;
+      }
       return Promise.map(devices, (d: any) => {
-        const dlogpath = `./${d.deviceName}`;
-        mkdirSync(join(logpath, `${logPath}/${d.deviceName}`));
-        const thispath = join(logpath, `${logPath}/${d.deviceName}/job.log`);
-        d['logging'] = {
-          logger: Log.create(thispath),
-          logfile: jobName
-        };
+        this.runnerLog.devices.push({
+          deviceName: d.deviceName,
+          ip: d.ip,
+          model: d.model,
+          sequences: [{
+            description: 'Initial ScreenShot',
+            image: (() => {
+              let img = d.img.replace('data:image/png;base64,', '');
+              return Buffer.from(img, 'base64').toString('binary');
+            })()
+          }]
+        });
         return this.macroRunner(cmds, d, provider, this);
       });
     },
@@ -353,25 +366,24 @@ export const jtapi = (() => {
         })
       })
     },
-    handleImgWrite({device, img, index, encoding='base64'}) {
-      const { deviceName, logging: { logfile } } = device;
-      const filename = `${deviceName}_${index}.png`;
-      if(encoding === 'base64') {
-        img = img.replace('data:image/png;base64,', '');
-      }
-      writeFile(
-        join(logpath, `./${logfile}/${deviceName}/${filename}`),
-        new Buffer(img, encoding),
-        err => {}
-      );
+    handleImgWrite({device, img, index, encoding='base64', cmd}) {
+      const { deviceName } = device;
+      const dIndex = this.runnerLog.devices.findIndex(d =>
+        d.deviceName === deviceName);
+      this.runnerLog.devices[dIndex].sequences.push({
+        description: cmd.description,
+        image: img
+      });
+      return;
     },
     deviceTableHandling({ selection, devices }) {
       return Promise.mapSeries(devices, (d: any, indx) => {
         if(selection === 'all') {
           d.checked = true;
+          if(d.img) return d;
           return this.getBackground(d.ip).then(img => {
-            d.img = d.img = `data:image/png;base64,` +
-              Buffer.from(img, 'binary').toString('base64');
+            d.img = `data:image/png;base64,` +
+              Buffer.from(img).toString('base64');
             return d;
           })
         } else if(selection === 'none') {
@@ -380,16 +392,45 @@ export const jtapi = (() => {
           if(d.checked) d.checked = false;
           else {
             d.checked = true;
-            console.log(this.account);
+            if(d.img) return d;
             return this.getBackground(d.ip, d.model).then(img => {
               d.img = img;
-              d.img = `data:image/bmp;base64,` +
+              d.img = `data:image/png;base64,` +
                 Buffer.from(img).toString('base64');
               return d;
             });
           }
         }
         return d;
+      });
+    },
+    createDoc() {
+      let fn = new Date().getTime();
+      const docx = new DocX()
+        .attachModule(imageMod)
+        .loadZip(zip)
+        .setData(this.runnerLog)
+        .render();
+      const buffer = docx
+        .getZip()
+        .generate({
+          type: 'nodebuffer',
+          compression: 'DEFLATE'
+        });
+      return new Promise((resolve, reject) => {
+        writeFile(
+          join(__dirname, `${fn}.docx`), buffer, err => {
+            this.runnerLog = null;
+            resolve(join(__dirname, `${fn}.docx`));
+          });
+      });
+    },
+    removeFile(filepath) {
+      return new Promise((resolve, reject) => {
+        unlink(filepath, (err) => {
+          if(err) console.log(err);
+          resolve();
+        });
       });
     }
   };

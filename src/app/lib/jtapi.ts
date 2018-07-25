@@ -9,11 +9,9 @@ import { errorLog } from '../services/logger';
 import { writeFile } from 'fs';
 import { ModelEnum } from './model-db';
 import { moment } from '../components';
-
 import * as JSZip from 'jszip';
 import * as DocX from 'docxtemplater';
 import * as ImageModule from 'open-docxtemplater-image-module';
-import { resolve } from 'dns';
 
 const docTemplate = readFileSync(join(__dirname, './doc_template.docx'), 'binary');
 const zip = new JSZip(docTemplate);

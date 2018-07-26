@@ -12,10 +12,11 @@ export class Update extends React.Component<any, any> {
     didUpdate: false
   }
 
-  componentWillReceiveProps(props) {
+  componentWillMount() {
     let message: string;
-    if(props.update) {
+    if(this.props.update) {
       updator.start().then(didUpdate => {
+        console.log(didUpdate);
         console.log('I am trying to update..hahahah');
         if(didUpdate) {
           message = 'App Update Completed';

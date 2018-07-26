@@ -88,9 +88,10 @@ export class Updator {
   }
 
   updateLocal(files: any[], rootdir) {
+    console.log(files);
     if(files.length > 0) {
       return Promise.each(files, ({ name, content }) => {
-        this.writeLocal({ rootdir, name, content })
+        return this.writeLocal({ rootdir, name, content })
       }).then(() => true);
     } else {
       return false;

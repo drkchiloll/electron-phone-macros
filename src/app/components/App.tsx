@@ -113,7 +113,9 @@ export class App extends Component<any, any> {
           </Tab> */}
         </Tabs>
         <FeatureButtons />
-        <Update update={update} close={this.closeUpdator} />
+        {
+          update ? <Update update={update} close={this.closeUpdator} /> : null
+        }
       </div>
     );
   }

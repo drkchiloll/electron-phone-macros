@@ -167,6 +167,7 @@ export class Cucm {
           `Status: ${result.error.status};` +
           `Message: ${result.error.message}`
         );
+        throw result;
       }
       return result;
     });

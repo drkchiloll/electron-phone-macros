@@ -10,9 +10,11 @@ const request: AxiosInstance = axios.create({
 
 export const req = {
   handleResponse(resp?, err?) {
-    if(resp.status >= 200 && resp.status <= 204)
+    if(err) {
+      return { error: {status: 'general error', message: err } };
+    } else if(resp.status >= 200 && resp.status <= 204)
       return resp.data;
-    else if(resp.status >= 400 || resp.status <= 599) {
+    else if(resp.status >= 400 && resp.status <= 599) {
       if(resp.status === 599) console.log(resp.data);
       return {
         error: { status: resp.status, message: resp.statusText }
@@ -26,6 +28,6 @@ export const req = {
     options['method'] = 'post';
     return request(options)
       .then(this.handleResponse)
-      .catch(this.handleResponse);
+      .catch(err => this.handleResponse(null, err));
   }
 };

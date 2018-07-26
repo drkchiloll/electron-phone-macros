@@ -25,7 +25,7 @@ export class SearchPanel extends Component<any, any> {
   }
   render() {
     const { searches } = this.props;
-    console.log(searches);
+    // console.log(searches);
     return (
       <div>
         { searches.map((s: any, i: number) =>

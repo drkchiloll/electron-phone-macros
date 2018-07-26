@@ -32,16 +32,16 @@ export class Update extends React.Component<any, any> {
     let { updated, message, didUpdate } = this.state;
     return (
       <Drawer open={update} openSecondary={true}
-        width={375}
+        width={365}
         containerStyle={{
           position: 'absolute',
           top: 0,
-          height: 85,
+          height: 70,
           border: '1px solid black',
           borderRadius: '6px',
           right: update ? window.innerWidth / 2.8 : -1
         }} >
-        <h4 style={{ marginLeft: '35px', width: 195 }} >
+        <h4 style={{ marginLeft: '25px', width: 200 }} >
           {message}
         </h4>
         {
@@ -53,7 +53,7 @@ export class Update extends React.Component<any, any> {
               style={{
                 position: 'absolute',
                 top: 8,
-                left: 270
+                left: 280
               }} >
               <ReloadIcon />
             </IconButton> :
@@ -61,13 +61,13 @@ export class Update extends React.Component<any, any> {
               <RefreshIndicator size={20} loadingColor='black'
                 status='loading'
                 top={18}
-                left={260} /> :
+                left={265} /> :
               updated && !didUpdate ?
                 <IconButton onClick={() => this.props.close()}
                   style={{
                     position: 'absolute',
                     top: 5,
-                    right: 10,
+                    right: 20,
                     height: 30,
                     width: 30
                   }}

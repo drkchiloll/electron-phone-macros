@@ -200,6 +200,8 @@ export class MainView extends Component<any, any> {
         }, []).then(devices => {
           this.setState({ devices: cucm.models });
         });
+      }).catch(() => {
+        this.setState({ searchLabel: 'Search' });
       })
   }
 

@@ -220,6 +220,7 @@ export const phone = (() => {
           });
           keys.push({ type: 'dial', ...this.cmds.dial });
           keys.push({type: 'dial', ...this.cmds.sendDigits});
+          keys.push({ type: 'init', ...this.cmds.init });
           return keys;
         case '8900':
         case '9900':
@@ -233,10 +234,6 @@ export const phone = (() => {
             });
           keys.push({ type: 'dial', ...this.cmds.dial });
           keys.push({ type: 'dial', ...this.cmds.sendDigits });
-          // keys.concat([
-          //   ...this.cmds.dial,
-          //   ...this.cmds.sendDigits
-          // ]);
           return keys;
       }
     },

@@ -74,7 +74,9 @@ export class DeviceTable extends Component<any, any> {
         <TableHeader
           displaySelectAll={true}
           adjustForCheckbox={true}
-          enableSelectAll={true}
+          enableSelectAll={(() => {
+            return devices.find((d: any) => !d.associated) ? false : true
+          })()}
         >
           <TableRow>{this._tableHeader()}</TableRow>
         </TableHeader>

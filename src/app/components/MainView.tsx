@@ -50,6 +50,7 @@ export class MainView extends Component<any, any> {
           this.jtapi.handleImgWrite({
             device,
             img: (() => {
+              if(!image) return null;
               let i = image.replace('data:image/png;base64,', '');
               return Buffer.from(i, 'base64').toString('binary');
             })(),
@@ -97,17 +98,19 @@ export class MainView extends Component<any, any> {
     } else if($(event.target).hasClass('fa-minus')) {
       if(ipAddresses.length === 1) ipAddresses[0] = '';
       else ipAddresses.splice(indx, 1);
+      if(devices && Object.keys(devices).length > 0) this.search();
     }
     this.setState({
       ipAddresses,
-      devices: ipAddresses[0] === '' ? null : devices
+      devices: ipAddresses[0] === '' ? null : devices,
+      selectedDevices: []
     });
   }
 
   style: any = () => {
     const { searchLabel, devices, executeJobLabel } = this.state;
     return {
-      main: { width: 350 },
+      main: { width: 450 },
       mainpaper: { background: '#CFD8DC', borderRadius: '4%' },
       rbtn: { width: 350 },
       rbdiv: {
@@ -119,7 +122,7 @@ export class MainView extends Component<any, any> {
       cdiv: {
         position: 'absolute',
         top: 0,
-        left: 355,
+        left: 455,
         width: 900,
         display: devices ? 'block': 'none'
       },
@@ -130,11 +133,11 @@ export class MainView extends Component<any, any> {
         boxShadow: 0
       },
       gdiv: {
-        marginTop: 10,
+        marginTop: 5,
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
-        width: 350
+        width: 450
       },
       glist: {
         display: 'flex',
@@ -148,90 +151,48 @@ export class MainView extends Component<any, any> {
     }
   }
 
-  _addrsquery = (cucm:any, o:any, modelNum) => {
-    let devices:any;
-    return cucm.createRisDoc(o).then((doc:any) => {
-      return Promise.all([
-        cucm.risquery({ body: doc, modelNum }),
-        cucm.query(devAssQuery.replace('%user%', cucm.profile.username), true)
-      ]).then((resp: any) => {
-        devices = resp[0];
-        this.setState({ devices });
-        let associations = resp[1];
-        return Promise.reduce(Object.keys(devices), (a: any, types: string) => {
-          return Promise.map(devices[types], ({ name }:any, i) => {
-            let device = devices[types][i];
-            if(!associations.find(({ devicename }) => devicename === name)) {
-              device['associated'] = false;
-              a.push(name);
-            } else {
-              device['associated'] = true;
-              return this.getImg(device).then(img => device.img = img);
-            }
-            return a;
-          }, {concurrency:1})
-        }, []).then(devices => {
-          this.setState({ devices: cucm.models });
-        });
-      });
-    })
-  }
-
-  _adrquery = (cucm:any, o:any, modelNum) => {
-    const { username } = cucm.profile;
-    let devices: any;
-    return cucm.createRisDoc(o).then(d => cucm.risquery({body: d, modelNum}))
-      .then(d => devices = d)
-      .then(() => cucm.query(devAssQuery.replace('%user%', username), true))
-      .then((ass: any) => {
-        this.setState({ devices });
-        return Promise.reduce(Object.keys(devices), (a: any, types: string) => {
-          return Promise.map(devices[types], ({ name }: any, i) => {
-            let device = devices[types][i];
-            if(!ass.find(({ devicename }) => devicename === name)) {
-              device['associated'] = false;
-              a.push(name);
-            } else {
-              device['associated'] = true;
-              return this.getImg(device).then(img => device.img = img);
-            }
-            return a;
-          }, { concurrency: 1 })
-        }, []).then(devices => {
-          this.setState({ devices: cucm.models });
-        });
-      }).catch(() => {
-        this.setState({ searchLabel: 'Search' });
-      })
-  }
-
-  _search = () => {
+  search = () => {
+    let { ipAddresses, modelNum, selectedMacros, devices } = this.state;
+    if(ipAddresses.length === 1 && !ipAddresses[0]) {
+      this.setState({ devices: null, selectedDevices: [] });
+      return;
+    }
     this.setState({ searchLabel: '' });
-    let { ipAddresses, modelNum, selectedMacros } = this.state;
     let filteredTypes: any;
     if(selectedMacros.length > 0) {
       let types = selectedMacros.reduce((a: any[], { types }) => {
         a = a.concat(types);
         return a;
       }, []);
-      filteredTypes = modelNum.filter(({modelname}) => {
+      filteredTypes = modelNum.filter(({ modelname }) => {
         let model = modelname.split(' ')[1];
-        return types.find(t => model.includes(t.substring(0,2)));
+        return types.find(t => model.includes(t.substring(0, 2)));
       })
     } else {
       filteredTypes = modelNum;
     }
-    const { account: { username, password, host, version } } = this.props;
-    let cucm = new Cucm({ host, version, username, password });
-    cucm.models = null;
-    let devices: any;
-    return Promise.each(ipAddresses, (addrs:string) => {
-      let risdoc: any = { ip: addrs },
-      newAddresses = [];
-      return this._adrquery(cucm, risdoc, filteredTypes);
-    }).then(() => {
-      this.setState({ searchLabel: 'Search' });
-    })
+    const { account } = this.props;
+    mainState.searchWork({
+      account,
+      addresses: ipAddresses,
+      types: filteredTypes,
+      phones: devices,
+      jtapi: this.jtapi
+    });
+    mainState.workEmitter
+      .on('devices-tokeep', devices => this.setState({ devices }));
+    mainState.workEmitter
+      .on('device-update', devices => this.setState({devices}));
+    mainState.workEmitter
+      .on('work-error', err =>
+        this.setState({devices: null, searchLabel: 'Search'}));
+    mainState.workEmitter
+      .on('dev-upcomplete', phones => {
+        this.setState({
+          devices: phones,
+          searchLabel: 'Search'
+        });
+      });
   }
 
   handleJobChange = (e, indx, selectedMacros) => {
@@ -314,14 +275,15 @@ export class MainView extends Component<any, any> {
                 searches={ipAddresses}
                 changed={this.handleSearchChange}
                 query={this.queryClick}
-                cr={this._search}
+                cr={this.search}
               />
             </Paper>
             <RaisedButton style={this.style().rbtn} label={searchLabel}
               icon={this.searchIcon()}
               disabled={disabled}
+              fullWidth={true}
               disabledBackgroundColor='#ECEFF1'
-              onClick={this._search} />
+              onClick={this.search} />
             <RaisedButton
               label={executeJobLabel}
               icon={this.execIcon()}
@@ -337,15 +299,19 @@ export class MainView extends Component<any, any> {
                   cellHeight={225}
                   cols={1}
                 >
-                  {selectedDevices.map((d: any) =>
-                    <GridTile
-                      key={d.deviceName}
-                      title={<strong>{d.deviceName}</strong>}
-                      titleStyle={this.style().tilestyle}
-                      titleBackground={this.style().tbg}
-                    >
-                      <img width={350} src={d.img} alt='background' />
-                    </GridTile>)}
+                  {selectedDevices.map((d: any) => {
+                    return (
+                      <GridTile
+                        style={{ height: mainState.gridHeight(d.model) }}
+                        key={d.deviceName}
+                        title={<strong>{d.deviceName}</strong>}
+                        titleStyle={this.style().tilestyle}
+                        titleBackground={this.style().tbg}
+                      >
+                        <img width={450} src={d.img} alt='background' />
+                      </GridTile>
+                    )
+                  })}
                 </GridList>
               </div> :
               null
@@ -356,12 +322,13 @@ export class MainView extends Component<any, any> {
                   label='Open Results'
                   style={this.style().rbtn}
                   primary={true}
+                  fullWidth={true}
                   onClick={() => {
                     shell.openItem(docx);
                     setTimeout(() => {
                       return this.jtapi.removeFile(docx)
                         .then(() => this.setState(mainState.init()));
-                    }, 1500)
+                    }, 25000)
                   }}
                 /> : null
             }
@@ -370,7 +337,7 @@ export class MainView extends Component<any, any> {
             {
               devices ?
                 Object.keys(devices).map((type, i) => {
-                  if(devices[type].length === 0) return;
+                  if(!devices || devices[type].length === 0) return;
                   return (
                     <Card
                       key={i}

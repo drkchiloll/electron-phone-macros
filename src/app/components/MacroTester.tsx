@@ -73,7 +73,8 @@ export class MacroTester extends Component<any, any> {
     this.setState({deviceInput: !deviceInput});
   }
   render() {
-    const { deviceInput, device, input, request, slides } = this.state;
+    const { deviceInput, device, input, request, slides }: any = this.state;
+    console.log(device);
     return (
       <Drawer
         width={380}
@@ -91,13 +92,26 @@ export class MacroTester extends Component<any, any> {
               {slides.map((s:any, i:number) => {
                 return (
                   <GridTile key={i}
+                    style={{
+                      height: device && device.firmware && device.firmware.includes('8832') ?
+                        128 : 250
+                    }}
                     title={
                       <FlatButton className='legend'
                         label={device.name}
                         onClick={this.selectionClick}
                         labelStyle={{ color: '#C6FF00' }} />
                     }>
-                    <img src={s.img} height={250} width={380} />
+                    <img
+                      src={s.img}
+                      height={(() => {
+                        if(device && device.firmware) {
+                          if(device.firmware.includes('8832')) return 128;
+                        }
+                        return 250;
+                      })()}
+                      width={380}
+                    />
                   </GridTile>
                 )
               })}

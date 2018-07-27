@@ -121,7 +121,7 @@ export class Cucm {
 
   getDeviceModel() {
     return {
-      6900: [], 7900:[], 7800:[], 8800:[], 8831:[], 8900:[], 9900:[]
+      6900: [], 7900:[], 7800:[], 8800:[], 8831:[], 8832:[], 8900:[], 9900:[]
     };
   }
 
@@ -137,15 +137,28 @@ export class Cucm {
         d.checked = false;
         let model = modelNum.find(m => m.modelnumber === d.modelNumber);
         d.model = model.modelname.split(' ')[1];
-        if(d.model === 8831) {
+        if(d.model === '8831' || d.model === '8832') {
           item[d.model].push(d);
         } else {
           item[d.model.substring(0,2) + '00'].push(d);
         }
         return item;
       }, models).then(results => {
-        this.models = results;
-        return this.models;
+        if(!this.models) {
+          this.models = results;
+          return this.models;
+        } else {
+          return Promise.each(Object.keys(results), type => {
+            return Promise.each(results[type], (d: any) => {
+              if(this.models[type].find(dev => d.name === dev.name)) {
+                return;
+              } else {
+                this.models[type].push(d);
+                return;
+              }
+            })
+          }).then(() => this.models);
+        }
       });
   }
   
@@ -154,7 +167,7 @@ export class Cucm {
         { version, username, password } = this.profile,
         uri = (version.startsWith('8')) ? this.risPort8Url :
           this.risPortUrl;
-    // console.log(body);
+    if(!body) throw 'error';
     return req.post({
       url: uri,
       headers,

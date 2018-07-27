@@ -5,8 +5,7 @@ import { Agent } from 'https'
 const request: AxiosInstance = axios.create({
   adapter: require('axios/lib/adapters/http'),
   validateStatus: status => status >= 200 && status <= 599,
-  httpsAgent: new Agent({ rejectUnauthorized: false }),
-  timeout: 7500
+  httpsAgent: new Agent({ rejectUnauthorized: false })
 });
 
 export const req = {

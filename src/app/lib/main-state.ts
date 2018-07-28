@@ -97,12 +97,14 @@ export const mainState = {
             return Promise.map(devices[type], (d: any) => {
               if(!associations.find(({ devicename }) => devicename === d.name)) {
                 d['associated'] = false;
+                this.workEmitter.emit('device-update', cucm.models);
                 return d;
               } else {
                 d['associated'] = true;
                 return jtapi.getBackground(d.ip, d.model).then(bg => {
                   if(bg) d.img = `data:image/png;base64,` +
                     `${Buffer.from(bg).toString('base64')}`
+                  this.workEmitter.emit('device-update', cucm.models);
                   return d;
                 });
               }
@@ -116,34 +118,81 @@ export const mainState = {
         })
     })
   },
+  emitter(evt: string, models) {
+    this.workEmitter.emit(evt, models);
+  },
   searchWork(params: any) {
-    const { account, addresses, types, phones, jtapi } = params;
+    let { cucm, account, addresses, types, phones, jtapi } = params;
+    let ipsToRemove = [];
     jtapi.account = account;
     // Do Any Phones Exist
     // Do Any Addresses Match a Phone Subnet
-    return new Promise((resolve, reject) => {
+    return new Promise((res, rej) => {
       if(phones && Object.keys(phones).length > 0) {
-        return Promise.reduce(Object.keys(phones), (a: any, type: any) => {
-          return this.reducePhones(phones[type], addresses)
-            .then(results => {
-              if(results.length > 0) a[type] = results;
-              return a;
-            })
-        }, {}).then(newPhones => resolve(newPhones));
+        let types = Object.keys(phones);
+        return Promise.reduce(types, (a:any, phType: string) => {
+          return Promise.each(addresses, (ip: string, index) => {
+            let partial = ip.replace('*', '');
+            if(phones[phType].findIndex(({ip}) => ip === partial) > -1 ||
+               phones[phType].findIndex(({ip}) => partial.startsWith(ip)) > -1) {
+              if(a.indexOf(ip) === -1) a.push(ip);
+              return;
+            } else {
+              return Promise.each(phones[phType], (p: any) => {
+                let match = addresses.find(adr => {
+                  if(p.ip.startsWith(adr.replace('*', '')) ||
+                     p.ip === adr.replace('*', '')) {
+                       return adr;
+                  } else {
+                    return undefined;
+                  }
+                })
+                if(!match) {
+                  if(!ipsToRemove.find((i: any) => p.ip === i.ip)) {
+                    ipsToRemove.push(p);
+                  }
+                }
+                return;
+              });
+            }
+          }).then(() => a);
+        }, []).then((addsToRemove) => res(addsToRemove));
       } else {
-        resolve({});
+        res([]);
       }
-    }).then((newDevices: any) => {
-      if(newDevices && Object.keys(newDevices).length > 0)
-        this.workEmitter.emit('dev-complete', newDevices);
-      const cucm = new Cucm({
-        host: account.host,
-        username: account.username,
-        password: account.password,
-        version: account.version
-      });
-      if(Object.keys(newDevices).length > 0) cucm.models = newDevices;
-      return this.queryHandler(cucm, addresses, types, jtapi);
+    }).then((filteredAddresses: string[]) => {
+      if(ipsToRemove.length > 0) {
+        let clone = JSON.parse(JSON.stringify(cucm.models));
+        return Promise.each(Object.keys(clone), (type) => {
+          return Promise.each(clone[type], (d: any, index) => {
+            let phone = ipsToRemove.find((ip: any) => ip.ip === d.ip);
+            if(phone) {
+              return Promise.filter(cucm.models[type], (ph: any) => {
+                if(phone.ip !== ph.ip) return true;
+                return false;
+              }).then(results => {
+                cucm.models[type] = results;
+                return;
+              })
+            } else {
+              return;
+            }
+          })
+        }).then(() => this.emitter('dev-upcomplete', cucm.models));
+      }
+      if(filteredAddresses.length > 0) {
+        return Promise.filter(addresses, (a: string) => {
+          if(filteredAddresses.findIndex(adrs => adrs === a) === -1) return true;
+          return false;
+        }).then((newadrses) => {
+          if(newadrses.length === 0)
+            return this.emitter('dev-upcomplete', cucm.models);
+          return this.queryHandler(cucm, newadrses, types, jtapi);
+        })
+      } else {
+        if(addresses.length === 0) this.emitter('dev-upcomplete', cucm.models);
+        return this.queryHandler(cucm, addresses, types, jtapi);
+      }
     })
   }
 }

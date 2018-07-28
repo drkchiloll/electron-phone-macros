@@ -1,8 +1,7 @@
 import {
   React, $, Promise, Cucm, Paper,
-  RaisedButton, Card,
-  CardHeader, CardText,
-  devAssQuery, Component
+  RaisedButton, Card, CardHeader,
+  CardText, Component
 } from './index';
 import { GridList, GridTile } from 'material-ui';
 import { DeviceTable } from './DeviceTable';
@@ -16,6 +15,7 @@ import { mainState } from '../lib/main-state';
 
 export class MainView extends Component<any, any> {
   public jtapi = jtapi;
+  public cucm: Cucm;
   constructor() {
     super();
     this.state = mainState.init();
@@ -25,8 +25,18 @@ export class MainView extends Component<any, any> {
     console.log('I unmounted');
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    console.log(this.props);
     if(this.props.account) {
+      const { account } = this.props;
+      console.log(account);
+      this.cucm = new Cucm({
+        host: account.host,
+        username: account.username,
+        password: account.password,
+        version: account.version
+      });
+
       this.setState({ account: this.props.account });
     }
     Promise.all([
@@ -96,7 +106,11 @@ export class MainView extends Component<any, any> {
       else if(indx > 0 && !ipAddresses[indx]) return;
       ipAddresses.push('');
     } else if($(event.target).hasClass('fa-minus')) {
-      if(ipAddresses.length === 1) ipAddresses[0] = '';
+      if(ipAddresses.length === 1) {
+        this.cucm.models = null;
+        devices = null;
+        ipAddresses[0] = '';
+      }
       else ipAddresses.splice(indx, 1);
       if(devices && Object.keys(devices).length > 0) this.search();
     }
@@ -173,14 +187,13 @@ export class MainView extends Component<any, any> {
     }
     const { account } = this.props;
     mainState.searchWork({
+      cucm: this.cucm,
       account,
       addresses: ipAddresses,
       types: filteredTypes,
       phones: devices,
       jtapi: this.jtapi
     });
-    mainState.workEmitter
-      .on('devices-tokeep', devices => this.setState({ devices }));
     mainState.workEmitter
       .on('device-update', devices => this.setState({devices}));
     mainState.workEmitter

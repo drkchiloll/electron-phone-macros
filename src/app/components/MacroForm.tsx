@@ -4,11 +4,11 @@ import {
   phone, blueGrey500, SelectField,
   RaisedButton, FloatingActionButton,
   blue300, MacroSequences, Api, IconButton,
-  $
+  Checkbox, $
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import { MacroTester } from './MacroTester';
-import * as robot from 'robotjs';
+// import * as robot from 'robotjs';
 
 export class MacroForm extends Component<any, any> {
   public grid = 6;
@@ -43,7 +43,27 @@ export class MacroForm extends Component<any, any> {
   }
   _renderItem = deviceList => {
     const devices = phone.devices;
-    let items = [];
+    let items = [
+      <MenuItem
+        key={'all'}
+        value={'all'}
+        primaryText='SELECT ALL'
+        insetChildren={true}
+        leftCheckbox={
+          <Checkbox
+            size={10}
+            iconStyle={{
+              height: 20.8,
+              width: 20.8,
+              left: 2.4,
+              bottom: 2.6,
+              borderRadius: '5%'
+            }}
+            onCheck={this.selectAllDevices}
+          />
+        }
+      />
+    ];
     Object.keys(devices).forEach(k => {
       devices[k].forEach((type: string) => {
         items.push(
@@ -76,7 +96,28 @@ export class MacroForm extends Component<any, any> {
       )
     });
   }
+  selectAllDevices = (e, checked) => {
+    let deviceList: string[];
+    console.log(deviceList);
+    if(checked) {
+      deviceList = Object.keys(phone.devices)
+        .reduce((a: string[], type: string, i) => {
+          a = a.concat(phone.devices[type]);
+          return a;
+        }, []);
+      this.setState({
+        deviceList,
+        cmdList: phone.commands('6900')
+      });
+    } else {
+      this.setState({
+        deviceList: [],
+        cmdList: []
+      });
+    }
+  }
   handleSelect = (e, indx, deviceList) => {
+    if(!deviceList) return;
     let cmdList = [];
     if(deviceList.length > 0) {
       let type = deviceList[deviceList.length - 1];

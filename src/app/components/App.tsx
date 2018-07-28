@@ -12,7 +12,7 @@ export class App extends Component<any, any> {
   constructor() {
     super();
     this.state = {
-      tabValue: 'device-search',
+      tabValue: 'templates',
       openAcct: false,
       tabIndx: 1,
       account: null,

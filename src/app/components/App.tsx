@@ -92,7 +92,7 @@ export class App extends Component<any, any> {
                 <i className='fa fa-superpowers fa-lg' />
               </span>
             }
-            label='Macros'
+            label='MACRO-BUILDER'
             style={{marginLeft:10}}
             value='templates'
           >

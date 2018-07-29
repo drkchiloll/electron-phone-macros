@@ -7,6 +7,7 @@ import { GridList, GridTile } from 'material-ui';
 import { DeviceTable } from './DeviceTable';
 import { SearchPanel } from './SearchPanel';
 import { MacroSelector } from './MacroSelector';
+import { ResultDocButton } from './ResultDocButton';
 import { ModelEnum } from '../lib/model-db';
 import { macroDb } from '../lib/macro-db';
 import { jtapi } from '../lib/jtapi';
@@ -119,13 +120,18 @@ export class MainView extends Component<any, any> {
   }
 
   style: any = () => {
-    const { searchLabel, devices, executeJobLabel } = this.state;
+    const {
+      searchLabel, devices, executeJobLabel, openDoc
+    } = this.state;
     return {
       main: { width: 450 },
       mainpaper: { background: '#CFD8DC', borderRadius: '4%' },
       rbtn: { width: 350 },
       rbdiv: {
         display: searchLabel ? 'none': 'block'
+      },
+      doc: {
+        display: openDoc ? 'block' : 'none'
       },
       execdiv: {
         display: executeJobLabel ? 'none' : 'block'
@@ -328,7 +334,20 @@ export class MainView extends Component<any, any> {
               </div> :
               null
             }
-            {
+            <ResultDocButton
+              style={this.style().doc}
+              open={() => {
+                shell.openItem(docx);
+                setTimeout(() => {
+                  return this.jtapi.removeFile(docx)
+                    .then(r => {
+                      this.cucm.models = null;
+                      this.setState({ ...mainState.afterJobReset() });
+                    });
+                }, 8500);
+              }}
+            />
+            {/* {
               openDoc ?
                 <RaisedButton
                   label='Open Results'
@@ -346,7 +365,7 @@ export class MainView extends Component<any, any> {
                     }, 8500)
                   }}
                 /> : null
-            }
+            } */}
           </div>
           <div style={this.style().cdiv}>
             {

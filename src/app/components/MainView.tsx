@@ -261,6 +261,8 @@ export class MainView extends Component<any, any> {
     </div>
   );
 
+  execBtn = (d, sm, sd) => d && sm.length > 0 && sd.length > 0 ? false: true;
+
   render() {
     let {
       ipAddresses, devices,
@@ -297,7 +299,7 @@ export class MainView extends Component<any, any> {
             <RaisedButton
               label={executeJobLabel}
               icon={this.execIcon()}
-              disabled={devices && selectedMacros.length > 0 ? false : true}
+              disabled={this.execBtn(devices, selectedMacros, selectedDevices)}
               disabledBackgroundColor='#ECEFF1'
               backgroundColor='#607D8B'
               labelColor='#FAFAFA'

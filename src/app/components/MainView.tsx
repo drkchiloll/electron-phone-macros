@@ -212,18 +212,16 @@ export class MainView extends Component<any, any> {
   }
 
   handleJobChange = (e, indx, selectedMacros) => {
-    let job: any;
+ , any;
     if(selectedMacros.length > 0) {
-      job = selectedMacros
-        .map(m => m.name)
-        .join(', ');
+   electedMacros   .map(m => m.name)   .join(', ');
     } else {
-      job = 'Select Job(s) to Run:';
+   Select Job(s) to Run:';
     }
-    this.setState({ selectedMacros, job })
+ i tState({ selectedMacros,})
   }
 
-  processImg = img => `data:image/png;base64,` +
+ cessImg = img => `data:image/png;base64,` +
     `${Buffer.from(img).toString('base64')}`
 
   getImg = device => this.jtapi
@@ -269,12 +267,22 @@ export class MainView extends Component<any, any> {
 
   execBtn = (d, sm, sd) => d && sm.length > 0 && sd.length > 0 ? false: true;
 
+  openDocument = () => {
+    const { docx } = this.state;
+    shell.openItem(docx);
+    setTimeout(() => {
+      return this.jtapi.removeFile(docx)
+        .then(r => {
+          this.cucm.models = null;
+          this.setState({ ...mainState.afterJobReset() });
+        });
+    }, 8500);
+  }
+
   render() {
     let {
-      ipAddresses, devices,
-      searchLabel, job, macros,
-      selectedMacros, selectedDevices,
-      executeJobLabel, openDoc, docx
+      ipAddresses, devices, searchLabel, macros,
+      selectedMacros, selectedDevices, executeJobLabel
     } = this.state;
     const { account } = this.props;
     this.jtapi.account = account;
@@ -336,36 +344,8 @@ export class MainView extends Component<any, any> {
             }
             <ResultDocButton
               style={this.style().doc}
-              open={() => {
-                shell.openItem(docx);
-                setTimeout(() => {
-                  return this.jtapi.removeFile(docx)
-                    .then(r => {
-                      this.cucm.models = null;
-                      this.setState({ ...mainState.afterJobReset() });
-                    });
-                }, 8500);
-              }}
+              open={this.openDocument}
             />
-            {/* {
-              openDoc ?
-                <RaisedButton
-                  label='Open Results'
-                  style={this.style().rbtn}
-                  primary={true}
-                  fullWidth={true}
-                  onClick={() => {
-                    shell.openItem(docx);
-                    setTimeout(() => {
-                      return this.jtapi.removeFile(docx)
-                        .then(() => {
-                          this.cucm.models = null;
-                          this.setState({...mainState.afterJobReset()})
-                        });
-                    }, 8500)
-                  }}
-                /> : null
-            } */}
           </div>
           <div style={this.style().cdiv}>
             {

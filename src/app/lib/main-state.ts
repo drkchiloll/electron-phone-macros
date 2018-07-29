@@ -22,6 +22,17 @@ export const mainState = {
       docx: null
     }
   },
+  afterJobReset() {
+    return {
+      devices: null,
+      job: 'Select Job(s) to Run:',
+      selectedMacros: [],
+      selectedDevices: [],
+      openDoc: false,
+      docx: null,
+      ipAddresses: ['']
+    }
+  },
   gridHeight(model) {
     switch(model) {
       case '8811':
@@ -88,7 +99,7 @@ export const mainState = {
     return Promise.map(addresses, (ip: string) => {
       return cucm.createRisDoc({ ip })
         .then(d => cucm.risquery({ body: d, modelNum: types }))
-        .then(() => this.workEmitter.emit('device-update', cucm.models),
+        .then((devices) => this.workEmitter.emit('device-update', cucm.models),
           err => this.workEmitter.emit('work-error'))
         .then(() => cucm.query(associated.replace('%user%', username), true))
         .then((associations: any[]) => {

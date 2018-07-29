@@ -5,15 +5,10 @@ import {
 const storage = localStorage;
 
 export class SearchPanel extends Component<any, any> {
+  public carriageTimeout;
+
   addToMemory = (req, indx) => {
-    let memory = this.remember();
-    if(memory.findIndex(m => m === req) === -1) {
-      if(memory.length === 0) memory.push(req);
-      else memory.unshift(req);
-      if(memory.length > 10) memory.pop();
-      storage.setItem('memory', JSON.stringify(memory));
-    }
-    this.props.cr();
+    this.carriageTimeout = setTimeout(() => this.props.cr(), 1500);
   }
   remember = () => {
     let memory = JSON.parse(storage.getItem('memory'));
@@ -23,9 +18,24 @@ export class SearchPanel extends Component<any, any> {
     }
     return memory;
   }
+  handleInput = (search, index) => {
+    let memory = this.remember();
+    if(search.includes('*') ||
+      (search.split('.').length === 3 &&
+       search.split('.')[3])) {
+      if(memory.findIndex(m => m === search) === -1)
+        memory.unshift(search);
+      if(memory.length > 10) memory.pop();
+      storage.setItem('memory', JSON.stringify(memory));
+    }
+    this.props.changed({ index, search });
+  };
+  addToQuery = (e, index) => {
+    clearTimeout(this.carriageTimeout);
+    this.props.query(e, index);
+  }
   render() {
     const { searches } = this.props;
-    // console.log(searches);
     return (
       <div>
         { searches.map((s: any, i: number) =>
@@ -40,10 +50,7 @@ export class SearchPanel extends Component<any, any> {
                 name={`ip_${i}`}
                 menuProps={{desktop:true,disableAutoFocus:true}}
                 onUpdateInput={(search, data) => {
-                  this.props.changed({
-                    index: i,
-                    search
-                  });
+                  this.handleInput(search, i);
                 }}
                 onNewRequest={this.addToMemory}
               />
@@ -51,7 +58,7 @@ export class SearchPanel extends Component<any, any> {
                 iconClassName='fa fa-plus'
                 iconStyle={{color: 'green'}}
                 style={{position: 'absolute', bottom: 2, right: 32}}
-                onClick={e => this.props.query(e, i)}
+                onClick={e => this.addToQuery(e, i)}
               />
               <IconButton className='fa-minus'
                 iconClassName='fa fa-minus'

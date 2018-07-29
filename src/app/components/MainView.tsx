@@ -212,16 +212,18 @@ export class MainView extends Component<any, any> {
   }
 
   handleJobChange = (e, indx, selectedMacros) => {
- , any;
+    let job: any;
     if(selectedMacros.length > 0) {
-   electedMacros   .map(m => m.name)   .join(', ');
+      job = selectedMacros
+        .map(m => m.name)
+        .join(', ');
     } else {
-   Select Job(s) to Run:';
+      job = 'Select Job(s) to Run:';
     }
- i tState({ selectedMacros,})
+    this.setState({ selectedMacros, job })
   }
 
- cessImg = img => `data:image/png;base64,` +
+  processImg = img => `data:image/png;base64,` +
     `${Buffer.from(img).toString('base64')}`
 
   getImg = device => this.jtapi

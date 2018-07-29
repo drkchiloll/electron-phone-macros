@@ -21,7 +21,7 @@ export class SearchPanel extends Component<any, any> {
   handleInput = (search, index) => {
     let memory = this.remember();
     if(search.includes('*') ||
-      (search.split('.').length === 3 &&
+      (search.split('.').length === 4 &&
        search.split('.')[3])) {
       if(memory.findIndex(m => m === search) === -1)
         memory.unshift(search);

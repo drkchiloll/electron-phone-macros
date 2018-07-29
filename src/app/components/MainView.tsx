@@ -26,17 +26,14 @@ export class MainView extends Component<any, any> {
   }
 
   componentWillMount() {
-    console.log(this.props);
     if(this.props.account) {
       const { account } = this.props;
-      console.log(account);
       this.cucm = new Cucm({
         host: account.host,
         username: account.username,
         password: account.password,
         version: account.version
       });
-
       this.setState({ account: this.props.account });
     }
     Promise.all([
@@ -340,8 +337,11 @@ export class MainView extends Component<any, any> {
                     shell.openItem(docx);
                     setTimeout(() => {
                       return this.jtapi.removeFile(docx)
-                        .then(() => this.setState(mainState.init()));
-                    }, 25000)
+                        .then(() => {
+                          this.cucm.models = null;
+                          this.setState({...mainState.afterJobReset()})
+                        });
+                    }, 8500)
                   }}
                 /> : null
             }

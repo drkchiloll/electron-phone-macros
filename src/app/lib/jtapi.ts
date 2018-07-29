@@ -137,7 +137,6 @@ export const jtapi = (() => {
     execMacro(terminal, dev, cmd) {
       if(cmd.name.includes('Pause')) {
         const timer = parseInt(cmd.name.replace('Key:Pause','') + '000', 10);
-        console.log(timer);
         return new Promise((resolve, reject) =>
           setTimeout(() => {
             resolve('pause complete');

@@ -4,7 +4,6 @@ import * as ImageModule from 'open-docxtemplater-image-module';
 import * as sizeof from 'image-size';
 import { join } from 'path';
 import { readFileSync } from 'fs';
-import { Promise } from 'bluebird';
 
 export class DocBuilder {
   private zip: JSZip;

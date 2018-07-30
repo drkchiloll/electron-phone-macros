@@ -275,6 +275,7 @@ export class MainView extends Component<any, any> {
     setTimeout(() => {
       return this.jtapi.removeFile(docx)
         .then(r => {
+          this.jtapi.runnerLog = null;
           this.cucm.models = null;
           this.setState({ ...mainState.afterJobReset() });
         });

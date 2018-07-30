@@ -140,8 +140,8 @@ export const mainState = {
     // Do Any Addresses Match a Phone Subnet
     return new Promise((res, rej) => {
       if(phones && Object.keys(phones).length > 0) {
-        let types = Object.keys(phones);
-        return Promise.reduce(types, (a:any, phType: string) => {
+        let phTypes = Object.keys(phones);
+        return Promise.reduce(phTypes, (a:any, phType: string) => {
           return Promise.each(addresses, (ip: string, index) => {
             let partial = ip.replace('*', '');
             if(phones[phType].findIndex(({ip}) => ip === partial) > -1 ||

@@ -2,29 +2,14 @@ import * as java from 'java';
 import { Promise } from 'bluebird';
 import { RisQuery as ris } from 'cucm-risdevice-query';
 import { join } from 'path';
-import { readFileSync, unlink } from 'fs';
+import { unlink } from 'fs';
 import { EventEmitter } from 'events';
 import { req } from './requests';
 import { errorLog } from '../services/logger';
 import { writeFile } from 'fs';
 import { ModelEnum } from './model-db';
 import { moment } from '../components';
-import * as JSZip from 'jszip';
-import * as DocX from 'docxtemplater';
-import * as ImageModule from 'open-docxtemplater-image-module';
-
-const docTemplate = readFileSync(join(__dirname, './doc_template.docx'), 'binary');
-const zip = new JSZip(docTemplate);
-const imageMod = new ImageModule({
-  centered: false,
-  fileType: 'docx',
-  getImage: (tagValue, tagName) => {
-    return tagValue;
-  },
-  getSize: (img, tagValue, tagName) => {
-    return [450, 300];
-  }
-});
+import { DocBuilder } from './doc-builder';
 
 export class JTAPI {
   public account: any;
@@ -395,22 +380,12 @@ export const jtapi = (() => {
       });
     },
     createDoc() {
-      let fn = new Date().getTime();
-      const docx = new DocX()
-        .attachModule(imageMod)
-        .loadZip(zip)
-        .setData(this.runnerLog)
-        .render();
-      const buffer = docx
-        .getZip()
-        .generate({
-          type: 'nodebuffer',
-          compression: 'DEFLATE'
-        });
+      const fn = new Date().getTime(),
+        docbuilder = new DocBuilder(),
+        docBlob = docbuilder.createDoc(this.runnerLog);
       return new Promise((resolve, reject) => {
         writeFile(
-          join(__dirname, `${fn}.docx`), buffer, err => {
-            this.runnerLog = null;
+          join(__dirname, `${fn}.docx`), docBlob, err => {
             resolve(join(__dirname, `${fn}.docx`));
           });
       });

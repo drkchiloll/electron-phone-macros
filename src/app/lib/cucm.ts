@@ -94,10 +94,14 @@ export class Cucm {
         url = this.axlUrl,
         headers = this.axlHeaders;
     return req.post({
-      url, headers, data: doc, auth: {
+      url,
+      headers,
+      data: doc,
+      auth: {
         username: this.profile.username,
         password: this.profile.password
-      }
+      },
+      timeout: 7500
     }).then((result: any) => {
       if(!result.error) return this.parseResp(result);
       else {
@@ -165,14 +169,15 @@ export class Cucm {
   risquery(params:any) {
     let { body, modelNum } = params,
         { version, username, password } = this.profile,
-        uri = (version.startsWith('8')) ? this.risPort8Url :
+        url = (version.startsWith('8')) ? this.risPort8Url :
           this.risPortUrl;
     if(!body) throw 'error';
     return req.post({
-      url: uri,
+      url,
       headers,
       data: body,
-      auth: { username, password }
+      auth: { username, password },
+      timeout: 9500
     }).then((result: any) => {
       if(!result.error) return this.parseRisDoc(result, modelNum);
       else {

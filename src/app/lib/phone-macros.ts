@@ -131,20 +131,8 @@ export const phone = (() => {
         name: 'NavSelect',
         displayName: 'Navigate Select Button'
       }, {
-        name: 'Pause1',
-        displayName: 'Pause 1sec'
-      }, {
-        name: 'Pause2',
-        displayName: 'Pause 2sec'
-      }, {
-        name: 'Pause3',
-        displayName: 'Pause 3sec'
-      }, {
-        name: 'Pause4',
-        displayName: 'Pause 4sec'
-      }, {
-        name: 'Pause5',
-        displayName: 'Pause 5sec'
+        name: 'Pause',
+        displayName: 'Pause'
       }],
       init: {
         name: 'Services',
@@ -293,7 +281,7 @@ export const phone = (() => {
     cmdHelper(params: any) {
       let { selected, list, macro, desc } = params;
       let mcmd = JSON.parse(JSON.stringify(list.find(c =>
-        c.displayName === selected)));
+        c.displayName === selected || c.name === selected)));
       mcmd['description'] = desc;
       if(mcmd.name.includes('Send') || mcmd.name.includes('Dial')) {
         mcmd.name = selected;

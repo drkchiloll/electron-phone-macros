@@ -158,13 +158,18 @@ export class MacroForm extends Component<any, any> {
   editSequenceItem = cmd => {
     this.setState({ editing: true });
     let { cmdList, digits } = this.state;
+    let index = cmdList.findIndex(c => c.displayName === cmd.displayName);
     if(cmd.displayName.includes('Dial') ||
       cmd.displayName.includes('Send')) {
-        let index = cmdList.findIndex(c => c.displayName === cmd.displayName);
         cmdList.splice(index, 1);
         let temp = cmd.displayName.split(':');
         cmd.displayName = temp[0] + ':'
         digits = temp[1];
+      } else if(cmd.displayName.includes('Pause')) {
+        cmdList.splice(index, 1);
+        let temp = cmd.displayName.split(' ');
+        cmd.displayName = temp[0]
+        digits = temp[1].replace('sec', '');
       }
     this.setState({
       cmdList,
@@ -247,28 +252,43 @@ export class MacroForm extends Component<any, any> {
                 { this._renderCmdList(cmdList)}
               </SelectField>
               {
-                selectedCmd == 'Dial:' || selectedCmd == 'SendDigits:' ?
+                selectedCmd == 'Dial:' || selectedCmd == 'SendDigits:' ||
+                  selectedCmd === 'Pause' ?
                 <TextField
                   id='digits'
+                  type={selectedCmd.includes('Pause:') ? 'number' : 'text'}
                   value={digits}
                   onChange={(e, digits) => this.setState({ digits })}
                   onBlur={() => {
                     if(digits) {
-                      cmdList.push({
-                        name: selectedCmd + ' ' + digits + '_' + cmdList.length + 1,
-                        displayName: selectedCmd + digits
-                      });
+                      if(selectedCmd.includes('Pause')) {
+                        cmdList.push({
+                          name: selectedCmd + digits,
+                          displayName: selectedCmd + ` ${digits}sec`,
+                          type: 'key'
+                        })
+                        this.setState({
+                          selectedCmd: `Pause ${digits}sec`,
+                          digits: ''
+                        });
+                      } else {
+                        cmdList.push({
+                          name: selectedCmd+' '+digits+'_'+ cmdList.length+1,
+                          displayName: selectedCmd + digits
+                        });
+                        this.setState({
+                          selectedCmd: selectedCmd + digits,
+                          digits: ''
+                        });
+                      }
                     }
-                    this.setState({
-                      selectedCmd: selectedCmd + digits,
-                      digits: ''
-                    });
                   }}
                   style={{
                     position: 'absolute',
-                    left: selectedCmd.includes('SendDigits:') ? 92 : 45,
+                    left: selectedCmd.includes('SendDigits:') ? 92 :
+                      selectedCmd.includes('Pause') ? 70: 45,
                     top: 33,
-                    width: 175
+                    width: selectedCmd.includes('Pause') ? 90: 175
                   }}
                   hintText='Enter Digits' /> :
                 null

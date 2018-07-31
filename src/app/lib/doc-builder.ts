@@ -24,7 +24,7 @@ export class DocBuilder {
       getSize: (img, tagVal, tagName) => {
         const image = Buffer.from(img, 'binary');
         const dimensions = sizeof(image);
-        if(dimensions.width >= 451 || dimensions.height >= 301) {
+        if(dimensions.width >= 800 || dimensions.height >= 301) {
           dimensions.width = 450;
           dimensions.height = 300;
         }

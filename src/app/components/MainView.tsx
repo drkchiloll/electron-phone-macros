@@ -183,7 +183,9 @@ export class MainView extends Component<any, any> {
       }, []);
       filteredTypes = modelNum.filter(({ modelname }) => {
         let model = modelname.split(' ')[1];
-        return types.find(t => model.includes(t.substring(0, 2)));
+        return types.find(t => {
+          return model.includes(t)
+        });
       })
     } else {
       filteredTypes = modelNum;

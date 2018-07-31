@@ -7,11 +7,11 @@ import {
   Checkbox, $
 } from './index';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Edit from 'material-ui/svg-icons/image/edit';
 import { MacroTester } from './MacroTester';
 // import * as robot from 'robotjs';
 
 export class MacroForm extends Component<any, any> {
-  public grid = 6;
   constructor(props) {
     super(props);
     this.state = {
@@ -22,6 +22,7 @@ export class MacroForm extends Component<any, any> {
       sequenceDesc: '',
       testMode: false,
       digits: '',
+      editing: false,
       macro: {
         name: '',
         types: [],
@@ -150,10 +151,12 @@ export class MacroForm extends Component<any, any> {
     this.setState({
       selectedCmd: '',
       sequenceDesc: '',
-      macro: m
+      macro: m,
+      editing: false
     });
   }
   editSequenceItem = cmd => {
+    this.setState({ editing: true });
     let { cmdList, digits } = this.state;
     if(cmd.displayName.includes('Dial') ||
       cmd.displayName.includes('Send')) {
@@ -202,7 +205,8 @@ export class MacroForm extends Component<any, any> {
   render() {
     let {
       deviceList, selectedCmd, cmdList, digits,
-      macroName, sequenceDesc, macro, testMode
+      macroName, sequenceDesc, macro, testMode,
+      editing
     } = this.state;
     return (
       <div>
@@ -282,7 +286,7 @@ export class MacroForm extends Component<any, any> {
               style={this.styles.fltbtn1}
               onClick={this.addSequence}
             >
-              <ContentAdd />
+              { editing ? <Edit /> : <ContentAdd /> }
             </FloatingActionButton>
             <br/>
             {

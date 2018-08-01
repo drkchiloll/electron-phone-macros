@@ -105,7 +105,9 @@ export const jtapi = (() => {
             }
             if(registered) return resolve(registered);
             else {
-              p.timer = 2500;
+              if(p.device.model.startsWith('78'))
+                p.timer = 4500;
+              else p.timer = 2500;
               return this.finish(p);
             }
           })
@@ -182,7 +184,13 @@ export const jtapi = (() => {
           forDevice: ip,
           errors: error.toString()
         });
-        return null;
+        return this.getBackground(ip, model).catch(error => {
+          errorLog.log('error', 'Getting BackGround 2nd Try', {
+            forDevice: ip,
+            errors: error.toString()
+          });
+          return null;
+        });
       });
     },
     updateEmitter(event, d, cmd, resp) {
@@ -232,7 +240,9 @@ export const jtapi = (() => {
           onDevice: d,
           error
         });
-      })
+        return this.macroRunner(cmds, d, provider)
+          .catch(e => errorLog.log('error', '2nd Runner Error'));
+      });
     },
     deviceRunner({cmds, provider, devices}) {
       if(!this.runnerLog) {

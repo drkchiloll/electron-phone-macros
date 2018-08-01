@@ -115,7 +115,7 @@ export const mainState = {
                 return jtapi.getBackground(d.ip, d.model).then(bg => {
                   if(bg) d.img = `data:image/png;base64,` +
                     `${Buffer.from(bg).toString('base64')}`
-                  this.workEmitter.emit('device-update', cucm.models);
+                  this.workEmitter.emit('device-update', devices);
                   return d;
                 });
               }
@@ -134,7 +134,7 @@ export const mainState = {
   },
   searchWork(params: any) {
     let { cucm, account, addresses, types, phones, jtapi } = params;
-    let ipsToRemove = [];
+    let ipsToRemove = false;
     jtapi.account = account;
     // Do Any Phones Exist
     // Do Any Addresses Match a Phone Subnet
@@ -159,8 +159,10 @@ export const mainState = {
                   }
                 })
                 if(!match) {
-                  if(!ipsToRemove.find((i: any) => p.ip === i.ip)) {
-                    ipsToRemove.push(p);
+                  let typeindex = cucm.models[phType].findIndex(t => t.ip === p.ip);
+                  if(typeindex !== -1) {
+                    cucm.models[phType].splice(typeindex, 1);
+                    ipsToRemove = true;
                   }
                 }
                 return;
@@ -172,25 +174,10 @@ export const mainState = {
         res([]);
       }
     }).then((filteredAddresses: string[]) => {
-      if(ipsToRemove.length > 0) {
-        let clone = JSON.parse(JSON.stringify(cucm.models));
-        return Promise.each(Object.keys(clone), (type) => {
-          return Promise.each(clone[type], (d: any, index) => {
-            let phone = ipsToRemove.find((ip: any) => ip.ip === d.ip);
-            if(phone) {
-              return Promise.filter(cucm.models[type], (ph: any) => {
-                if(phone.ip !== ph.ip) return true;
-                return false;
-              }).then(results => {
-                cucm.models[type] = results;
-                return;
-              })
-            } else {
-              return;
-            }
-          })
-        }).then(() => this.emitter('dev-upcomplete', cucm.models));
+      if(ipsToRemove) {
+        this.emitter('dev-upcomplete', cucm.models);
       }
+      console.log(filteredAddresses)
       if(filteredAddresses.length > 0) {
         return Promise.filter(addresses, (a: string) => {
           if(filteredAddresses.findIndex(adrs => adrs === a) === -1) return true;

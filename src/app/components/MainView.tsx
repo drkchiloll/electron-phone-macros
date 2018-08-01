@@ -239,6 +239,7 @@ export class MainView extends Component<any, any> {
     const {
       selectedMacros, devices, selectedDevices
     } = this.state;
+    console.log(selectedDevices);
     const { account } = this.props;
     setTimeout(() => {
       this.jtapi.runner.on('update', updates =>

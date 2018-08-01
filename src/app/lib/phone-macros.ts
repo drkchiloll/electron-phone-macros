@@ -203,7 +203,7 @@ export const phone = (() => {
             });
           keys.push({
             name: 'Reset',
-            displayName: 'Reset ITL Final Seq. (8811+)',
+            displayName: 'Reset Security. Settings: Soft3/1/1 (8800/8900/9900)',
             type: 'key'
           });
           keys.push({ type: 'dial', ...this.cmds.dial });
@@ -220,6 +220,11 @@ export const phone = (() => {
               c['type'] = 'key'
               return c;
             });
+          keys.push({
+            name: 'Reset',
+            displayName: 'Reset Security. Settings: Soft3/1/1 (8800/8900/9900)',
+            type: 'key'
+          });
           keys.push({ type: 'dial', ...this.cmds.dial });
           keys.push({ type: 'dial', ...this.cmds.sendDigits });
           return keys;

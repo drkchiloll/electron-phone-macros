@@ -53,7 +53,6 @@ export class MacroTester extends Component<any, any> {
     const { device, slides, mouse } = this.state;
     this.jtapi.runSingle({account, macro, device});
     this.jtapi.runner.on('update', update => {
-      console.log(update);
       const img = this.processImg(update.img);
       slides.unshift({ img });
       this.setState({ slides });
@@ -74,7 +73,6 @@ export class MacroTester extends Component<any, any> {
   }
   render() {
     const { deviceInput, device, input, request, slides }: any = this.state;
-    console.log(device);
     return (
       <Drawer
         width={380}

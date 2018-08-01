@@ -104,28 +104,30 @@ export const mainState = {
         .then(() => cucm.query(associated.replace('%user%', username), true))
         .then((associations: any[]) => {
           let devices = cucm.models;
-          return Promise.reduce(Object.keys(devices), (a: any, type: string) => {
-            return Promise.map(devices[type], (d: any) => {
-              if(!associations.find(({ devicename }) => devicename === d.name)) {
-                d['associated'] = false;
-                this.workEmitter.emit('device-update', cucm.models);
-                return d;
-              } else {
-                d['associated'] = true;
-                return jtapi.getBackground(d.ip, d.model).then(bg => {
-                  if(bg) d.img = `data:image/png;base64,` +
-                    `${Buffer.from(bg).toString('base64')}`
-                  this.workEmitter.emit('device-update', devices);
+          if(devices && Object.keys(devices).length > 0) {
+            return Promise.reduce(Object.keys(devices), (a: any, type: string) => {
+              return Promise.map(devices[type], (d: any) => {
+                if(!associations.find(({ devicename }) => devicename === d.name)) {
+                  d['associated'] = false;
+                  this.workEmitter.emit('device-update', cucm.models);
                   return d;
-                });
-              }
-            }).then(devices => {
-              a[type] = devices;
-              return a;
-            })
-          }, {}).then((phones) => {
-            this.workEmitter.emit('dev-upcomplete', phones);
-          })
+                } else {
+                  d['associated'] = true;
+                  return jtapi.getBackground(d.ip, d.model).then(bg => {
+                    if(bg) d.img = `data:image/png;base64,` +
+                      `${Buffer.from(bg).toString('base64')}`
+                    this.workEmitter.emit('device-update', devices);
+                    return d;
+                  });
+                }
+              }).then(devices => {
+                a[type] = devices;
+                return a;
+              })
+            }, {}).then((phones) => {
+              this.workEmitter.emit('dev-upcomplete', phones);
+            });
+          }
         })
     })
   },
@@ -138,6 +140,11 @@ export const mainState = {
     jtapi.account = account;
     // Do Any Phones Exist
     // Do Any Addresses Match a Phone Subnet
+    if(addresses.length === 0) {
+      cucm.models = null;
+      this.workEmitter.emit('dev-upcomplete', cucm.models);
+      return;
+    }
     return new Promise((res, rej) => {
       if(phones && Object.keys(phones).length > 0) {
         let phTypes = Object.keys(phones);
@@ -177,7 +184,7 @@ export const mainState = {
       if(ipsToRemove) {
         this.emitter('dev-upcomplete', cucm.models);
       }
-      console.log(filteredAddresses)
+      // console.log(filteredAddresses)
       if(filteredAddresses.length > 0) {
         return Promise.filter(addresses, (a: string) => {
           if(filteredAddresses.findIndex(adrs => adrs === a) === -1) return true;

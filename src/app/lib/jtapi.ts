@@ -103,10 +103,13 @@ export const jtapi = (() => {
                 }
               });
             }
+            console.log(registered);
             if(registered) return resolve(registered);
             else {
               if(p.device.model.startsWith('78'))
                 p.timer = 4500;
+              if(p.device.model.startsWith('99') ||
+                p.device.model.startsWith('89')) p.timer = 35000;
               else p.timer = 2500;
               return this.finish(p);
             }

@@ -105,9 +105,15 @@ export class MainView extends Component<any, any> {
       ipAddresses.push('');
     } else if($(event.target).hasClass('fa-minus')) {
       if(ipAddresses.length === 1) {
+        mainState.workEmitter.removeAllListeners('device-update');
+        mainState.workEmitter.removeAllListeners('dev-upcomplete');
         this.cucm.models = null;
         devices = null;
-        ipAddresses[0] = '';
+        ipAddresses = [''];
+        this.setState({
+          devices, ipAddresses, selectedDevices: []
+        });
+        return;
       }
       else ipAddresses.splice(indx, 1);
       if(devices && Object.keys(devices).length > 0) this.search();
@@ -200,7 +206,9 @@ export class MainView extends Component<any, any> {
       jtapi: this.jtapi
     });
     mainState.workEmitter
-      .on('device-update', devices => this.setState({devices}));
+      .on('device-update', devices => {
+        this.setState({devices})
+      });
     mainState.workEmitter
       .on('work-error', err =>
         this.setState({devices: null, searchLabel: 'Search'}));
@@ -239,7 +247,6 @@ export class MainView extends Component<any, any> {
     const {
       selectedMacros, devices, selectedDevices
     } = this.state;
-    console.log(selectedDevices);
     const { account } = this.props;
     setTimeout(() => {
       this.jtapi.runner.on('update', updates =>

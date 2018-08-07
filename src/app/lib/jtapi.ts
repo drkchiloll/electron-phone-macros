@@ -295,7 +295,8 @@ export const jtapi = (() => {
       this.account = account;
       const risDoc = ris.createRisDoc({
         version: account.version,
-        query: devices
+        query: devices,
+        options: { status: 'Registered' }
       });
       let device: any;
       return req.get({

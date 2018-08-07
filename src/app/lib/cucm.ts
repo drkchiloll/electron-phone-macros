@@ -118,7 +118,8 @@ export class Cucm {
     return Promise.resolve(
       RisQuery.createRisDoc({
         version: this.profile.version,
-        query: ip
+        query: ip,
+        options: { status: 'Registered' }
       })
     );
   }
@@ -179,7 +180,10 @@ export class Cucm {
       auth: { username, password },
       timeout: 9500
     }).then((result: any) => {
-      if(!result.error) return this.parseRisDoc(result, modelNum);
+      if(!result.error) {
+        if(params.bypass) return result;
+        else return this.parseRisDoc(result, modelNum);
+      }
       else {
         alert(
           `Status: ${result.error.status};` +

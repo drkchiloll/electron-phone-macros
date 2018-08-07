@@ -34,7 +34,8 @@ export class FeatureButtons extends React.Component<any, any> {
     this.state = {
       filename: 'macros',
       macros: null,
-      addmacros: false
+      addmacros: false,
+      reportClick: false
     }
   }
   cucm = null;
@@ -62,7 +63,7 @@ export class FeatureButtons extends React.Component<any, any> {
     });
   }
   render() {
-    const { macros, filename, addmacros } = this.state;
+    const { macros, filename, addmacros, reportClick } = this.state;
     return (
       <div>
         <BottomNavigation style={styles.nav}>
@@ -81,7 +82,10 @@ export class FeatureButtons extends React.Component<any, any> {
           <BottomNavigationItem
             className='open-report'
             label='Device Report'
-            icon={this._navIcon('file-text-o')}
+            icon={reportClick ? <span className='fa-stack fa-lg' >
+              <i className={`fa fa-spinner fa-pulse fa-lg fa-fw`} />
+            </span> :
+              this._navIcon('file-text-o')}
             onClick={this.runSweep} />
         </BottomNavigation>
         { macros ? <ExportMacro cancel={this.cancel} {...this.state} />: null }
@@ -159,6 +163,7 @@ export class FeatureButtons extends React.Component<any, any> {
   }
 
   runSweep = () => {
+    this.setState({ reportClick: true });
     const { account: { username, password, host, version } } = this.props;
     let cquery = this.generateQuery(0);
     let skip: number = 200, devices: any[];
@@ -190,7 +195,10 @@ export class FeatureButtons extends React.Component<any, any> {
             });
           })
         }).then(() => {
-          mainState.createCsv(newDevices, (csv) => shell.openItem(csv));
+          mainState.createCsv(newDevices, (csv) => {
+            this.setState({ reportClick: false });
+            shell.openItem(csv)
+          });
         });
       });
     })

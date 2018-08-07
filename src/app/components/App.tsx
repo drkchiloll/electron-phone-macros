@@ -112,7 +112,7 @@ export class App extends Component<any, any> {
             <LogViewer />
           </Tab> */}
         </Tabs>
-        <FeatureButtons />
+        <FeatureButtons account={account} />
         {
           update ? <Update update={update} close={this.closeUpdator} /> : null
         }

@@ -2,6 +2,10 @@ import { Promise } from 'bluebird';
 import { Cucm } from './cucm';
 import { EventEmitter } from 'events';
 import { devAssQuery as associated } from '../components';
+import { writeFile } from 'fs';
+import { join } from 'path';
+import * as J2V from 'json2csv';
+const J2VParser = J2V.Parser;
 
 export const mainState = {
   workEmitter: new EventEmitter(),
@@ -198,6 +202,48 @@ export const mainState = {
         if(addresses.length === 0) this.emitter('dev-upcomplete', cucm.models);
         return this.queryHandler(cucm, addresses, types, jtapi);
       }
+    })
+  },
+  clean(devices) {
+    return Object.keys(devices).reduce((a: any, type: string) => {
+      if(devices[type].length === 0) return a;
+      devices[type].forEach(({name, ip, dn, model, firmware}: any) => {
+        a.push({ name, ip, dn, model, firmware });
+      });
+      return a;
+    }, []);
+  },
+  createCsv(devices, done) {
+    const fields = [{
+      label: 'DeviceName',
+      value: 'name'
+    }, {
+      label: 'Description',
+      value: 'description'
+    }, {
+      label: 'Status',
+      value: 'status'
+    }, {
+      label: 'IP Addresses',
+      value: 'ip'
+    }, {
+      label: 'Directory Number',
+      value: 'dn'
+    }, {
+      label: 'Phone Model',
+      value: 'model'
+    }, {
+      label: 'User',
+      value: 'user'
+    }, {
+      label: 'CurrentFirmware',
+      value: 'firmware'
+    }];
+    let registered = devices;
+    const j2vp = new J2VParser({ fields });
+    const csv = j2vp.parse(registered);
+    writeFile(join(__dirname, './registered.csv'), csv, 'utf-8', err => {
+      done(join(__dirname, './registered.csv'));
     })
   }
 }

@@ -163,44 +163,49 @@ export class FeatureButtons extends React.Component<any, any> {
   }
 
   runSweep = () => {
-    this.setState({ reportClick: true });
-    const { account: { username, password, host, version } } = this.props;
-    let cquery = this.generateQuery(0);
-    let skip: number = 200, devices: any[];
-    let newDevices: any = [];
-    this.cucm = new Cucm({ ...this.props.account });
-    return this.queryRunner({
-      statement: cquery,
-      skip: 200,
-      devices: []
-    }).then(devices => {
-      return this.deviceHandler(devices).then((deviceNames: any[]) => {
-        return Promise.map(deviceNames, (devs: string[]) => {
-          const ris = RisQuery.createRisDoc({
-            version,
-            query: devs,
-            options: { status: undefined }
-          });
-          return this.cucm.risquery({
-            body: ris,
-            bypass: true
-          }).then((risres: any) => {
-            const risos = RisQuery.parseResponse(risres);
-            risos.forEach((d: any) => {
-              const dev = devices.find((device:any) => device.devicename === d.name);
-              d.description = dev.description;
-              d.model = dev.model;
-              newDevices.push(d);
-              return;
+    if(confirm(
+      'This executes a site-wide "export" of Devices configured in the system.\n'+
+      'Please Proceed with Caution.'
+    )) {
+      this.setState({ reportClick: true });
+      const { account: { username, password, host, version } } = this.props;
+      let cquery = this.generateQuery(0);
+      let skip: number = 200, devices: any[];
+      let newDevices: any = [];
+      this.cucm = new Cucm({ ...this.props.account });
+      return this.queryRunner({
+        statement: cquery,
+        skip: 200,
+        devices: []
+      }).then(devices => {
+        return this.deviceHandler(devices).then((deviceNames: any[]) => {
+          return Promise.map(deviceNames, (devs: string[]) => {
+            const ris = RisQuery.createRisDoc({
+              version,
+              query: devs,
+              options: { status: undefined }
             });
-          })
-        }).then(() => {
-          mainState.createCsv(newDevices, (csv) => {
-            this.setState({ reportClick: false });
-            shell.openItem(csv)
+            return this.cucm.risquery({
+              body: ris,
+              bypass: true
+            }).then((risres: any) => {
+              const risos = RisQuery.parseResponse(risres);
+              risos.forEach((d: any) => {
+                const dev = devices.find((device: any) => device.devicename === d.name);
+                d.description = dev.description;
+                d.model = dev.model;
+                newDevices.push(d);
+                return;
+              });
+            })
+          }).then(() => {
+            mainState.createCsv(newDevices, (csv) => {
+              this.setState({ reportClick: false });
+              shell.openItem(csv)
+            });
           });
         });
-      });
-    })
+      })
+    } else return;
   }
 }

@@ -1,17 +1,20 @@
 import {
-  React, Tabs, Tab, Accounts, MainView, Component
+  React, Tabs, Tab, Accounts, MainView, Component,
+  Dialog, TextField
 } from './index';
 import { PhoneMacros } from './PhoneMacros';
 import { FeatureButtons } from './FeatureButtons';
 import { Update } from './Update';
+import { RegDialog } from './RegDialog';
 import { accountDb } from '../lib/account-db';
 import { ipcRenderer } from 'electron';
-import { LogViewer } from './LogViewer';
+import { REGISTRATION as registry } from '../lib/registrations';
 
 export class App extends Component<any, any> {
   constructor() {
     super();
     this.state = {
+      registered: false,
       tabValue: 'templates',
       openAcct: false,
       tabIndx: 1,
@@ -21,6 +24,7 @@ export class App extends Component<any, any> {
   }
   componentWillMount() {
     let account:any;
+    this.setState({ registered: registry.verify() });
     accountDb.get().then((accounts: any) => {
       if (accounts.length > 0) {
         account = accounts.find((r: any) => r.selected);
@@ -45,7 +49,7 @@ export class App extends Component<any, any> {
   updateAccount = account => this.setState({ account });
 
   render() {
-    const { account, openAcct, tabValue, update } = this.state;
+    const { account, openAcct, tabValue, update, registered } = this.state;
     return (
       <div style={{ position: 'relative' }}>
         <Tabs className='tabs-container'
@@ -101,23 +105,13 @@ export class App extends Component<any, any> {
                 <PhoneMacros account={account} />
             }
           </Tab>
-          {/* <Tab icon={
-            <span className='fa-stack fa-lg'>
-              <i className='fa fa-file-code-o fa-lg' />
-            </span>
-          }
-            label='Logs'
-            value='logs'
-          >
-            <LogViewer />
-          </Tab> */}
         </Tabs>
         <FeatureButtons account={account} />
-        {
-          update ? <Update update={update} close={this.closeUpdator} /> : null
-        }
+        {update ? <Update update={update} close={this.closeUpdator} /> : null}
+        { !registered ? <RegDialog closeReg={this.closeReg} />: null }
       </div>
     );
   }
   closeUpdator = () => this.setState({ update: false })
+  closeReg = () => this.setState({ registered: true })
 }

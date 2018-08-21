@@ -36,9 +36,7 @@ export const REGISTRATION: any = {
   },
   getWinSn() {
     return this.runCommand(this.winSn)
-      .then(output => {
-        return output;
-      })
+      .then(output => output.match(/SerialNumber\s+\n(.*)/)[1].trim())
   },
   verify() {
     if(!JSON.parse(localStorage.getItem('registration'))) return false;

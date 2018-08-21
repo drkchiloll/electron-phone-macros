@@ -183,10 +183,13 @@ export const jtapi = (() => {
         responseType: 'arraybuffer',
         auth: { username, password }
       }).then(({ data }) => data).catch(error => {
+        const err = error.toString();
         errorLog.log('error', 'Getting BackGround', {
           forDevice: ip,
-          errors: error.toString()
+          errors: err
         });
+        if(err.includes('REFUSED') || err.includes('TIMEOUT'))
+          return null;
         return this.getBackground(ip, model).catch(error => {
           errorLog.log('error', 'Getting BackGround 2nd Try', {
             forDevice: ip,

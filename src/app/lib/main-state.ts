@@ -75,28 +75,53 @@ export const mainState = {
         return 225;
     }
   },
-  reduceAddresses(addresses, phone: any): any {
-    return Promise.reduce(addresses, (ph: any, ip: string) => {
-      let temp = ip.replace('*', '');
-      if(temp.substring(temp.length - 1) === '.') {
-        // 10.253.* = 10.253
-        temp = temp.replace(temp.substring(temp.length - 1), '');
-      } // 10.25* = 10.25
-      if(phone.ip.startsWith(temp)) {
-        ph = phone;
-        return ph;
+  iterateAddresses({cucm, phones, type, addrs, a}): any {
+    let removeDevices = false;
+    return Promise.each(addrs, (ip: string, indx) => {
+      let part = ip.replace('*', '');
+      const ipMatch = phones[type].findIndex(d => d.ip === part),
+        startMatch = phones[type].findIndex(d => part.startsWith(d.ip));
+      if(ipMatch > -1 || startMatch > -1) {
+        if(a.indexOf(ip) === -1) a.push(ip);
+        return;
       } else {
-        return ph;
+        // Remove Devices from View
+        return Promise.each(phones[type], (p: any) => {
+          let match = addrs.find(addr => {
+            const m1 = p.ip.startsWith(addr.replace('*', '')),
+              m2 = p.ip === addr.replace('*', '');
+            if(m1 || m2) return addr;
+            else return undefined;
+          });
+          if(!match) {
+            let typeindex = cucm.models[type].findIndex(t => t.ip === p.ip);
+            if(typeindex !== -1) {
+              cucm.models[type].splice(typeindex, 1);
+              removeDevices = true;
+            }
+          }
+        }).then(() => ({
+          addressesToRemove: a,
+          removeDevices
+        }))
       }
-    }, {});
+    })
   },
-  reducePhones(phones, addresses) {
-    return Promise.reduce(phones, (a: any[], phone: any) => {
-      return this.reduceAddresses(addresses, phone).then(res => {
-        if(Object.keys(res).length > 0) a.push(res);
+  reducePhones({types, phones, addresses, cucm}) {
+    let deviceRemoval = false;
+    return Promise.reduce(types, (a:any, type: string) => {
+      return this.iterateAddresses({
+        cucm,
+        phones,
+        type,
+        addrs: addresses,
+        a
+      }).then(({ addressesToRemove, removeDevices }) => {
+        a.concat(addressesToRemove);
+        if(removeDevices) deviceRemoval = true;
         return a;
-      });
-    }, [])
+      })
+    }, []).then(addsToRemove => ({ addsToRemove, deviceRemoval }));
   },
   queryHandler(cucm: Cucm, addresses, types, jtapi) {
     const { username } = cucm.profile;
@@ -152,35 +177,12 @@ export const mainState = {
     return new Promise((res, rej) => {
       if(phones && Object.keys(phones).length > 0) {
         let phTypes = Object.keys(phones);
-        return Promise.reduce(phTypes, (a:any, phType: string) => {
-          return Promise.each(addresses, (ip: string, index) => {
-            let partial = ip.replace('*', '');
-            if(phones[phType].findIndex(({ip}) => ip === partial) > -1 ||
-               phones[phType].findIndex(({ip}) => partial.startsWith(ip)) > -1) {
-              if(a.indexOf(ip) === -1) a.push(ip);
-              return;
-            } else {
-              return Promise.each(phones[phType], (p: any) => {
-                let match = addresses.find(adr => {
-                  if(p.ip.startsWith(adr.replace('*', '')) ||
-                     p.ip === adr.replace('*', '')) {
-                       return adr;
-                  } else {
-                    return undefined;
-                  }
-                })
-                if(!match) {
-                  let typeindex = cucm.models[phType].findIndex(t => t.ip === p.ip);
-                  if(typeindex !== -1) {
-                    cucm.models[phType].splice(typeindex, 1);
-                    ipsToRemove = true;
-                  }
-                }
-                return;
-              });
-            }
-          }).then(() => a);
-        }, []).then((addsToRemove) => res(addsToRemove));
+        return this.reducePhones({
+          cucm, types: phTypes, phones, addresses
+        }).then(({ addsToRemove, deviceRemoval}) => {
+          ipsToRemove = deviceRemoval;
+          res(addsToRemove);
+        });
       } else {
         res([]);
       }

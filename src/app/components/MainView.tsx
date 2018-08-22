@@ -76,7 +76,7 @@ export class MainView extends Component<any, any> {
             this.jtapi.runner.removeAllListeners('update-end');
             executeJobLabel = 'Execute Job';
             this.jtapi.createDoc().then(filename => {
-              this.setState({ openDoc: true, docx: filename });
+              return this.setState({ openDoc: true, docx: filename });
             });
           }
           return this.setState({ selectedDevices, executeJobLabel });

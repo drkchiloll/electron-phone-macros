@@ -397,14 +397,18 @@ export const jtapi = (() => {
     },
     createDoc() {
       const fn = new Date().getTime(),
-        docbuilder = new DocBuilder(),
-        docBlob = docbuilder.createDoc(this.runnerLog);
-      return new Promise((resolve, reject) => {
-        writeFile(
-          join(__dirname, `${fn}.docx`), docBlob, err => {
-            resolve(join(__dirname, `${fn}.docx`));
+        docbuilder = new DocBuilder();
+      return docbuilder.initialize()
+        .then(() => docbuilder.createDoc(this.runnerLog))
+        .then(docBlob => {
+          return new Promise((res, rej) => {
+            writeFile(
+              join(__dirname, `${fn}.docx`), docBlob, err => {
+                return res(join(__dirname, `${fn}.docx`));
+              }
+            );
           });
-      });
+        });
     },
     removeFile(filepath) {
       return new Promise((resolve, reject) => {

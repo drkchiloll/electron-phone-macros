@@ -9,6 +9,7 @@ import { errorLog } from '../services/logger';
 import { ModelEnum } from './model-db';
 import { moment } from '../components';
 import { DocBuilder } from './doc-builder';
+import { phone } from './phone-macros';
 
 export class JTAPI {
   public account: any;
@@ -88,7 +89,7 @@ export const jtapi = (() => {
     provider: null,
     runnerLog: null,
     finish(params) {
-      const { provider, device, cmd, resp, timer = 0 } = params;
+      const { provider, device, cmd, resp, macroName, timer = 0 } = params;
       const { ctiTerminal, logging } = device;
       return new Promise((resolve, reject) => {
         setTimeout((p, t) => {
@@ -103,9 +104,24 @@ export const jtapi = (() => {
                 }
               });
             }
-            console.log(registered);
-            if(registered) return resolve(registered);
-            else {
+            if(registered) {
+              const name = p.macroName.toLowerCase() || 'undefined';
+              if(p.device && p.device.model) {
+                const isDevice99 = p.device.model.startsWith('99'),
+                  mreset: boolean = name.includes('reset') || name.includes('itl');
+                if(isDevice99 && mreset) {
+                  let cmd = phone.generateXml({
+                    name: 'Key:Soft1'
+                  });
+                  t.sendData(cmd, (e, r) => {
+                    console.log(r);
+                    return resolve(registered);
+                  })
+                } else {
+                  return resolve(registered);
+                }
+              }
+            } else {
               if(p.device.model.startsWith('78'))
                 p.timer = 4500;
               if(p.device.model.startsWith('99') ||
@@ -123,16 +139,23 @@ export const jtapi = (() => {
         return;
       })
     },
+    registered(t) {
+      return new Promise(resolve => {
+        t.isRegistered((err, registered) => resolve(registered));
+      });
+    },
     execMacro(terminal, dev, cmd) {
       if(cmd.name.includes('Pause')) {
         const timer = parseInt(cmd.name.replace('Key:Pause','') + '000', 10);
         return new Promise((resolve, reject) =>
-          setTimeout(() => {
-            resolve('pause complete');
-          }, timer));
+          setTimeout(() => resolve({ resp: 'pause complete' }), timer));
       } else {
         return new Promise((resolve, reject) => {
           setTimeout((term, d, c) => {
+            let timer = 1000;
+            if(d.model && (d.model.startsWith('79') || d.model.startsWith('69'))) {
+              timer = (c.sequenceId * 150) + 1000;
+            }
             term.execAction([d.deviceName, c.xml], (err, phone) => {
               if(c.sequenceId === 1) {
                 if(err) {
@@ -150,9 +173,9 @@ export const jtapi = (() => {
               }
               setTimeout(t => {
                 t.getDataResponse((err, resp) => {
-                  return resolve({resp});
+                  return resolve({ resp });
                 });
-              }, 1000, term);
+              }, timer, term);
             });
           }, 0, terminal, dev, cmd);
         });
@@ -219,25 +242,28 @@ export const jtapi = (() => {
         }
         if(img) update['img'] = img;
         this.runner.emit(event, update);
-        return;
+        return 1;
       });
     },
-    macroRunner(cmds, d, provider) {
+    macroRunner(cmds, d, provider, macroName) {
       return Promise.mapSeries(cmds, (cmd: any, indx) => {
         return this.terminal(provider).then(t => {
           return this.execMacro(t, d, cmd).then(({resp}) => {
             return this.updateEmitter(
               'update', d, cmd, resp
             ).then(() => {
-              if(indx === cmds.length - 1) {
-                return this.finish({
+              if(indx === cmds.length - 1 || resp === 'finished') {
+                const fin = {
+                  cmd,
+                  resp,
                   provider: t,
                   device: d,
-                  cmd,
-                  resp
-                })
+                  macroName
+                };
+                return this.finish(fin);
+              } else {
+                return 1;
               }
-              return;
             });
           });
         });
@@ -250,7 +276,7 @@ export const jtapi = (() => {
           .catch(e => errorLog.log('error', '2nd Runner Error'));
       });
     },
-    deviceRunner({cmds, provider, devices}) {
+    deviceRunner({cmds, provider, devices}, macroName) {
       if(!this.runnerLog) {
         this.runnerLog = {
           name: moment().format('dddd, MMMM Do YYYY, h:mm:ss a'),
@@ -274,7 +300,7 @@ export const jtapi = (() => {
             })()
           }]
         });
-        return this.macroRunner(cmds, d, provider, this);
+        return this.macroRunner(cmds, d, provider, macroName);
       });
     },
     getProvider(cmds, d) {
@@ -291,7 +317,7 @@ export const jtapi = (() => {
         let compute = { types: macro.types, devices };
         return this.computeDevicesToPush(compute)
           .then(d => this.getProvider(macro.cmds, d)
-          .then(results => this.deviceRunner(results)));
+          .then(results => this.deviceRunner(results, macro.name)));
       })
     },
     deviceQuery({ account, devices }) {

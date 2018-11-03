@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { readdir, readFile, writeFile } from 'fs';
 import { join } from 'path';
-import { Promise } from 'bluebird';
+import * as Promise from 'bluebird';
 import * as moment from 'moment';
 
 export class Updator {

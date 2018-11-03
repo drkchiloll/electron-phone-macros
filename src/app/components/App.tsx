@@ -9,6 +9,8 @@ import { RegDialog } from './RegDialog';
 import { accountDb } from '../lib/account-db';
 import { ipcRenderer } from 'electron';
 import { REGISTRATION as registry } from '../lib/registrations';
+import { javaChecker } from '../lib/java-check';
+import * as sudo from 'sudo-prompt';
 
 export class App extends Component<any, any> {
   constructor() {
@@ -49,27 +51,18 @@ export class App extends Component<any, any> {
   updateAccount = account => this.setState({ account });
 
   render() {
-    const { account, openAcct, tabValue, update, registered } = this.state;
+    const {
+      account, openAcct, tabValue, update, registered
+    } = this.state;
     return (
       <div style={{ position: 'relative' }}>
         <Tabs className='tabs-container'
-          inkBarStyle={{ background: '#546E7A', border: '.5px solid #546E7A' }}
-          tabItemContainerStyle={{
-            width: 505,
-            height: 75,
-            borderTop: '.5px solid #B0BEC5',
-            borderRight: '.5px solid #B0BEC5',
-            borderLeft: '.5px solid #B0BEC5',
-            borderBottom: '.25px dashed #B0BEC5'
-          }}
+          inkBarStyle={this.style.tabBar}
+          tabItemContainerStyle={this.style.tabContainer}
           initialSelectedIndex={this.state.tabIdx}
           value={tabValue}
           onChange={this._tabSelect}>
-          <Tab icon={
-              <span className='fa-stack fa-lg'>
-                <i className='fa fa-server fa-lg'/>
-              </span>
-            }
+          <Tab icon={this._renderTabIcon('server')}
             label='Accounts'
             value='accounts'
           >
@@ -78,11 +71,7 @@ export class App extends Component<any, any> {
               acctClose={this._handleClose}
               setAccount={this.updateAccount} />
           </Tab>
-          <Tab icon={
-              <span className='fa-stack fa-lg'>
-                <i className='fa fa-phone fa-lg' />
-              </span>
-            }
+          <Tab icon={this._renderTabIcon('phone')}
             label='MACRO-RUNNER'
             value='device-search'
           >
@@ -91,11 +80,7 @@ export class App extends Component<any, any> {
                 <MainView account={account} />
             }
           </Tab>
-          <Tab icon={
-              <span className='fa-stack fa-lg'>
-                <i className='fa fa-superpowers fa-lg' />
-              </span>
-            }
+          <Tab icon={this._renderTabIcon('superpowers')}
             label='MACRO-BUILDER'
             style={{marginLeft:10}}
             value='templates'
@@ -112,6 +97,22 @@ export class App extends Component<any, any> {
       </div>
     );
   }
+  _renderTabIcon = type => {
+    return <span className='fa-stack fa-lg'>
+      <i className={`fa fa-${type} fa-lg`} />
+    </span>
+  }
   closeUpdator = () => this.setState({ update: false })
   closeReg = () => this.setState({ registered: true })
+  style: any = {
+    tabBar: { background: '#546E7A', border: '.5px solid #546E7A' },
+    tabContainer: {
+      width: 505,
+      height: 75,
+      borderTop: '.5px solid #B0BEC5',
+      borderRight: '.5px solid #B0BEC5',
+      borderLeft: '.5px solid #B0BEC5',
+      borderBottom: '.25px dashed #B0BEC5'
+    }
+  }
 }

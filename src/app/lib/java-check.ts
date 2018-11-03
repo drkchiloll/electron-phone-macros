@@ -1,7 +1,7 @@
 import * as targz from 'targz'
-import { Promise, resolve } from 'bluebird';
+import { Promise } from 'bluebird';
 import { join } from 'path';
-import { exists } from 'fs';
+import { exists, open } from 'fs';
 import { exec } from 'child_process';
 import { BrowserWindow } from 'electron';
 
@@ -17,8 +17,8 @@ export const javaChecker = (() => {
     xtractJava() {
       return new Promise(resolve => {
         targz.decompress({
-          src: join(__dirname, './jdk-10.0.1.tar.gz'),
-          dest: 'C:\\PhoneMacros\\Java\\'
+          src: join(__dirname, './jdk-10.0.1.jdk.tgz'),
+          dest: '/Libary/Java/JavaVirtualMachines/'
         }, (err) => resolve('done'))
       })
     },
@@ -58,6 +58,22 @@ export const javaChecker = (() => {
       } else {
         return Promise.resolve('done');
       }
+    },
+    openDir(path) {
+      return new Promise((resolve, reject) => {
+        open(path, 'r', (e, fd) => {
+          if(e) reject(e);
+          else resolve();
+        })
+      })
+    },
+    check() {
+      const lib = '/Library',
+        java = '/Java',
+        jvms = '/JavaVirtualMachines',
+        jdk = '/jdk-10.0.1.jdk';
+      return this.openDir(`${lib}${java}`)
+        .then(() => this.openDir(`${lib}${java}${jvms}${jdk}`))
     }
   };
   return service;

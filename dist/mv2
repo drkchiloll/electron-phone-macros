@@ -1,0 +1,7 @@
+#!/bin/sh
+# Check to See the the JAVA/JVM DIR Exists
+if [ ! -d $1 ]
+then
+  mkdir -p $1
+fi
+tar -xvf $2 -C /Library/Java/JavaVirtualMachines/

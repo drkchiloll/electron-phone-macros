@@ -43,8 +43,18 @@ let sqlDoc = (
     `DELETE FROM enduserdevicemap
     where fkenduser=(SELECT pkid from enduser where userid="%userid") AND
     fkdevice=(SELECT pkid from device where name="%devicename%")`
+  ),
+  userPermissions = (
+    `SELECT DISTINCT(fr.name) as permissionrole FROM DirGroup as dg
+      INNER JOIN functionroledirgroupmap as frdgm on frdgm.fkdirgroup = dg.pkid
+      INNER JOIN functionrole as fr on frdgm.fkfunctionrole=fr.pkid
+      INNER JOIN enduserdirgroupmap as eudgm on eudgm.fkdirgroup = dg.pkid
+      INNER JOIN enduser as eu on eu.pkid = eudgm.fkenduser
+      WHERE eu.userid="%userid%"`
   );
 
 export {
-  sqlDoc, axlHeaders, headers, phModelQuery, devAssQuery, updDevAssoc
+  sqlDoc, axlHeaders, headers,
+  phModelQuery, devAssQuery, updDevAssoc,
+  userPermissions, delDevAssoc
 };

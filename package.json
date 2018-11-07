@@ -15,6 +15,7 @@
     "start": "node_modules/.bin/electron .",
     "package:macos": "node_modules/.bin/electron-packager ./ Imperium_Control --platform=darwin --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.icns",
     "package:win64": "node_modules/.bin/electron-packager ./ imperium --platform=win32 --arch=x64 --prune=true --ignore=src/app --ignore=node_modules/@types --ignore=node_modules/.cache --ignore=node_modules/electron* --app-version=4.0.0 --icon ./resources/icon.ico",
+    "build:dmg": "./node_modules/.bin/build --prepackaged Imperium_Control-macOS",
     "clean": "cd dist && rm *.js* && cd ..",
     "clean_jtapi": "rm CiscoJtapi*"
   },

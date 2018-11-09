@@ -8,15 +8,12 @@ import { Update } from './Update';
 import { RegDialog } from './RegDialog';
 import { accountDb } from '../lib/account-db';
 import { ipcRenderer } from 'electron';
-import { REGISTRATION as registry } from '../lib/registrations';
-import { javaChecker } from '../lib/java-check';
-import * as sudo from 'sudo-prompt';
 
 export class App extends Component<any, any> {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      registered: false,
+      registered: props.registration ? true: false,
       tabValue: 'templates',
       openAcct: false,
       tabIndx: 1,
@@ -26,7 +23,6 @@ export class App extends Component<any, any> {
   }
   componentWillMount() {
     let account:any;
-    this.setState({ registered: registry.verify() });
     accountDb.get().then((accounts: any) => {
       if (accounts.length > 0) {
         account = accounts.find((r: any) => r.selected);
@@ -93,7 +89,7 @@ export class App extends Component<any, any> {
         </Tabs>
         <FeatureButtons account={account} />
         {update ? <Update update={update} close={this.closeUpdator} /> : null}
-        { !registered ? <RegDialog closeReg={this.closeReg} />: null }
+        { !registered ? <RegDialog closeReg={this.closeReg} subscribe={this.props.subscribe} />: null }
       </div>
     );
   }

@@ -43,21 +43,23 @@ export class Cucm {
   }
 
   parseResp(data: string):any {
-    // console.log(data);
     const doc = new dom().parseFromString(data);
     let rows = Array.from(doc.getElementsByTagName('row'));
-    if (rows && rows.length === 0) {
-      return [];
+    if(rows && rows.length === 0) {
+      rows = Array.from(doc.getElementsByTagName('rowsUpdated'));
+      if(rows && rows.length === 0) {
+        return [];
+      }
     }
     return Promise.map(rows, row => {
       return Array.from(row.childNodes).reduce((o:any, child:any) => {
         o[child.nodeName] = child.textContent;
         return o;
       }, {})
-    }).then((object: any) => {
-      // console.log(object);
-      return object;
-    });
+    })
+    // .then((object: any) =>
+    //   return object;
+    // });
   }
 
   parseErrorResp(data: any) {
@@ -90,7 +92,9 @@ export class Cucm {
   }
 
   query(statement: string, simple: boolean = false) {
-    let doc = this.setDoc({ action: 'Query', statement }),
+    let action = 'Query';
+    if(!simple) action = 'Update';
+    let doc = this.setDoc({ action, statement }),
         url = this.axlUrl,
         headers = this.axlHeaders;
     return req.post({
@@ -180,9 +184,15 @@ export class Cucm {
       auth: { username, password },
       timeout: 9500
     }).then((result: any) => {
+      // console.log(result);
       if(!result.error) {
         if(params.bypass) return result;
-        else return this.parseRisDoc(result, modelNum);
+        else {
+          return this.parseRisDoc(result, modelNum);
+          // let parsed = RisQuery.parseResponse(result)
+          // console.log(parsed);
+          // return parsed;
+        }
       }
       else {
         alert(

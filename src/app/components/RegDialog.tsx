@@ -2,7 +2,7 @@ import {
   React, Component, Dialog, TextField,
   RaisedButton, Subheader, Divider
 } from './index';
-import { REGISTRATION as registration } from '../lib/registrations';
+import { REGISTRATION as registration } from '../lib';
 
 export class RegDialog extends Component<any, any> {
   state = {
@@ -26,11 +26,11 @@ export class RegDialog extends Component<any, any> {
     const { reg } = this.state;
     return registration.init(reg)
       .then(registration => {
-        console.log(registration);
         this.setState({
           registration,
           registered: true
         });
+        this.props.subscribe(registration);
       });
   }
   action = () => ([
@@ -110,7 +110,11 @@ export class RegDialog extends Component<any, any> {
             Thank you for registering. Currently this application is
             in Beta. Please take note of your License Key: 
             <span style={{color: 'red'}}>
-              {registration&&registration.id?registration.id.toUpperCase():''}
+              {
+                (registration && registration.id) ?
+                  registration.id.toUpperCase() :
+                  ''
+              }
             </span>
           </strong>
         </div>

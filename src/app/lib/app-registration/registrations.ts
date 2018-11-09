@@ -1,5 +1,5 @@
 import { TeamsGuestIssuer } from 'webexteams-guestissuer';
-import { fb } from './fb-datastore';
+import { FireDB } from './firebase-db';
 import { exec } from 'child_process';
 
 const appId = `Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi82NTRhZDhk` +
@@ -19,9 +19,13 @@ export type registration = {
   personId: string;
   created: string;
   membershipId: string;
+  apps: string[];
+  killSwitch: boolean;
+  update: boolean;
 };
 
 export const REGISTRATION: any = {
+  fire: new FireDB(),
   guest: TeamsGuestIssuer(appId, appSecret),
   registration: null,
   macSn: 'ioreg -l | grep IOPlatformSerialNumber',
@@ -39,9 +43,13 @@ export const REGISTRATION: any = {
       .then(output => output.match(/SerialNumber\s+\n(.*)/)[1].trim())
   },
   verify() {
-    if(!JSON.parse(localStorage.getItem('registration'))) return false;
-    else this.registration = JSON.parse(localStorage.getItem('registration'));
-    return true;
+    try {
+      if(!JSON.parse(localStorage.getItem('registration'))) {}
+      else this.registration = JSON.parse(localStorage.getItem('registration'));
+      return true;
+    } catch(e) {
+      return false;
+    }
   },
   generateMachineId() {
     if(process.platform === 'darwin') {
@@ -55,22 +63,26 @@ export const REGISTRATION: any = {
     }
   },
   getRecord(id) {
-    let registration;
     return this.generateMachineId().then((machine: any) => {
-      return fb.getRecord(id.toLowerCase())
-        .then(doc => {
-          if(doc.exists) {
-            registration = doc.data();
-            const { machines } = registration;
-            if(!machines.find((m: any) => m.sn === machine.sn)) {
-              registration.machines.push(machine);
-              return fb.updateMachine({ id: id.toLowerCase(), machine });
-            }
+      return this.fire.get(id).then(d => {
+        if(d.exists) return d.data();
+        else return undefined;
+      }).then(doc => {
+        if(doc) {
+          const { machines } = doc;
+          if(!machines.find((m => m.sn === machine.sn))) {
+            return this.fire.updateMachine({ id, machine })
+              .then(doc => {
+                localStorage.setItem('registration', JSON.stringify(doc));
+                return doc;
+              })
+          } else {
+            return doc;
           }
-        }).then((reg) => {
-          localStorage.setItem('registration', JSON.stringify(reg || registration));
-          return reg ? reg : registration;
-        });
+        } else {
+          return undefined;
+        }
+      })
     })
   },
   createRegistration({ user, email, company }) {
@@ -95,7 +107,10 @@ export const REGISTRATION: any = {
             emails,
             companyName: company,
             personId: guestUser.id,
-            membershipId: null
+            membershipId: null,
+            apps: ['phone-macros'],
+            killSwitch: false,
+            update: false
           };
           return this.guest.genericRequest({
             url: '/team/memberships',
@@ -108,7 +123,7 @@ export const REGISTRATION: any = {
           }).then(({ id }) => {
             reg.membershipId = id;
             localStorage.setItem('registration', JSON.stringify(reg));
-            return fb.createRecord(reg);
+            return this.fire.createRecord(reg);
           }).then(record => {
             return record.data();
           });
@@ -132,7 +147,7 @@ export const REGISTRATION: any = {
         personId: 'Y2KM',
         membershipId: 'Y2KN'
       };
-      return fb.createRecord(reg)
+      return this.fire.createRecord(reg)
     }).then((doc: any) => {
       console.log(doc.data());
       if(doc.exists) return doc.data();

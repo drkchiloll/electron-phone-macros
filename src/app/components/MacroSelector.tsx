@@ -1,11 +1,12 @@
 import {
   React, Component, IconButton, MenuItem, ListItem, SelectField,
-  Subheader, darkBlack, $
+  Subheader, darkBlack, $, FontIcon
 } from './index';
 // const robot = require('robotjs');
 import * as robot from 'robotjs';
 
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
+import ExpandMore from 'material-ui/svg-icons/navigation/expand-more'
 
 import { fullBlack } from 'material-ui/styles/colors';
 
@@ -57,7 +58,12 @@ export const MacroSelector = props => {
       fullWidth={true}
       style={{marginLeft: 5, width: 'auto', minWidth: 335}}
       menuStyle={{autoWidth: true}}
-      iconStyle={{outlineColor: fullBlack}}
+      underlineStyle={{borderBottomColor: fullBlack}}
+      dropDownMenuProps={{
+        iconButton: <FontIcon style={{ color: fullBlack, marginTop: -150 }}>
+          <ExpandMore/>
+        </FontIcon>
+      }}
     >
       { menuItems(macros, values) }
     </SelectField>

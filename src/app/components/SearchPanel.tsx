@@ -6,7 +6,6 @@ const storage = localStorage;
 
 export class SearchPanel extends Component<any, any> {
   public carriageTimeout;
-
   addToMemory = (req, indx) => {
     this.carriageTimeout = setTimeout(() => this.props.cr(), 1500);
   }
@@ -45,6 +44,23 @@ export class SearchPanel extends Component<any, any> {
                 id={`search_field_${i}`}
                 autoFocus
                 searchText={s}
+                errorText={(() => {
+                  if(!s) return '';
+                  if(s.includes('*') || s.split('.').length === 4) {
+                    const tmp = s.split('.');
+                    const tmpLen = tmp.length;
+                    let ip: string;
+                    if(tmpLen === 4 && s.includes('*')) {
+                      ip = tmp[0]+'.'+tmp[1]+'.'+tmp[2]+'.1'
+                    } else if(tmpLen === 3) {
+                      ip = `${tmp[0]}.${tmp[1]}.1.1`
+                    } else if(tmpLen === 4) {
+                      ip = s;
+                    }
+                    const re = /^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/;
+                    return re.test(ip) ? '' : 'improperly formatted ip address';
+                  }
+                })()}
                 hintText='10.255.2.* (wildcard)'
                 dataSource={this.remember()}
                 name={`ip_${i}`}

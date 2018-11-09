@@ -6,7 +6,9 @@ import {
   Subheader, ListItem, SelectField, Snackbar,
   SelectableList, Cucm, moment, Component
 } from './index';
+import UserGroup from 'material-ui/svg-icons/social/group';
 import { accountDb } from '../lib/account-db';
+import { userPermissions } from '../lib';
 
 export class Accounts extends Component<any,any> {
   constructor() {
@@ -110,6 +112,16 @@ export class Accounts extends Component<any,any> {
       });
     })
   }
+  getPermissions = () => {
+    let { accounts, selectedAcct } = this.state,
+      account = accounts[selectedAcct],
+      { host, version, username, password } = account;
+    const cucm = new Cucm({ host, version, username, password });
+    const cmd = userPermissions.replace('%userid%', username);
+    cucm.query(cmd, true).then(resp => {
+      console.log(resp);
+    })
+  }
   selectAccount = (e: any, selected: number) => {
     let { accounts, selectedAcct, api } = this.state;
     accounts[selected].selected = true;
@@ -179,6 +191,12 @@ export class Accounts extends Component<any,any> {
         }
         primary={true}
         onClick={this.testAccount}
+      />,
+      <FlatButton
+        label='Verify Permissions'
+        icon={<FontIcon><UserGroup/></FontIcon>}
+        primary={true}
+        onClick={this.getPermissions}
       />,
       <FlatButton
         label='Close'

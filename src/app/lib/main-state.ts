@@ -1,7 +1,10 @@
 import { Promise } from 'bluebird';
 import { Cucm } from './cucm';
 import { EventEmitter } from 'events';
-import { devAssQuery as associated } from '../components';
+import {
+  devAssQuery as associated,
+  updDevAssoc as updateAssociated
+} from '../components';
 import { writeFile } from 'fs';
 import { join } from 'path';
 import * as J2V from 'json2csv';
@@ -127,7 +130,9 @@ export const mainState = {
     const { username } = cucm.profile;
     return Promise.map(addresses, (ip: string) => {
       return cucm.createRisDoc({ ip })
-        .then(d => cucm.risquery({ body: d, modelNum: types }))
+        .then(d => {
+          return cucm.risquery({ body: d, modelNum: types })
+        })
         .then((devices) => this.workEmitter.emit('device-update', cucm.models),
           err => this.workEmitter.emit('work-error'))
         .then(() => cucm.query(associated.replace('%user%', username), true))
@@ -137,9 +142,21 @@ export const mainState = {
             return Promise.reduce(Object.keys(devices), (a: any, type: string) => {
               return Promise.map(devices[type], (d: any) => {
                 if(!associations.find(({ devicename }) => devicename === d.name)) {
-                  d['associated'] = false;
-                  this.workEmitter.emit('device-update', cucm.models);
-                  return d;
+                  let update = updateAssociated
+                    .replace('%userid%', username)
+                    .replace('%devicename%', d.name);
+                  return cucm.query(
+                    update,
+                    false
+                  ).then(result => {
+                    d['associated'] = true;
+                    return jtapi.getBackground(d.ip, d.model).then(bg => {
+                      if(bg) d.img = `data:image/png;base64,` +
+                        `${Buffer.from(bg).toString('base64')}`
+                      this.workEmitter.emit('device-update', devices);
+                      return d;
+                    });
+                  })
                 } else {
                   d['associated'] = true;
                   return jtapi.getBackground(d.ip, d.model).then(bg => {

@@ -21,7 +21,7 @@ export class MacroTester extends Component<any, any> {
     mouse: null
   }
 
-  processImg = img => `data:image/png;base64,` +
+  processImg = img => `data:image/bmp;base64,` +
     Buffer.from(img, 'binary').toString('base64');
 
   saveDeviceName = () => {
@@ -36,7 +36,7 @@ export class MacroTester extends Component<any, any> {
     });
     this.jtapi.deviceQuery({
       account, devices: [input]
-    }).then(device => {
+    }).then((device: any) => {
       let img = this.processImg(device.img);
       slides = [{ img }];
       this.setState({slides, device});
@@ -55,6 +55,7 @@ export class MacroTester extends Component<any, any> {
     this.jtapi.runner.on('update', update => {
       const img = this.processImg(update.img);
       slides.unshift({ img });
+      if(slides.length > 10) slides.pop();
       this.setState({ slides });
     });
     this.jtapi.runner.on('update-end', () => {

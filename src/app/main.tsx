@@ -6,7 +6,7 @@ import {
 } from './components/index';
 import { remote } from 'electron';
 import { FireDB } from './lib/app-registration/firebase-db';
-import { REGISTRATION as registration } from './lib/registrations';
+import { REGISTRATION as registration } from './lib/app-registration/registrations';
 
 const fireSubscribe = reg => {
   const fire = new FireDB();

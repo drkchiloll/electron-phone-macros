@@ -129,7 +129,7 @@ export class FeatureButtons extends React.Component<any, any> {
   }
 
   queryRunner = (p: any) => {
-    return this.cucm.query(p.statement).then(results => {
+    return this.cucm.query(p.statement, true).then(results => {
       p.devices = p.devices.concat(results);
       if(results.length === 200) {
         let cquery = this.generateQuery(p.skip);

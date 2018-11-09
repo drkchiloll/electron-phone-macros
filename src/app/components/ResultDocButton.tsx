@@ -6,9 +6,9 @@ export const ResultDocButton = props => {
     <RaisedButton
       label='OPEN RESULTS'
       style={style}
-      primary={true}
       fullWidth={true}
       onClick={open}
+      buttonStyle={{backgroundColor: 'red'}}
     />
   )
 }

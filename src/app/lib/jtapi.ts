@@ -105,6 +105,7 @@ export const jtapi = (() => {
               });
             }
             if(registered) {
+              console.log(p);
               const name = p.macroName.toLowerCase() || 'undefined';
               if(p.device && p.device.model) {
                 const isDevice99 = p.device.model.startsWith('99'),
@@ -194,12 +195,24 @@ export const jtapi = (() => {
     },
     getBackground(ip, model?) {
       let url: string;
+      let { username, password } = this.account;
       if(model && model.startsWith('69')) {
-        url = `http://${ip}/CGI/lcd4.bmp`;
+        return req.get({
+          url: `http://${ip}/CGI/Screenshot`,
+          method: 'get',
+          auth: { username, password }
+        }).then(() => {
+          url = `http://${ip}/CGI/lcd4.bmp`;
+          return req.get({
+            url,
+            method: 'get',
+            responseType: 'arraybuffer',
+            auth: { username, password }
+          }).then(({ data }) => data)
+        })
       } else {
         url = `http://${ip}/CGI/Screenshot`;
       }
-      let { username, password } = this.account;
       return req.get({
         url,
         method: 'get',
@@ -336,12 +349,15 @@ export const jtapi = (() => {
         auth: { username: account.username, password: account.password }
       }).then(({ data }) => {
         device = ris.parseResponse(data)[0];
+        console.log(device);
         return ModelEnum.get().then((models: any[]) => {
-          if(models.findIndex(m => m.modelnumber === device.model) !== -1) {
+          console.log(models);
+          if(models.findIndex(m => m.modelnumber === device.modelNumber) !== -1) {
             device['model'] =
-              models.find(m => m.modelnumber === device.model).modelname.replace(
+              models.find(m => m.modelnumber === device.modelNumber).modelname.replace(
                 'Cisco ', ''
               );
+            console.log(device);
           }
           return;
         });
@@ -369,7 +385,8 @@ export const jtapi = (() => {
                       provider: t,
                       device,
                       c,
-                      resp: data.resp
+                      resp: data.resp,
+                      macroName: macro.name
                     }).then(() => {
                       this.provider.disconnectProvider();
                       this.runner.removeAllListeners('update');

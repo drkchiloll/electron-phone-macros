@@ -10,3 +10,4 @@ dist/logs/*
 dist/~$c_template.docx
 dist/~$test.docx
 dist/jdk*
+.vscode/*

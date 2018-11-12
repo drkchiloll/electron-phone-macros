@@ -123,7 +123,7 @@ export const REGISTRATION: any = {
           }).then(({ id }) => {
             reg.membershipId = id;
             localStorage.setItem('registration', JSON.stringify(reg));
-            return this.fire.createRecord(reg);
+            return this.fire.create(reg);
           }).then(record => {
             return record.data();
           });
@@ -131,7 +131,10 @@ export const REGISTRATION: any = {
       })
   },
   init({ id, user, email, company }) {
-    if(id) return this.getRecord(id);
+    if(id) return this.getRecord(id).then((doc) => {
+      localStorage.setItem('registration', JSON.stringify(doc));
+      return doc;
+    });
     else return this.createRegistration({ user, email, company });
   },
   test(register) {

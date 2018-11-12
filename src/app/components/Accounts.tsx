@@ -117,10 +117,17 @@ export class Accounts extends Component<any,any> {
       account = accounts[selectedAcct],
       { host, version, username, password } = account;
     const cucm = new Cucm({ host, version, username, password });
-    const cmd = userPermissions.replace('%userid%', username);
-    cucm.query(cmd, true).then(resp => {
-      console.log(resp);
-    })
+    cucm.setPermissions((e, r) => {
+      this.setState({
+        openSnack: true,
+        acctMsg: 'User Permissions Set'
+      })
+    }).then(() => {
+      this.setState({
+        openSnack: true,
+        acctMsg: 'User Permissions Set'
+      });
+    });
   }
   selectAccount = (e: any, selected: number) => {
     let { accounts, selectedAcct, api } = this.state;
@@ -193,7 +200,7 @@ export class Accounts extends Component<any,any> {
         onClick={this.testAccount}
       />,
       <FlatButton
-        label='Verify Permissions'
+        label='Set Permissions'
         icon={<FontIcon><UserGroup/></FontIcon>}
         primary={true}
         onClick={this.getPermissions}

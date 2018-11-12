@@ -6,6 +6,9 @@ import {
 import { errorLog } from '../services/logger';
 import { req } from './requests';
 import { RisQuery } from 'cucm-risdevice-query';
+import {
+  getDirGroup, addDirGroup, updateDirGroup, updatePermissions
+} from './configs';
 
 export class Cucm {
   readonly doc = sqlDoc;
@@ -40,6 +43,31 @@ export class Cucm {
       .replace(/\%version\%/gi, this.profile.version)
       .replace(/\%statement\%/gi, params.statement)
       .replace(/\%action\%/gi, params.action);
+  }
+
+  setPermissions(cb) {
+    const roles = [
+      'Standard SERVICEABILITY Administration',
+      'Standard CCM Admin Users',
+      'Standard AXL API Access',
+      'Standard CTI Allow Control of All Devices',
+      'Standard CTI Allow Control of Phones supporting Connected Xfer and conf',
+      'Standard CTI Enabled'
+    ];
+    return this.query(getDirGroup, true).then(dirgroup => {
+      if(dirgroup && dirgroup.length === 0) {
+        return this.query(addDirGroup, false)
+      } else {
+        cb(null, { exists: true });
+      }
+    }).then(r => {
+      if(!r) return;
+      return Promise.each(roles, r => {
+        return this.query(updateDirGroup.replace('%functionrole%', r), false);
+      }).then(() => this.query(
+        updatePermissions.replace('%userid%', this.profile.username), false
+      ))
+    })
   }
 
   parseResp(data: string):any {

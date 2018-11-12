@@ -51,10 +51,40 @@ let sqlDoc = (
       INNER JOIN enduserdirgroupmap as eudgm on eudgm.fkdirgroup = dg.pkid
       INNER JOIN enduser as eu on eu.pkid = eudgm.fkenduser
       WHERE eu.userid="%userid%"`
+  ),
+  getDirGroup = `SELECT name from dirgroup where name="IMPERIUM"`,
+  addDirGroup = (
+    `INSERT INTO dirgroup (name,pkid) VALUES(
+      "IMPERIUM",
+      newid()
+    )`
+  ),
+  updateDirGroup = (
+    `INSERT INTO functionroledirgroupmap (fkdirgroup,fkfunctionrole,pkid) VALUES(
+      (select pkid from dirgroup where name="IMPERIUM"),
+      (select pkid from functionrole where name="%functionrole%"),
+      newid()
+    )`
+  ),
+  updateWeb = (
+    `INSERT INTO devicexml4k (fkDevice,webenabled,pkid) VALUES(
+      (select pkid from device where name="%name%"),
+      "0",
+      newid()
+    )`
+  ),
+  updatePermissions = (
+    `INSERT INTO enduserdirgroupmap (fkenduser,fkdirgroup,pkid) VALUES(
+      (select pkid from enduser where userid="%userid%"),
+      (select pkid from dirgroup where name="IMPERIUM"),
+      newid()
+    )`
   );
 
 export {
   sqlDoc, axlHeaders, headers,
   phModelQuery, devAssQuery, updDevAssoc,
-  userPermissions, delDevAssoc
+  userPermissions, delDevAssoc, addDirGroup,
+  updateDirGroup, updatePermissions, getDirGroup,
+  updateWeb
 };

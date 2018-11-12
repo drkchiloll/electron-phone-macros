@@ -206,6 +206,11 @@ export const phone = (() => {
             displayName: 'Reset Security. Settings: Soft3/1/1 (8800/8900/9900)',
             type: 'key'
           });
+          keys.push({
+            name: 'Reset 8831',
+            displayName: 'Reset Security Settings: Soft4/2 (8831)',
+            type: 'key'
+          })
           keys.push({ type: 'dial', ...this.cmds.dial });
           keys.push({type: 'dial', ...this.cmds.sendDigits});
           keys.push({ type: 'init', ...this.cmds.init });
@@ -245,6 +250,7 @@ export const phone = (() => {
       element.appendChild(el);
     },
     generateXml(cmd) {
+      console.log(cmd);
       const d = (new builder()).createDocument(null, null, null),
         el1: Element = d.createElement('CiscoIPPhoneExecute');
       d.appendChild(
@@ -254,6 +260,9 @@ export const phone = (() => {
       );
       if(cmd.name === 'Key:Reset') {
         ['Soft3', 'Soft1', 'Soft1'].forEach(c =>
+          this.docBuilderHelper(d, el1, c));
+      } else if(cmd.name === 'Key:Reset 8831') {
+        ['Soft4', 'Soft2'].forEach(c =>
           this.docBuilderHelper(d, el1, c));
       } else if(cmd.name === 'Key:7900-StarStarPound') {
         ['KeyPadStar', 'KeyPadStar', 'KeyPadPound'].forEach(c =>
@@ -265,7 +274,6 @@ export const phone = (() => {
         this.docBuilderHelper(d, el1, cmd.name);
       }
       d.appendChild(el1);
-      console.log(d.toString());
       return d.toString();
     },
     saveMacro(macro) {

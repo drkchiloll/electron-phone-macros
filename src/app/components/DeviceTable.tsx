@@ -87,7 +87,7 @@ export class DeviceTable extends Component<any, any> {
           {devices.map((device: any, i: number) => (
             <TableRow
               key={i}
-              selectable={device.associated && check ? true : false}
+              selectable={!device.img ? false: device.associated && check ? true : false}
               selected={device.checked}
             >
               <TableRowColumn>

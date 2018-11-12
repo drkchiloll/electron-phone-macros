@@ -105,7 +105,6 @@ export const jtapi = (() => {
               });
             }
             if(registered) {
-              console.log(p);
               const name = p.macroName.toLowerCase() || 'undefined';
               if(p.device && p.device.model) {
                 const isDevice99 = p.device.model.startsWith('99'),
@@ -115,7 +114,6 @@ export const jtapi = (() => {
                     name: 'Key:Soft1'
                   });
                   t.sendData(cmd, (e, r) => {
-                    console.log(r);
                     return resolve(registered);
                   })
                 } else {
@@ -349,15 +347,12 @@ export const jtapi = (() => {
         auth: { username: account.username, password: account.password }
       }).then(({ data }) => {
         device = ris.parseResponse(data)[0];
-        console.log(device);
         return ModelEnum.get().then((models: any[]) => {
-          console.log(models);
           if(models.findIndex(m => m.modelnumber === device.modelNumber) !== -1) {
             device['model'] =
               models.find(m => m.modelnumber === device.modelNumber).modelname.replace(
                 'Cisco ', ''
               );
-            console.log(device);
           }
           return;
         });

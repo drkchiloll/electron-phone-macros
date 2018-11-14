@@ -5,7 +5,7 @@ import {
 } from './index';
 import { GridList, GridTile } from 'material-ui';
 import { DeviceTable } from './DeviceTable';
-import { SearchPanel } from './SearchPanel';
+import { SearchInputPanel } from './SearchInputPanel';
 import { MacroSelector } from './MacroSelector';
 import { ResultDocButton } from './ResultDocButton';
 import { ModelEnum } from '../lib/model-db';
@@ -97,7 +97,7 @@ export class MainView extends Component<any, any> {
     this.setState({ ipAddresses });
   }
 
-  queryClick = (event, indx) => {
+  updateSearchPanel = (event, indx) => {
     let { ipAddresses, devices } = this.state;
     if($(event.target).hasClass('fa-plus')) {
       if(indx === 0 && !ipAddresses[0]) return;
@@ -310,19 +310,14 @@ export class MainView extends Component<any, any> {
         <div style={{position: 'relative'}}>
           <div style={this.style().main}>
             <Paper zDepth={1} style={this.style().mainpaper}>
-              <SearchPanel
+              <SearchInputPanel
+                searching={searchLabel}
                 searches={ipAddresses}
                 changed={this.handleSearchChange}
-                query={this.queryClick}
+                updatePanel={this.updateSearchPanel}
                 cr={this.search}
               />
             </Paper>
-            <RaisedButton style={this.style().rbtn} label={searchLabel}
-              icon={this.searchIcon()}
-              disabled={disabled}
-              fullWidth={true}
-              disabledBackgroundColor='#ECEFF1'
-              onClick={this.search} />
             <RaisedButton
               label={executeJobLabel}
               icon={this.execIcon()}

@@ -4,7 +4,7 @@ import {
 } from './index';
 const storage = localStorage;
 
-export class SearchPanel extends Component<any, any> {
+export class SearchInputPanel extends Component<any, any> {
   public carriageTimeout;
   addToMemory = (req, indx) => {
     this.carriageTimeout = setTimeout(() => this.props.cr(), 1500);
@@ -31,10 +31,10 @@ export class SearchPanel extends Component<any, any> {
   };
   addToQuery = (e, index) => {
     clearTimeout(this.carriageTimeout);
-    this.props.query(e, index);
+    this.props.updatePanel(e, index);
   }
   render() {
-    const { searches } = this.props;
+    const { searches, searching } = this.props;
     return (
       <div>
         { searches.map((s: any, i: number) =>
@@ -70,6 +70,23 @@ export class SearchPanel extends Component<any, any> {
                 }}
                 onNewRequest={this.addToMemory}
               />
+              {
+                i === searches.length - 1 ?
+                  <IconButton
+                    style={{ position: 'absolute', bottom: 2, right: 65 }}
+                    iconClassName={
+                      !searching ?
+                        'fa fa-spinner fa-spin':
+                        'fa fa-search fa-lg'
+                    }
+                    iconStyle={{ color: !s ? 'grey': 'blue' }}
+                    disabled={(() => {
+                      if(!s) return true;
+                      return false;
+                    })()}
+                    onClick={this.props.cr}
+                  /> : null
+              }
               <IconButton className='fa-plus'
                 iconClassName='fa fa-plus'
                 iconStyle={{color: 'green'}}
@@ -80,7 +97,7 @@ export class SearchPanel extends Component<any, any> {
                 iconClassName='fa fa-minus'
                 iconStyle={{ color: 'red' }}
                 style={{position: 'absolute', bottom: 2, right: 0}}
-                onClick={e => this.props.query(e, i)}
+                onClick={e => this.props.updatePanel(e, i)}
               />
             </div>
           </div>

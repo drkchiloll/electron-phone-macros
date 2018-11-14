@@ -22,7 +22,7 @@ const menuItems = (macros: any, values: any) => {
       iconStyle={{ height: 19, width: 19 }}
       onClick={() => {
         let { x, y } = robot.getMousePos();
-        robot.moveMouseSmooth(x+50, y);
+        robot.moveMouseSmooth(x+95, y);
         robot.mouseClick();
         setTimeout(() => {
           $('#search_field_0').focus();
@@ -51,12 +51,13 @@ export const MacroSelector = props => {
   return (
     <SelectField
       id='macro-selector'
-      floatingLabelText={'SELECT MACROS TO RUN'}
+      floatingLabelText={'SELECT ONE OR MORE MACROS TO RUN'}
+      floatingLabelStyle={{color: 'red'}}
       multiple={true}
       value={values}
       onChange={props.change}
       fullWidth={true}
-      style={{marginLeft: 5, width: 'auto', minWidth: 335}}
+      style={{marginLeft: 5, width: 'auto', minWidth: 440}}
       menuStyle={{autoWidth: true}}
       underlineStyle={{borderBottomColor: fullBlack}}
       dropDownMenuProps={{

@@ -141,24 +141,14 @@ export const mainState = {
           if(devices && Object.keys(devices).length > 0) {
             return Promise.reduce(Object.keys(devices), (a: any, type: string) => {
               return Promise.map(devices[type], (d: any) => {
-                return cucm.query('', false).then(() => {
-                  if(!associations.find(({ devicename }) => devicename === d.name)) {
-                    let update = updateAssociated
-                      .replace('%userid%', username)
-                      .replace('%devicename%', d.name);
-                    return cucm.query(
-                      update,
-                      false
-                    ).then(result => {
-                      d['associated'] = true;
-                      return jtapi.getBackground(d.ip, d.model).then(bg => {
-                        if(bg) d.img = `data:image/png;base64,` +
-                          `${Buffer.from(bg).toString('base64')}`
-                        this.workEmitter.emit('device-update', devices);
-                        return d;
-                      });
-                    })
-                  } else {
+                if(!associations.find(({ devicename }) => devicename === d.name)) {
+                  let update = updateAssociated
+                    .replace('%userid%', username)
+                    .replace('%devicename%', d.name);
+                  return cucm.query(
+                    update,
+                    false
+                  ).then(result => {
                     d['associated'] = true;
                     return jtapi.getBackground(d.ip, d.model).then(bg => {
                       if(bg) d.img = `data:image/png;base64,` +
@@ -166,11 +156,19 @@ export const mainState = {
                       this.workEmitter.emit('device-update', devices);
                       return d;
                     });
-                  }
-                }).then(devices => {
-                  a[type] = devices;
-                  return a;
-                })
+                  })
+                } else {
+                  d['associated'] = true;
+                  return jtapi.getBackground(d.ip, d.model).then(bg => {
+                    if(bg) d.img = `data:image/png;base64,` +
+                      `${Buffer.from(bg).toString('base64')}`
+                    this.workEmitter.emit('device-update', devices);
+                    return d;
+                  });
+                }
+              }).then(devices => {
+                a[type] = devices;
+                return a;
               })
             }, {}).then((phones) => {
               this.workEmitter.emit('dev-upcomplete', phones);
